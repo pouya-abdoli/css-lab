@@ -1,0 +1,2640 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>What is CSS? — Lesson 01 · css.lab</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' fill='none' stroke='%23f07f4f' stroke-width='2'/%3E%3Crect x='8' y='8' width='16' height='16' fill='none' stroke='%23f2c14e' stroke-width='2'/%3E%3Crect x='13' y='13' width='6' height='6' fill='%2358a6ff'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ============ tokens ============ */
+      :root {
+        --bg: #0b0e15;
+        --panel: #121826;
+        --panel2: #0d1220;
+        --ink: #10141d;
+        --line: #222c40;
+        --line2: #31405e;
+        --text: #e9eef7;
+        --muted: #8d9ab0;
+        --faint: #5b6a84;
+        --margin-c: #f07f4f;
+        --margin-bg: rgba(240, 127, 79, 0.14);
+        --border-c: #f2c14e;
+        --border-bg: rgba(242, 193, 78, 0.16);
+        --padding-c: #3ecf8e;
+        --padding-bg: rgba(62, 207, 142, 0.14);
+        --content-c: #58a6ff;
+        --content-bg: rgba(88, 166, 255, 0.17);
+        --pink: #ff4f8b;
+        --page: #f7f4ee;
+        --page-ink: #1c1f26;
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: dark;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 15px;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+      ::selection {
+        background: rgba(88, 166, 255, 0.35);
+      }
+      .mono {
+        font-family: var(--mono);
+      }
+      section {
+        scroll-margin-top: 76px;
+      }
+      b {
+        font-weight: 600;
+      }
+
+      /* ambient background */
+      .bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            700px 460px at 12% -6%,
+            rgba(242, 193, 78, 0.07),
+            transparent 60%
+          ),
+          radial-gradient(
+            760px 520px at 92% 22%,
+            rgba(88, 166, 255, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            600px 480px at 40% 105%,
+            rgba(62, 207, 142, 0.05),
+            transparent 60%
+          );
+      }
+      .bg::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(233, 238, 247, 0.035) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(233, 238, 247, 0.035) 1px,
+            transparent 1px
+          );
+        background-size: 28px 28px;
+        mask-image: radial-gradient(
+          ellipse 120% 90% at 50% 0%,
+          #000 40%,
+          transparent 100%
+        );
+      }
+      .bg .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.5;
+        animation: drift 26s ease-in-out infinite alternate;
+      }
+      .bg .g1 {
+        width: 420px;
+        height: 420px;
+        left: -120px;
+        top: 30%;
+        background: rgba(240, 127, 79, 0.1);
+      }
+      .bg .g2 {
+        width: 460px;
+        height: 460px;
+        right: -140px;
+        top: 60%;
+        background: rgba(88, 166, 255, 0.1);
+        animation-delay: -12s;
+      }
+      @keyframes drift {
+        from {
+          transform: translateY(-30px);
+        }
+        to {
+          transform: translateY(40px);
+        }
+      }
+
+      /* ============ topbar ============ */
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 12px clamp(16px, 4vw, 44px);
+        background: rgba(11, 14, 21, 0.92);
+        border-bottom: 1px solid var(--line);
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: var(--disp);
+        font-weight: 700;
+      }
+      .logo {
+        width: 22px;
+        height: 22px;
+        border: 2px solid var(--margin-c);
+        position: relative;
+        flex: none;
+        transition: transform 0.4s;
+      }
+      .logo::before {
+        content: "";
+        position: absolute;
+        inset: 3px;
+        border: 2px solid var(--border-c);
+      }
+      .logo::after {
+        content: "";
+        position: absolute;
+        inset: 8px;
+        background: var(--content-c);
+      }
+      .brand:hover .logo {
+        transform: rotate(90deg);
+      }
+      .brand small {
+        color: var(--faint);
+        font-weight: 500;
+      }
+      .topbar nav {
+        display: flex;
+        gap: 4px;
+      }
+      .topbar nav a {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 6px 11px;
+        border-radius: 999px;
+        transition: 0.2s;
+      }
+      .topbar nav a:hover {
+        color: var(--text);
+        background: #161d2c;
+      }
+      .lesson-tag {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--border-c);
+        border: 1px dashed rgba(242, 193, 78, 0.45);
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .wrap {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: 0 clamp(16px, 4vw, 44px);
+      }
+
+      /* ============ intro ============ */
+      .intro {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        padding: clamp(40px, 7vh, 84px) 0 clamp(30px, 5vh, 56px);
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--padding-c);
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(2.3rem, 5.2vw, 3.7rem);
+        line-height: 1.06;
+        letter-spacing: -0.02em;
+      }
+      .word-style {
+        display: inline-block;
+        padding: 0.02em 0.22em;
+        background: var(--border-bg);
+        border: 0.06em solid var(--border-c);
+        border-radius: 0.14em;
+        color: #ffe3a1;
+        transition: transform 0.3s;
+        cursor: default;
+      }
+      .word-style:hover {
+        transform: rotate(-2deg) scale(1.03);
+      }
+      .lede {
+        color: var(--muted);
+        max-width: 56ch;
+        margin-top: 18px;
+        font-size: 1.05rem;
+      }
+      .lede b {
+        color: var(--text);
+      }
+      .css-full {
+        display: inline-block;
+        margin-top: 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--faint);
+        letter-spacing: 0.08em;
+      }
+
+      .intro-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 26px;
+        display: grid;
+        place-items: center;
+        gap: 14px;
+        box-shadow: 0 30px 60px -40px rgba(0, 0, 0, 0.8);
+      }
+      .idoc {
+        background: var(--page);
+        color: var(--page-ink);
+        width: 100%;
+        max-width: 330px;
+        border-radius: 12px;
+        padding: 24px 22px;
+        font-family: "Times New Roman", Times, serif;
+        transition: all 0.5s ease;
+      }
+      .idoc h2 {
+        font-size: 1.35em;
+        margin-bottom: 10px;
+      }
+      .idoc p {
+        font-size: 14px;
+        margin-bottom: 12px;
+        line-height: 1.35;
+      }
+      .idoc button {
+        font-family: inherit;
+        background: #e3e0da;
+        border: 2px solid #b9b5ac;
+        color: #1c1f26;
+        padding: 2px 10px;
+        font-size: 13px;
+      }
+      .idoc.styled {
+        font-family: var(--body);
+        box-shadow: 0 24px 44px -24px rgba(0, 0, 0, 0.7);
+      }
+      .idoc.styled h2 {
+        font-family: var(--disp);
+        color: #ff6b57;
+        letter-spacing: -0.01em;
+        margin-bottom: 8px;
+      }
+      .idoc.styled p {
+        line-height: 1.65;
+        color: #454b57;
+        margin-bottom: 16px;
+      }
+      .idoc.styled button {
+        background: #ff6b57;
+        border: none;
+        color: #fff;
+        border-radius: 999px;
+        padding: 8px 18px;
+        font-weight: 600;
+        font-size: 13px;
+      }
+      .imode {
+        font-size: 11px;
+        color: var(--faint);
+        letter-spacing: 0.1em;
+      }
+      .imode.on {
+        color: var(--padding-c);
+      }
+
+      /* ============ section heads ============ */
+      .sec {
+        padding: clamp(36px, 6vh, 64px) 0;
+      }
+      .sec-head {
+        margin-bottom: 26px;
+        max-width: 72ch;
+      }
+      .sec-head h2 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+        letter-spacing: -0.015em;
+        line-height: 1.15;
+      }
+      .sec-head .lede {
+        margin-top: 10px;
+      }
+
+      /* ============ generic bits ============ */
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 18px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .panel-head h3 {
+        font-family: var(--disp);
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dots i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dots i:nth-child(1) {
+        background: #f07f4f;
+      }
+      .dots i:nth-child(2) {
+        background: #f2c14e;
+      }
+      .dots i:nth-child(3) {
+        background: #3ecf8e;
+      }
+      .segmented {
+        position: relative;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 1fr;
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        padding: 3px;
+      }
+      .segmented button {
+        position: relative;
+        z-index: 1;
+        background: none;
+        border: 0;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        padding: 8px 6px;
+        cursor: pointer;
+        transition: color 0.25s;
+        border-radius: 8px;
+      }
+      .segmented button:hover {
+        color: var(--text);
+      }
+      .segmented button.active {
+        color: #fff;
+      }
+      .seg-thumb {
+        position: absolute;
+        top: 3px;
+        bottom: 3px;
+        left: 3px;
+        width: calc((100% - 6px) / 3);
+        background: #26334c;
+        border-radius: 8px;
+        transition:
+          transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+          width 0.28s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      }
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        outline: none;
+        cursor: pointer;
+        background: linear-gradient(
+          90deg,
+          var(--ac) var(--fill, 50%),
+          #232c40 var(--fill, 50%)
+        );
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        transition: transform 0.15s;
+      }
+      input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.15);
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+      }
+      .ctl {
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 8px 11px;
+        transition: 0.2s;
+      }
+      .ctl:hover {
+        background: #101725;
+        border-color: var(--line);
+      }
+      .ctl-top {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 7px;
+      }
+      .ctl-top label {
+        font-family: var(--mono);
+        font-size: 12.5px;
+        color: var(--text);
+      }
+      .ctl-val {
+        margin-left: auto;
+        font-family: var(--mono);
+        font-size: 12.5px;
+        color: var(--ac);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 2px 9px;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.85;
+        overflow-x: auto;
+      }
+      .t-tag {
+        color: #ff9d76;
+      }
+      .t-attr {
+        color: #7fe0b0;
+      }
+      .t-str {
+        color: #f2c14e;
+      }
+      .t-txt {
+        color: #c9d4e6;
+      }
+      .t-com {
+        color: #5b6a84;
+      }
+      .c-sel {
+        color: #7fe0b0;
+      }
+      .c-prop {
+        color: #8ab4ff;
+      }
+      .c-val {
+        color: #f2c14e;
+      }
+      .hl {
+        background: rgba(242, 193, 78, 0.14);
+        border-radius: 4px;
+        padding: 1px 4px;
+        box-shadow: 0 0 0 1px rgba(242, 193, 78, 0.25);
+      }
+
+      /* ============ 01 · powers ============ */
+      .powers-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 330px;
+        gap: 18px;
+        align-items: stretch;
+      }
+      .spec-stage {
+        padding: 30px;
+        display: grid;
+        place-items: center;
+        min-height: 400px;
+      }
+      .spec-page {
+        background: var(--page);
+        color: var(--page-ink);
+        width: 100%;
+        max-width: 440px;
+        border-radius: 12px;
+        padding: 26px 26px 30px;
+        font-family: "Times New Roman", Times, serif;
+        transition:
+          padding 0.4s,
+          box-shadow 0.4s;
+      }
+      .spec-page .spec-badge {
+        display: none;
+      }
+      .spec-h {
+        font-size: 1.5em;
+        font-weight: bold;
+        margin: 0 0 14px;
+      }
+      .spec-p {
+        margin: 0 0 14px;
+        line-height: 1.35;
+      }
+      .spec-a {
+        color: #0000ee;
+        text-decoration: underline;
+        display: block;
+        margin-bottom: 16px;
+      }
+      .spec-btn {
+        font-family: inherit;
+        background: #e3e0da;
+        border: 2px solid #b9b5ac;
+        color: #1c1f26;
+        padding: 2px 10px;
+        border-radius: 0;
+        cursor: pointer;
+        font-size: 14px;
+      }
+      #spec.fx-type {
+        font-family: var(--body);
+      }
+      #spec.fx-type .spec-h {
+        font-family: var(--disp);
+        letter-spacing: -0.02em;
+      }
+      #spec.fx-color .spec-h {
+        color: #ff6b57;
+      }
+      #spec.fx-color .spec-a {
+        color: #0d8a72;
+      }
+      #spec.fx-color .spec-btn {
+        background: #ff6b57;
+        border-color: #ff6b57;
+        color: #fff;
+      }
+      #spec.fx-space {
+        padding: 38px 34px 44px;
+      }
+      #spec.fx-space .spec-h {
+        margin: 0 0 10px;
+      }
+      #spec.fx-space .spec-p {
+        line-height: 1.75;
+        margin: 0 0 20px;
+      }
+      #spec.fx-comp .spec-a {
+        text-decoration: none;
+        display: inline-block;
+        border-bottom: 2px solid currentColor;
+        padding-bottom: 1px;
+      }
+      #spec.fx-comp .spec-btn {
+        border-radius: 999px;
+        padding: 10px 22px;
+        font-weight: 600;
+        border: none;
+      }
+      #spec.fx-motion .spec-badge {
+        display: inline-block;
+        background: #ffd166;
+        color: #4a3a00;
+        font: 600 11px var(--body);
+        padding: 4px 12px;
+        border-radius: 999px;
+        margin-bottom: 14px;
+        animation: bob 1.6s ease-in-out infinite;
+      }
+      @keyframes bob {
+        50% {
+          transform: translateY(-6px);
+        }
+      }
+      .powers-side {
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .switch-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        background: var(--panel2);
+        border: 1px dashed var(--line2);
+        border-radius: 12px;
+        padding: 14px 16px;
+      }
+      .switch {
+        position: relative;
+        width: 66px;
+        height: 34px;
+        border-radius: 999px;
+        background: #232c40;
+        border: 1px solid var(--line2);
+        cursor: pointer;
+        transition: 0.3s;
+        flex: none;
+      }
+      .switch .knob {
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: #8d9ab0;
+        transition: 0.3s;
+      }
+      .switch.on {
+        background: rgba(62, 207, 142, 0.22);
+        border-color: var(--padding-c);
+      }
+      .switch.on .knob {
+        left: 35px;
+        background: var(--padding-c);
+        box-shadow: 0 0 14px rgba(62, 207, 142, 0.6);
+      }
+      .switch-row .lab {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .switch-row .lab b {
+        display: block;
+        font-size: 14px;
+        color: var(--text);
+      }
+      #powerState {
+        margin-left: auto;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--faint);
+        letter-spacing: 0.12em;
+      }
+      #powerState.on {
+        color: var(--padding-c);
+      }
+      .grp {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .powers-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .power {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: var(--mono);
+        font-size: 12.5px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        padding: 10px 14px;
+        border-radius: 11px;
+        cursor: pointer;
+        transition: 0.2s;
+        text-align: left;
+        width: 100%;
+      }
+      .power i {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--pc);
+        flex: none;
+      }
+      .power small {
+        margin-left: auto;
+        color: var(--faint);
+        font-size: 10.5px;
+      }
+      .power:hover {
+        color: var(--text);
+        border-color: var(--pc);
+        transform: translateX(4px);
+      }
+      .powers-hint {
+        font-size: 12px;
+        color: var(--faint);
+      }
+
+      /* ============ 02 · html vs css ============ */
+      .versus {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 16px;
+        align-items: stretch;
+      }
+      .code-pane {
+        padding: 20px 0;
+      }
+      .ln {
+        display: block;
+        padding: 3px 20px;
+        border-left: 3px solid transparent;
+        transition: 0.15s;
+        cursor: default;
+        white-space: pre;
+      }
+      .ln:hover,
+      .ln.hot {
+        background: rgba(88, 166, 255, 0.08);
+        border-left-color: var(--content-c);
+      }
+      .pv-pane {
+        padding: 26px;
+        display: grid;
+        place-items: center;
+      }
+      .pv-page {
+        background: var(--page);
+        color: var(--page-ink);
+        border-radius: 12px;
+        width: 100%;
+        max-width: 340px;
+        padding: 26px;
+        font-family: var(--body);
+      }
+      .pv-page h2 {
+        font-family: var(--disp);
+        color: #ff6b57;
+        font-size: 1.4rem;
+        margin-bottom: 8px;
+        transition: 0.15s;
+        border-radius: 6px;
+      }
+      .pv-page p {
+        color: #454b57;
+        line-height: 1.65;
+        margin-bottom: 14px;
+        font-size: 14px;
+        transition: 0.15s;
+        border-radius: 6px;
+      }
+      .pv-page a {
+        color: #0d8a72;
+        border-bottom: 2px solid currentColor;
+        text-decoration: none;
+        margin-right: 16px;
+        transition: 0.15s;
+        border-radius: 4px;
+      }
+      .pv-page button {
+        background: #ff6b57;
+        color: #fff;
+        border: none;
+        border-radius: 999px;
+        padding: 9px 20px;
+        font-weight: 600;
+        font-family: var(--body);
+        cursor: pointer;
+        transition: 0.15s;
+      }
+      .pv-page [data-el].hot {
+        box-shadow:
+          0 0 0 2px var(--content-c),
+          0 0 22px rgba(88, 166, 255, 0.35);
+      }
+      .versus-mid {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        color: var(--faint);
+        font-family: var(--mono);
+        font-size: 11px;
+      }
+      .versus-mid .plus {
+        width: 44px;
+        height: 44px;
+        border: 1px solid var(--line2);
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: var(--border-c);
+        font-size: 18px;
+        background: var(--ink);
+      }
+      .role-row {
+        display: flex;
+        gap: 14px;
+        margin-top: 16px;
+        flex-wrap: wrap;
+      }
+      .role {
+        flex: 1;
+        min-width: 250px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 14px 18px;
+        background: var(--panel);
+      }
+      .role b {
+        font-family: var(--mono);
+        font-size: 13px;
+        display: block;
+        margin-bottom: 3px;
+      }
+      .role span {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .role.html b {
+        color: #ff9d76;
+      }
+      .role.css b {
+        color: #7fe0b0;
+      }
+
+      /* ============ 03 · three ways ============ */
+      .ways-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: clamp(18px, 3vw, 28px);
+      }
+      .ways-top {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 22px;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+      .swatches {
+        display: flex;
+        gap: 8px;
+      }
+      .swatch {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+        background: var(--sw);
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .swatch:hover {
+        transform: translateY(-3px);
+      }
+      .swatch.on {
+        border-color: #fff;
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
+      }
+      #segWay {
+        max-width: 420px;
+      }
+      .ways-grid {
+        display: grid;
+        grid-template-columns: 1.25fr 0.75fr;
+        gap: 18px;
+        align-items: start;
+      }
+      .way-code {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        overflow: hidden;
+      }
+      .way-code .panel-head b {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--border-c);
+        font-weight: 500;
+      }
+      .way-code pre {
+        padding: 18px 20px;
+        min-height: 280px;
+      }
+      .file-card {
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        margin-bottom: 12px;
+        overflow: hidden;
+        background: var(--ink);
+      }
+      .file-card:last-child {
+        margin-bottom: 0;
+      }
+      .file-name {
+        font-size: 11px;
+        color: var(--padding-c);
+        background: #151c2b;
+        padding: 6px 14px;
+        border-bottom: 1px solid var(--line);
+      }
+      .file-card pre {
+        padding: 12px 16px;
+        min-height: 0;
+      }
+      .way-side {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .way-map {
+        display: none;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px;
+        background: var(--panel2);
+        border: 1px dashed var(--line2);
+        border-radius: 12px;
+        padding: 14px;
+      }
+      .way-map.on {
+        display: flex;
+      }
+      .fchip {
+        font-family: var(--mono);
+        font-size: 11.5px;
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 6px 12px;
+        color: var(--text);
+      }
+      .fchip em {
+        font-style: normal;
+        color: var(--border-c);
+      }
+      .farrow {
+        color: var(--border-c);
+        font-family: var(--mono);
+      }
+      .way-notes {
+        display: none;
+        list-style: none;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .way-notes.on {
+        display: flex;
+      }
+      .way-notes li {
+        font-size: 13px;
+        color: var(--muted);
+        padding-left: 22px;
+        position: relative;
+      }
+      .way-notes li::before {
+        position: absolute;
+        left: 0;
+        font-family: var(--mono);
+      }
+      .way-notes li.good::before {
+        content: "✓";
+        color: var(--padding-c);
+      }
+      .way-notes li.bad::before {
+        content: "✗";
+        color: var(--margin-c);
+      }
+      .verdict {
+        font-family: var(--mono);
+        font-size: 12px;
+        border-radius: 10px;
+        padding: 10px 14px;
+        border: 1px solid var(--line);
+        background: var(--ink);
+        color: var(--muted);
+      }
+      .verdict.good {
+        color: var(--padding-c);
+        border-color: rgba(62, 207, 142, 0.45);
+      }
+      .verdict.bad {
+        color: var(--margin-c);
+        border-color: rgba(240, 127, 79, 0.4);
+      }
+
+      /* ============ 04 · loading ============ */
+      .load-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: clamp(18px, 3vw, 28px);
+        display: grid;
+        grid-template-columns: 0.9fr 1.1fr;
+        gap: 26px;
+      }
+      .steps {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-bottom: 16px;
+      }
+      .steps li {
+        display: flex;
+        gap: 12px;
+        align-items: baseline;
+        font-size: 13.5px;
+        color: var(--muted);
+        padding: 9px 13px;
+        border-radius: 10px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .steps li:hover {
+        background: #101725;
+      }
+      .steps li .n {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--faint);
+        flex: none;
+      }
+      .steps li.active {
+        color: var(--text);
+        background: #101725;
+        border-color: var(--line2);
+      }
+      .steps li.active .n {
+        color: var(--border-c);
+      }
+      .steps li.done .n {
+        color: var(--padding-c);
+      }
+      .step-cap {
+        font-size: 13.5px;
+        color: var(--muted);
+        background: var(--panel2);
+        border: 1px dashed var(--line2);
+        border-radius: 12px;
+        padding: 14px 16px;
+        min-height: 84px;
+        margin-bottom: 14px;
+      }
+      .step-cap b {
+        color: var(--border-c);
+      }
+      .step-ctl {
+        display: flex;
+        gap: 8px;
+      }
+      .step-ctl button {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 9px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .step-ctl button:hover {
+        color: var(--text);
+        border-color: var(--content-c);
+        transform: translateY(-2px);
+      }
+      .step-ctl button.playing {
+        color: var(--padding-c);
+        border-color: var(--padding-c);
+      }
+      .net {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin: 12px 0 22px;
+      }
+      .node {
+        border: 1px solid var(--line2);
+        background: var(--ink);
+        border-radius: 10px;
+        padding: 12px 16px;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--muted);
+        text-align: center;
+        flex: none;
+      }
+      .node b {
+        display: block;
+        color: var(--text);
+        font-size: 12px;
+        margin-top: 2px;
+      }
+      .wire {
+        flex: 1;
+        position: relative;
+        border-top: 1px dashed var(--line2);
+      }
+      .packet {
+        position: absolute;
+        top: -6px;
+        left: 4%;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: var(--border-c);
+        box-shadow: 0 0 14px rgba(242, 193, 78, 0.8);
+        transform: translateX(-50%);
+        transition: left 0.7s ease-in-out;
+      }
+      .load-mini {
+        position: relative;
+        background: var(--page);
+        border-radius: 12px;
+        padding: 22px;
+        min-height: 210px;
+        color: var(--page-ink);
+        font-family: "Times New Roman", serif;
+        overflow: hidden;
+      }
+      .lm-skel {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding-top: 8px;
+        transition: opacity 0.4s;
+      }
+      .lm-skel i {
+        display: block;
+        height: 14px;
+        border-radius: 4px;
+        background: linear-gradient(
+          90deg,
+          #e6e2d8 25%,
+          #f2efe6 50%,
+          #e6e2d8 75%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.2s linear infinite;
+      }
+      .lm-skel i:nth-child(1) {
+        width: 55%;
+        height: 22px;
+      }
+      .lm-skel i:nth-child(3) {
+        width: 80%;
+      }
+      .lm-skel i:nth-child(4) {
+        width: 35%;
+      }
+      @keyframes shimmer {
+        to {
+          background-position: -200% 0;
+        }
+      }
+      .lm-real {
+        opacity: 0;
+        transition: opacity 0.5s;
+      }
+      .lm-real h3 {
+        font-size: 1.35em;
+        margin-bottom: 10px;
+      }
+      .lm-real p {
+        font-size: 14px;
+        line-height: 1.4;
+        margin-bottom: 12px;
+      }
+      .lm-real a {
+        color: #0000ee;
+        text-decoration: underline;
+        margin-right: 14px;
+      }
+      .lm-real button {
+        font-family: inherit;
+        background: #e3e0da;
+        border: 2px solid #b9b5ac;
+        padding: 2px 10px;
+        font-size: 13px;
+      }
+      .load-mini.show-html .lm-skel {
+        opacity: 0;
+        position: absolute;
+        inset: 22px;
+      }
+      .load-mini.show-html .lm-real {
+        opacity: 1;
+      }
+      .load-mini.styled {
+        font-family: var(--body);
+      }
+      .load-mini.styled h3 {
+        font-family: var(--disp);
+        color: #ff6b57;
+      }
+      .load-mini.styled p {
+        color: #454b57;
+        line-height: 1.65;
+      }
+      .load-mini.styled a {
+        color: #0d8a72;
+        text-decoration: none;
+        border-bottom: 2px solid currentColor;
+      }
+      .load-mini.styled button {
+        background: #ff6b57;
+        color: #fff;
+        border: none;
+        border-radius: 999px;
+        padding: 8px 18px;
+        font-weight: 600;
+      }
+      .fetch-note {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: #4a3a00;
+        background: #ffd166;
+        border-radius: 999px;
+        padding: 4px 12px;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      .fetch-note.on {
+        opacity: 1;
+        animation: bob 1.2s ease-in-out infinite;
+      }
+      .ins-note {
+        font-size: 12px;
+        color: var(--faint);
+        margin-top: 14px;
+      }
+      .ins-note b {
+        color: var(--border-c);
+      }
+
+      /* ============ 05 · syntax ============ */
+      .syntax-grid {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 18px;
+        align-items: start;
+        margin-bottom: 18px;
+      }
+      .anat {
+        padding: 26px;
+        margin-top: 80px;
+      }
+      .anat-rule {
+        font-size: clamp(15px, 2vw, 19px);
+        line-height: 2;
+        padding: 8px 4px;
+      }
+      .an {
+        cursor: default;
+        padding: 1px 4px;
+        border-radius: 5px;
+        transition: 0.15s;
+      }
+      .an.hot {
+        background: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 0 0 1px var(--line2);
+      }
+      .an[data-part="sel"] {
+        color: #7fe0b0;
+      }
+      .an[data-part="prop"] {
+        color: #8ab4ff;
+      }
+      .an[data-part="val"] {
+        color: #f2c14e;
+      }
+      .an[data-part="brace"],
+      .an[data-part="colon"] {
+        color: #c9d4e6;
+      }
+      .an[data-part="semi"] {
+        color: #8d9ab0;
+      }
+      .an[data-part="semi"].hot {
+        color: var(--margin-c);
+      }
+      .anat-note {
+        border-top: 1px dashed var(--line2);
+        margin-top: 14px;
+        padding-top: 14px;
+        font-size: 13px;
+        color: var(--muted);
+        min-height: 58px;
+      }
+      .anat-note b {
+        color: var(--border-c);
+      }
+      .builder {
+        padding: 22px;
+      }
+      .k {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--faint);
+        display: block;
+        margin-bottom: 9px;
+      }
+      .build-row {
+        margin-bottom: 16px;
+      }
+      #segSel {
+        max-width: 340px;
+      }
+      .decls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .decl {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 7px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .decl:hover {
+        color: var(--text);
+        border-color: var(--border-c);
+        transform: translateY(-2px);
+      }
+      .decl.on {
+        color: #0e1017;
+        background: var(--border-c);
+        border-color: var(--border-c);
+        font-weight: 600;
+      }
+      .ghost {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--faint);
+        background: none;
+        border: 1px dashed var(--line2);
+        border-radius: 8px;
+        padding: 6px 12px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .ghost:hover {
+        color: var(--margin-c);
+        border-color: var(--margin-c);
+      }
+      .build-out {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-top: 6px;
+      }
+      .build-out pre {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 16px;
+        min-height: 170px;
+      }
+      .bp-page {
+        background: var(--page);
+        color: var(--page-ink);
+        border-radius: 12px;
+        padding: 24px;
+        font-family: "Times New Roman", serif;
+        min-height: 170px;
+        display: grid;
+        place-items: center;
+        text-align: center;
+      }
+      .bp-page h1 {
+        font-size: 2em;
+        font-weight: bold;
+      }
+      .bp-page p {
+        line-height: 1.4;
+        max-width: 32ch;
+      }
+      .bp-page button {
+        font-family: inherit;
+        background: #e3e0da;
+        border: 2px solid #b9b5ac;
+        padding: 3px 14px;
+        font-size: 14px;
+      }
+      .bp-page * {
+        transition: all 0.25s ease;
+      }
+
+      /* ============ field notes ============ */
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 16px;
+      }
+      .note-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.3s,
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+      .note-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--nc);
+        opacity: 0.85;
+      }
+      .note-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--nc);
+        box-shadow: 0 24px 44px -28px rgba(0, 0, 0, 0.85);
+      }
+      .note-card h3 {
+        font-family: var(--mono);
+        font-size: 15px;
+        color: var(--nc);
+        margin-bottom: 8px;
+      }
+      .note-card p {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .note-tip {
+        margin-top: 12px;
+        font-size: 11px;
+        color: var(--faint);
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+      }
+      .note-demo {
+        height: 104px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        overflow: hidden;
+      }
+      .demo-paint {
+        display: flex;
+        gap: 8px;
+      }
+      .demo-paint i {
+        width: 26px;
+        height: 44px;
+        border-radius: 6px;
+        background: #39415a;
+        transition: 0.4s;
+        margin-left: 20px;
+      }
+      .note-card:hover .demo-paint i:nth-child(1) {
+        background: var(--margin-c);
+      }
+      .note-card:hover .demo-paint i:nth-child(2) {
+        background: var(--border-c);
+        transition-delay: 0.08s;
+      }
+      .note-card:hover .demo-paint i:nth-child(3) {
+        background: var(--padding-c);
+        transition-delay: 0.16s;
+      }
+      .note-card:hover .demo-paint i:nth-child(4) {
+        background: var(--content-c);
+        transition-delay: 0.24s;
+      }
+      .demo-syntax {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: #c9d4e6;
+      }
+      .demo-syntax .tk {
+        display: inline-block;
+        transition: transform 0.35s;
+        transform: translateY(5px);
+        opacity: 0.35;
+      }
+      .note-card:hover .demo-syntax .tk {
+        transform: none;
+        opacity: 1;
+      }
+      .note-card:hover .demo-syntax .tk:nth-child(2) {
+        transition-delay: 0.06s;
+      }
+      .note-card:hover .demo-syntax .tk:nth-child(3) {
+        transition-delay: 0.12s;
+      }
+      .note-card:hover .demo-syntax .tk:nth-child(4) {
+        transition-delay: 0.18s;
+      }
+      .demo-methods {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+      .demo-methods i {
+        font-style: normal;
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--muted);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 4px 10px;
+        transition: 0.3s;
+      }
+      .note-card:hover .demo-methods i.win {
+        color: var(--padding-c);
+        border-color: var(--padding-c);
+        box-shadow: 0 0 14px rgba(62, 207, 142, 0.25);
+      }
+      .demo-load {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--muted);
+        position: relative;
+        padding: 10px 16px;
+        border: 1px dashed var(--line2);
+        border-radius: 9px;
+      }
+      .demo-load::after {
+        content: "";
+        position: absolute;
+        left: 10%;
+        right: 10%;
+        bottom: -9px;
+        height: 2px;
+        border-radius: 2px;
+        background: var(--content-c);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.6s ease;
+      }
+      .note-card:hover .demo-load::after {
+        transform: scaleX(1);
+      }
+
+      /* ============ lesson nav ============ */
+      .lesson-nav {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px clamp(18px, 3vw, 28px);
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+        align-items: center;
+      }
+      .ln-status {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--padding-c);
+        border: 1px solid rgba(62, 207, 142, 0.45);
+        border-radius: 999px;
+        padding: 3px 10px;
+      }
+      .lesson-nav h3 {
+        font-family: var(--disp);
+        font-size: 17px;
+        margin-top: 8px;
+      }
+      .ln-track {
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .tick {
+        width: 7px;
+        height: 15px;
+        border-radius: 2px;
+        background: #212a3e;
+        transition: 0.2s;
+      }
+      .tick.done {
+        background: var(--padding-c);
+        box-shadow: 0 0 8px rgba(62, 207, 142, 0.55);
+      }
+      .tick:hover {
+        background: var(--line2);
+      }
+      .ln-next {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        text-align: right;
+      }
+      .ln-next span {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .ln-next b {
+        font-family: var(--disp);
+        font-size: 15px;
+        color: var(--muted);
+      }
+      .ln-next .soon {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--border-c);
+        border: 1px dashed rgba(242, 193, 78, 0.4);
+        border-radius: 999px;
+        padding: 2px 9px;
+      }
+
+      footer {
+        border-top: 1px solid var(--line);
+        margin-top: 40px;
+        padding: 30px 0 44px;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+        color: var(--faint);
+        font-size: 12.5px;
+      }
+      footer .mono {
+        font-size: 11.5px;
+      }
+      footer .sp {
+        margin-left: auto;
+      }
+
+      .reveal {
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+
+      @media (max-width: 1020px) {
+        .intro {
+          grid-template-columns: 1fr;
+        }
+        .powers-grid,
+        .syntax-grid {
+          grid-template-columns: 1fr;
+        }
+        .versus {
+          grid-template-columns: 1fr;
+        }
+        .versus-mid {
+          flex-direction: row;
+          padding: 6px 0;
+        }
+        .ways-grid {
+          grid-template-columns: 1fr;
+        }
+        .ways-top {
+          grid-template-columns: 1fr;
+        }
+        .load-panel {
+          grid-template-columns: 1fr;
+        }
+        .build-out {
+          grid-template-columns: 1fr;
+        }
+        .lesson-nav {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .ln-next {
+          align-items: center;
+        }
+        .topbar nav {
+          display: none;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg">
+      <span class="glow g1"></span><span class="glow g2"></span>
+    </div>
+
+    <header class="topbar">
+      <div class="brand"></div>
+      <span class="lesson-tag">lesson 01 / 45</span>
+      <nav>
+        <a href="#does">what-it-does</a>
+        <a href="#versus">html-vs-css</a>
+        <a href="#methods">methods</a>
+        <a href="#loading">loading</a>
+        <a href="#syntax">syntax</a>
+        <a href="#notes">cheat-codes</a>
+      </nav>
+    </header>
+
+    <div class="wrap">
+      <!-- ============ intro ============ -->
+      <section class="intro">
+        <div>
+          <p class="eyebrow">lesson 01 · interactive</p>
+          <h1>
+            HTML builds the page. CSS makes it
+            <span class="word-style">beautiful</span>.
+          </h1>
+          <p class="lede">
+            CSS — <b>Cascading Style Sheets</b> — is the design language of the
+            web. It takes plain documents and gives them color, shape, rhythm
+            and motion. In this lesson you'll see exactly <b>what CSS does</b>,
+            <b>where it lives</b>, <b>how the browser loads it</b>, and how to
+            write your <b>first rule</b>.
+          </p>
+          <span class="css-full">C · ASCADING · S · TYLE · S · HEETS</span>
+        </div>
+        <div class="intro-panel">
+          <div class="idoc" id="introDoc">
+            <h2>Aurora Coffee</h2>
+            <p>Small-batch beans, roasted every Tuesday.</p>
+            <button>Order a bag</button>
+          </div>
+          <p class="imode mono" id="introMode">
+            styles: off — this is raw html
+          </p>
+        </div>
+      </section>
+
+      <!-- ============ 01 · what css does ============ -->
+      <section id="does" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">01 · what css does</p>
+          <h2>One switch, five superpowers</h2>
+          <p class="lede">
+            The same boring document, on the operating table. Flip the switch —
+            or hover a single power to see it work in isolation.
+          </p>
+        </div>
+        <div class="powers-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>live specimen</h3>
+            </div>
+            <div class="spec-stage">
+              <div class="spec-page" id="spec">
+                <span class="spec-badge">★ fresh roast</span>
+                <h2 class="spec-h">Aurora Coffee</h2>
+                <p class="spec-p">
+                  Small-batch beans, roasted every Tuesday and shipped within 24
+                  hours. No subscriptions, no nonsense — just very good coffee.
+                </p>
+                <a class="spec-a" href="#">Read our story →</a>
+                <button class="spec-btn">Order a bag</button>
+              </div>
+            </div>
+          </div>
+          <aside class="panel powers-side">
+            <div class="switch-row">
+              <button class="switch" id="powerSwitch" aria-pressed="false">
+                <span class="knob"></span>
+              </button>
+              <span class="lab"><b>CSS</b>on / off</span>
+              <span id="powerState">OFF</span>
+            </div>
+            <p class="grp">isolate one power — hover</p>
+            <div class="powers-list">
+              <button
+                class="power"
+                data-fx="color"
+                style="--pc: var(--margin-c)"
+              >
+                <i></i>color &amp; mood<small>paint</small>
+              </button>
+              <button
+                class="power"
+                data-fx="type"
+                style="--pc: var(--content-c)"
+              >
+                <i></i>typography<small>fonts</small>
+              </button>
+              <button
+                class="power"
+                data-fx="space"
+                style="--pc: var(--padding-c)"
+              >
+                <i></i>spacing<small>rhythm</small>
+              </button>
+              <button
+                class="power"
+                data-fx="comp"
+                style="--pc: var(--border-c)"
+              >
+                <i></i>components<small>buttons, links</small>
+              </button>
+              <button class="power" data-fx="motion" style="--pc: var(--pink)">
+                <i></i>motion<small>animation</small>
+              </button>
+            </div>
+            <p class="powers-hint">
+              Tip: switch CSS off, then hover the powers one by one to see what
+              each one contributes.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 02 · html vs css ============ -->
+      <section id="versus" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">02 · html vs css</p>
+          <h2>Structure meets style</h2>
+          <p class="lede">
+            Hover any line of HTML — its styled twin lights up in the preview.
+            Two languages, one team: HTML names the parts, CSS decides how they
+            look.
+          </p>
+        </div>
+        <div class="versus">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>index.html — structure</h3>
+            </div>
+            <pre
+              class="code-pane"
+              id="htmlCode"
+            ><span class="ln">&lt;<span class="t-tag">article</span> <span class="t-attr">class</span>=<span class="t-str">"card"</span>&gt;</span><span class="ln" data-el="h2">  &lt;<span class="t-tag">h2</span>&gt;<span class="t-txt">Aurora Coffee</span>&lt;/<span class="t-tag">h2</span>&gt;</span><span class="ln" data-el="p">  &lt;<span class="t-tag">p</span>&gt;<span class="t-txt">Small-batch beans, roasted…</span>&lt;/<span class="t-tag">p</span>&gt;</span><span class="ln" data-el="a">  &lt;<span class="t-tag">a</span> <span class="t-attr">href</span>=<span class="t-str">"/story"</span>&gt;<span class="t-txt">Read our story</span>&lt;/<span class="t-tag">a</span>&gt;</span><span class="ln" data-el="button">  &lt;<span class="t-tag">button</span>&gt;<span class="t-txt">Order a bag</span>&lt;/<span class="t-tag">button</span>&gt;</span><span class="ln">&lt;/<span class="t-tag">article</span>&gt;</span></pre>
+          </div>
+          <div class="versus-mid">
+            <span>html</span>
+            <span class="plus">+</span>
+            <span class="mono" style="color: var(--padding-c)">styles.css</span>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>what visitors see — presentation</h3>
+            </div>
+            <div class="pv-pane">
+              <div class="pv-page" id="livePreview">
+                <h2 data-el="h2">Aurora Coffee</h2>
+                <p data-el="p">Small-batch beans, roasted every Tuesday.</p>
+                <a data-el="a" href="#">Read our story</a>
+                <button data-el="button">Order a bag</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="role-row">
+          <div class="role html">
+            <b>HTML = the nouns</b
+            ><span
+              >Headings, paragraphs, links, buttons. It decides
+              <i>what things are</i> and in what order — nothing about how they
+              look.</span
+            >
+          </div>
+          <div class="role css">
+            <b>CSS = the adjectives</b
+            ><span
+              >Colors, sizes, fonts, spacing, motion. It decides
+              <i>how things look</i> — without touching the content
+              itself.</span
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 03 · three ways ============ -->
+      <section id="methods" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">03 · inline · internal · external</p>
+          <h2>Where does CSS live?</h2>
+          <p class="lede">
+            One rule, three possible homes. Pick a color and a size, then switch
+            tabs to watch the exact same styles move between the tag, the page,
+            and a separate file.
+          </p>
+        </div>
+        <div class="ways-panel">
+          <div class="ways-top">
+            <div>
+              <p class="grp" style="margin-bottom: 9px">pick a color</p>
+              <div class="swatches" id="swatches">
+                <button
+                  class="swatch on"
+                  data-c="#ff6b57"
+                  style="--sw: #ff6b57"
+                  aria-label="coral"
+                ></button>
+                <button
+                  class="swatch"
+                  data-c="#58a6ff"
+                  style="--sw: #58a6ff"
+                  aria-label="sky"
+                ></button>
+                <button
+                  class="swatch"
+                  data-c="#3ecf8e"
+                  style="--sw: #3ecf8e"
+                  aria-label="leaf"
+                ></button>
+                <button
+                  class="swatch"
+                  data-c="#f2c14e"
+                  style="--sw: #f2c14e"
+                  aria-label="gold"
+                ></button>
+              </div>
+            </div>
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rSize">font-size</label
+                ><output class="ctl-val" id="vSize">18px</output>
+              </div>
+              <input type="range" id="rSize" min="12" max="28" value="18" />
+            </div>
+            <div class="segmented" id="segWay">
+              <span class="seg-thumb"></span>
+              <button data-v="inline" class="active">inline</button>
+              <button data-v="internal">internal</button>
+              <button data-v="external">external</button>
+            </div>
+          </div>
+          <div class="ways-grid">
+            <div class="way-code">
+              <div class="panel-head">
+                <span class="dots"><i></i><i></i><i></i></span
+                ><b id="wayFile">index.html</b>
+              </div>
+              <pre id="wayCode"></pre>
+            </div>
+            <div class="way-side">
+              <div class="way-map on" data-way="inline">
+                <span class="fchip">index.html</span>
+                <span class="farrow">→</span>
+                <span class="fchip">style lives <em>inside the tag</em></span>
+              </div>
+              <div class="way-map" data-way="internal">
+                <span class="fchip">index.html</span>
+                <span class="farrow">→</span>
+                <span class="fchip"
+                  >&lt;<em>style</em>&gt; block in &lt;head&gt;</span
+                >
+              </div>
+              <div class="way-map" data-way="external">
+                <span class="fchip">index.html</span>
+                <span class="farrow">— &lt;link&gt; →</span>
+                <span class="fchip"><em>styles.css</em></span>
+              </div>
+              <ul class="way-notes on" data-way="inline">
+                <li class="good">Instant — no extra files, works right away</li>
+                <li class="bad">Copy-pasted onto every single element</li>
+                <li class="bad">Can't be cached or reused anywhere</li>
+              </ul>
+              <ul class="way-notes" data-way="internal">
+                <li class="good">
+                  Everything stays in one file — handy for demos
+                </li>
+                <li class="bad">
+                  Must be duplicated into every page of the site
+                </li>
+                <li class="bad">Mixes design into your structure</li>
+              </ul>
+              <ul class="way-notes" data-way="external">
+                <li class="good">One stylesheet styles the entire site</li>
+                <li class="good">
+                  Browsers cache it — later pages load faster
+                </li>
+                <li class="good">Clean separation: content vs. design</li>
+              </ul>
+              <p class="verdict bad" id="wayVerdict">
+                verdict: emergencies only
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 04 · how css is loaded ============ -->
+      <section id="loading" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">04 · how css is loaded</p>
+          <h2>Follow the stylesheet from server to screen</h2>
+          <p class="lede">
+            Step through a real page load. Notice step 3 — when the browser
+            meets the
+            <span class="mono" style="color: var(--border-c)"
+              >&lt;link&gt;</span
+            >
+            tag, it <b>pauses painting</b> until the CSS arrives. That's called
+            <b>render-blocking</b>, and it's a feature: no flash of unstyled
+            content.
+          </p>
+        </div>
+        <div class="load-panel">
+          <div>
+            <ol class="steps" id="steps">
+              <li class="active"><span class="n">01</span>you hit enter</li>
+              <li><span class="n">02</span>browser requests index.html</li>
+              <li><span class="n">03</span>server sends the HTML</li>
+              <li>
+                <span class="n">04</span>&lt;link&gt; found → fetch styles.css
+              </li>
+              <li><span class="n">05</span>CSS applied → page paints</li>
+            </ol>
+            <p class="step-cap" id="stepCap"></p>
+            <div class="step-ctl">
+              <button id="stepPrev">← prev</button>
+              <button id="stepPlay">▶ autoplay</button>
+              <button id="stepNext">next →</button>
+            </div>
+            <p class="ins-note">
+              That's why <b>&lt;link&gt; belongs in &lt;head&gt;</b> — so styles
+              arrive before the first paint. Put CSS at the bottom and users see
+              the ugly version first.
+            </p>
+          </div>
+          <div class="load-stage">
+            <div class="net">
+              <div class="node">▭<b>browser</b></div>
+              <div class="wire"><span class="packet" id="packet"></span></div>
+              <div class="node">▤<b>server</b></div>
+            </div>
+            <div class="load-mini" id="loadMini">
+              <span class="fetch-note" id="fetchNote"
+                >fetching styles.css…</span
+              >
+              <div class="lm-skel"><i></i><i></i><i></i><i></i></div>
+              <div class="lm-real">
+                <h3>Aurora Coffee</h3>
+                <p>
+                  Small-batch beans, roasted every Tuesday and shipped within 24
+                  hours.
+                </p>
+                <a href="#">Read our story</a>
+                <button>Order a bag</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 05 · syntax ============ -->
+      <section id="syntax" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">05 · basic css syntax</p>
+          <h2>Anatomy of a rule</h2>
+          <p class="lede">
+            Every rule in CSS follows one tiny pattern:
+            <span class="mono" style="color: var(--border-c)"
+              >who { what: how; }</span
+            >. Hover each piece, then build your own rule below.
+          </p>
+        </div>
+        <div class="syntax-grid">
+          <div class="panel anat">
+            <div class="panel-head" style="padding: 13px 0 0; border: none">
+              <h3>hover each piece</h3>
+            </div>
+            <pre
+              class="anat-rule"
+            ><span class="an" data-part="sel">h1</span> <span class="an" data-part="brace">{</span>
+  <span class="an" data-part="prop">color</span><span class="an" data-part="colon">:</span> <span class="an" data-part="val">hotpink</span><span class="an" data-part="semi">;</span>
+  <span class="an" data-part="prop">font-size</span><span class="an" data-part="colon">:</span> <span class="an" data-part="val">32px</span><span class="an" data-part="semi">;</span>
+<span class="an" data-part="brace">}</span></pre>
+            <p class="anat-note" id="anatNote">
+              Every character has a job — hover the code above.
+            </p>
+          </div>
+          <div class="panel builder">
+            <div class="build-row">
+              <span class="k">step 1 · pick a selector — who to style</span>
+              <div class="segmented" id="segSel">
+                <span class="seg-thumb"></span>
+                <button data-v="h1" class="active">h1</button>
+                <button data-v="p">p</button>
+                <button data-v="button">button</button>
+              </div>
+            </div>
+            <div class="build-row">
+              <span class="k"
+                >step 2 · toggle declarations — what to change</span
+              >
+              <div class="decls" id="decls">
+                <button class="decl" data-d="color">color: #ff4f8b</button>
+                <button class="decl" data-d="bg">background: #ffe08a</button>
+                <button class="decl" data-d="fs">font-size: 30px</button>
+                <button class="decl" data-d="pad">padding: 12px 20px</button>
+                <button class="decl" data-d="rad">border-radius: 12px</button>
+                <button class="decl" data-d="bor">
+                  border: 3px dashed #58a6ff
+                </button>
+              </div>
+            </div>
+            <button class="ghost" id="declReset">✕ clear declarations</button>
+            <div class="build-out">
+              <pre id="buildCode"></pre>
+              <div>
+                <span class="k">live result</span>
+                <div class="bp-page" id="bpPage"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ field notes ============ -->
+      <section id="notes" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">06 · field notes</p>
+          <h2>Cheat codes from lesson 01</h2>
+        </div>
+        <div class="notes-grid">
+          <article class="note-card" style="--nc: var(--margin-c)">
+            <div class="note-demo demo-paint"><i></i><i></i><i></i><i></i></div>
+            <h3>what css does</h3>
+            <p>
+              Color, typography, spacing, component design, layout and motion.
+              Without CSS, every website on earth looks like a 1993 document —
+              because that's all HTML provides.
+            </p>
+            <p class="note-tip mono">↳ hover: paint arrives</p>
+          </article>
+          <article class="note-card" style="--nc: var(--content-c)">
+            <div class="note-demo demo-syntax">
+              <span class="tk" style="color: #7fe0b0">h1</span>
+              <span class="tk" style="color: #c9d4e6"> { </span>
+              <span class="tk"
+                ><span style="color: #8ab4ff">color</span
+                ><span style="color: #c9d4e6">: </span
+                ><span style="color: #f2c14e">red</span
+                ><span style="color: #8d9ab0">;</span></span
+              >
+              <span class="tk" style="color: #c9d4e6"> }</span>
+            </div>
+            <h3>the syntax pattern</h3>
+            <p>
+              <span class="mono">selector { property: value; }</span> — selector
+              picks the element, declarations change it. Miss a
+              <span class="mono">;</span> and the next declaration silently
+              breaks.
+            </p>
+            <p class="note-tip mono">↳ hover: the rule assembles</p>
+          </article>
+          <article class="note-card" style="--nc: var(--border-c)">
+            <div class="note-demo demo-methods">
+              <i>inline — style="…"</i>
+              <i>internal — &lt;style&gt;</i>
+              <i class="win">external — styles.css ✓</i>
+            </div>
+            <h3>three homes for css</h3>
+            <p>
+              Inline is for emergencies, internal for prototypes,
+              <b>external for everything real</b>. One cached stylesheet can
+              style a thousand pages.
+            </p>
+            <p class="note-tip mono">↳ hover: the winner emerges</p>
+          </article>
+          <article class="note-card" style="--nc: var(--padding-c)">
+            <div class="note-demo">
+              <span class="demo-load">&lt;link rel="stylesheet"&gt; → 🖥</span>
+            </div>
+            <h3>loading order</h3>
+            <p>
+              Put <span class="mono">&lt;link&gt;</span> in
+              <span class="mono">&lt;head&gt;</span>. CSS is render-blocking on
+              purpose — the browser waits for it so users never see a flash of
+              unstyled content (FOUC).
+            </p>
+            <p class="note-tip mono">↳ hover: stylesheet ships</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ lesson nav ============ -->
+      <div class="lesson-nav reveal">
+        <div>
+          <span class="ln-status">✓ completed</span>
+          <h3>01 — What is CSS?</h3>
+        </div>
+        <div class="ln-track" id="lnTrack"></div>
+        <div class="ln-next">
+          <span>up next</span>
+          <b>02 · Selectors</b>
+          <span class="soon">coming soon</span>
+        </div>
+      </div>
+
+      <footer>
+        <span class="mono"
+          >css.lab — drag things, break things, learn things.</span
+        >
+        <span class="sp mono">45 lessons · lesson 01 · what is css?</span>
+      </footer>
+    </div>
+    <!-- /wrap -->
+
+    <script>
+      (() => {
+        const $ = (id) => document.getElementById(id);
+
+        /* ---------- segmented helper (shared) ---------- */
+        function initSeg(seg, onPick) {
+          const btns = [...seg.querySelectorAll("button")],
+            thumb = seg.querySelector(".seg-thumb"),
+            n = btns.length;
+          function set(i) {
+            btns.forEach((b, j) => b.classList.toggle("active", i === j));
+            thumb.style.width = `calc((100% - 6px)/${n})`;
+            thumb.style.transform = `translateX(${i * 100}%)`;
+          }
+          btns.forEach((b, i) =>
+            b.addEventListener("click", () => {
+              set(i);
+              onPick(b.dataset.v);
+            }),
+          );
+          set(0);
+          return (v) => set(btns.findIndex((b) => b.dataset.v === v));
+        }
+
+        /* ---------- intro auto-demo ---------- */
+        const introDoc = $("introDoc"),
+          introMode = $("introMode");
+        let introOn = false;
+        setInterval(() => {
+          introOn = !introOn;
+          introDoc.classList.toggle("styled", introOn);
+          introMode.textContent = introOn
+            ? "styles: on — same html, different feelings"
+            : "styles: off — this is raw html";
+          introMode.classList.toggle("on", introOn);
+        }, 2400);
+
+        /* ---------- 01 · powers ---------- */
+        const spec = $("spec"),
+          powerSwitch = $("powerSwitch"),
+          powerState = $("powerState");
+        const FX = ["color", "type", "space", "comp", "motion"];
+        let cssOn = false;
+        function applyAll(on) {
+          cssOn = on;
+          FX.forEach((k) => spec.classList.toggle("fx-" + k, on));
+          powerSwitch.classList.toggle("on", on);
+          powerSwitch.setAttribute("aria-pressed", on);
+          powerState.textContent = on ? "ON" : "OFF";
+          powerState.classList.toggle("on", on);
+        }
+        powerSwitch.addEventListener("click", () => applyAll(!cssOn));
+        document.querySelectorAll(".power").forEach((ch) => {
+          ch.addEventListener("mouseenter", () => {
+            if (!cssOn) spec.classList.add("fx-" + ch.dataset.fx);
+          });
+          ch.addEventListener("mouseleave", () => {
+            if (!cssOn) spec.classList.remove("fx-" + ch.dataset.fx);
+          });
+        });
+
+        /* ---------- 02 · html vs css cross-highlight ---------- */
+        function linkHover(container) {
+          container.addEventListener("mouseover", (e) => {
+            const t = e.target.closest("[data-el]");
+            if (!t) return;
+            document
+              .querySelectorAll(`[data-el="${t.dataset.el}"]`)
+              .forEach((el) => el.classList.add("hot"));
+          });
+          container.addEventListener("mouseout", (e) => {
+            const t = e.target.closest("[data-el]");
+            if (!t) return;
+            document
+              .querySelectorAll(`[data-el="${t.dataset.el}"]`)
+              .forEach((el) => el.classList.remove("hot"));
+          });
+        }
+        linkHover($("htmlCode"));
+        linkHover($("livePreview"));
+
+        /* ---------- 03 · three ways ---------- */
+        const S3 = { color: "#ff6b57", size: 18, tab: "inline" };
+        const wayCode = $("wayCode"),
+          wayFile = $("wayFile"),
+          wayVerdict = $("wayVerdict");
+        const VERDICTS = {
+          inline: ["verdict: emergencies only", "bad"],
+          internal: ["verdict: prototypes & one-off widgets", "bad"],
+          external: ["verdict: real projects — always ✓", "good"],
+        };
+        function renderWays() {
+          const { color, size, tab } = S3;
+          const rule = `p { color: ${color}; font-size: ${size}px; }`;
+          if (tab === "inline") {
+            wayFile.textContent = "index.html";
+            wayCode.innerHTML = `<span class="t-com">&lt;!-- the style lives INSIDE the tag itself --&gt;</span>
+&lt;<span class="t-tag">body</span>&gt;
+  &lt;<span class="t-tag">p</span> <span class="hl">style="color: ${color}; font-size: ${size}px;"</span>&gt;
+    Small-batch beans, roasted every Tuesday…
+  &lt;/<span class="t-tag">p</span>&gt;
+&lt;/<span class="t-tag">body</span>&gt;`;
+          } else if (tab === "internal") {
+            wayFile.textContent = "index.html";
+            wayCode.innerHTML = `<span class="t-com">&lt;!-- the style lives in a &lt;style&gt; block in &lt;head&gt; --&gt;</span>
+&lt;<span class="t-tag">head</span>&gt;
+<span class="hl">  &lt;<span class="t-tag">style</span>&gt;
+    ${rule}
+  &lt;/<span class="t-tag">style</span>&gt;</span>
+&lt;/<span class="t-tag">head</span>&gt;
+&lt;<span class="t-tag">body</span>&gt;
+  &lt;<span class="t-tag">p</span>&gt;Small-batch beans, roasted every Tuesday…&lt;/<span class="t-tag">p</span>&gt;
+&lt;/<span class="t-tag">body</span>&gt;`;
+          } else {
+            wayFile.textContent = "index.html  +  styles.css";
+            wayCode.innerHTML = `<div class="file-card"><div class="file-name">index.html</div><pre>&lt;<span class="t-tag">head</span>&gt;
+<span class="hl">  &lt;<span class="t-tag">link</span> <span class="t-attr">rel</span>=<span class="t-str">"stylesheet"</span> <span class="t-attr">href</span>=<span class="t-str">"styles.css"</span>&gt;</span>
+&lt;/<span class="t-tag">head</span>&gt;
+&lt;<span class="t-tag">body</span>&gt;
+  &lt;<span class="t-tag">p</span>&gt;Small-batch beans, roasted every Tuesday…&lt;/<span class="t-tag">p</span>&gt;
+&lt;/<span class="t-tag">body</span>&gt;</pre></div><div class="file-card"><div class="file-name">styles.css</div><pre><span class="hl">${rule}</span></pre></div>`;
+          }
+          document
+            .querySelectorAll(".way-map,.way-notes")
+            .forEach((el) => el.classList.toggle("on", el.dataset.way === tab));
+          wayVerdict.textContent = VERDICTS[tab][0];
+          wayVerdict.className = "verdict " + VERDICTS[tab][1];
+        }
+        const setWay = initSeg($("segWay"), (v) => {
+          S3.tab = v;
+          renderWays();
+        });
+        document.querySelectorAll(".swatch").forEach((sw) =>
+          sw.addEventListener("click", () => {
+            document
+              .querySelectorAll(".swatch")
+              .forEach((x) => x.classList.remove("on"));
+            sw.classList.add("on");
+            S3.color = sw.dataset.c;
+            renderWays();
+          }),
+        );
+        const rSize = $("rSize"),
+          vSize = $("vSize");
+        rSize.addEventListener("input", () => {
+          S3.size = +rSize.value;
+          vSize.textContent = S3.size + "px";
+          rSize.style.setProperty(
+            "--fill",
+            ((S3.size - 12) / (28 - 12)) * 100 + "%",
+          );
+          renderWays();
+        });
+
+        /* ---------- 04 · loading steps ---------- */
+        const CAPS = [
+          "You press enter. The browser has a URL and one job: fetch the page.",
+          "<b>GET /index.html</b> — the request flies across the network to the server.",
+          "The HTML arrives. The browser starts reading it, tag by tag, top to bottom.",
+          'It hits <b>&lt;link rel="stylesheet"&gt;</b> and pauses painting to request <b>styles.css</b>. CSS is render-blocking — on purpose.',
+          "The CSS arrives, every rule is matched to its elements, and the fully styled page finally paints. ✓",
+        ];
+        const POS = ["4%", "88%", "4%", "88%", "4%"];
+        const stepLis = [...$("steps").children],
+          stepCap = $("stepCap"),
+          packet = $("packet");
+        const loadMini = $("loadMini"),
+          fetchNote = $("fetchNote");
+        let step = 0,
+          timer = null;
+        function gotoStep(i) {
+          step = Math.max(0, Math.min(4, i));
+          stepLis.forEach((li, j) => {
+            li.classList.toggle("active", j === step);
+            li.classList.toggle("done", j < step);
+          });
+          stepCap.innerHTML = CAPS[step];
+          packet.style.left = POS[step];
+          packet.style.background =
+            step === 1 || step === 3 ? "var(--border-c)" : "var(--content-c)";
+          loadMini.classList.toggle("show-html", step >= 2);
+          loadMini.classList.toggle("styled", step >= 4);
+          fetchNote.classList.toggle("on", step === 3);
+        }
+        function stopPlay() {
+          if (timer) {
+            clearInterval(timer);
+            timer = null;
+          }
+          $("stepPlay").textContent = "▶ autoplay";
+          $("stepPlay").classList.remove("playing");
+        }
+        stepLis.forEach((li, i) =>
+          li.addEventListener("click", () => {
+            stopPlay();
+            gotoStep(i);
+          }),
+        );
+        $("stepPrev").addEventListener("click", () => {
+          stopPlay();
+          gotoStep(step - 1);
+        });
+        $("stepNext").addEventListener("click", () => {
+          stopPlay();
+          gotoStep(step + 1);
+        });
+        $("stepPlay").addEventListener("click", () => {
+          if (timer) {
+            stopPlay();
+            return;
+          }
+          $("stepPlay").textContent = "❚❚ pause";
+          $("stepPlay").classList.add("playing");
+          gotoStep(0);
+          timer = setInterval(() => {
+            step >= 4 ? stopPlay() : gotoStep(step + 1);
+          }, 1800);
+        });
+
+        /* ---------- 05 · anatomy ---------- */
+        const PARTS = {
+          sel: "<b>selector</b> — points at the HTML element(s) to style. This one grabs every &lt;h1&gt; on the page.",
+          brace:
+            "<b>curly braces { }</b> — wrap the declaration block: the full list of things you want to change.",
+          prop: "<b>property</b> — what to change (color, size, spacing…). CSS has hundreds of these.",
+          val: "<b>value</b> — how to change it. It must be a valid value for that property.",
+          semi: "<b>semicolon ;</b> — ends a declaration. Forget it once and the next line silently breaks.",
+          colon: "<b>colon :</b> — separates the property from its value.",
+        };
+        const anatNote = $("anatNote");
+        document.querySelectorAll(".an").forEach((sp) => {
+          sp.addEventListener("mouseenter", () => {
+            document
+              .querySelectorAll(".an")
+              .forEach((x) =>
+                x.classList.toggle("hot", x.dataset.part === sp.dataset.part),
+              );
+            anatNote.innerHTML = PARTS[sp.dataset.part];
+          });
+          sp.addEventListener("mouseleave", () => {
+            document
+              .querySelectorAll(".an")
+              .forEach((x) => x.classList.remove("hot"));
+            anatNote.innerHTML =
+              "Every character has a job — hover the code above.";
+          });
+        });
+
+        /* ---------- 05 · rule builder ---------- */
+        const DECLS = {
+          color: "color: #ff4f8b",
+          bg: "background: #ffe08a",
+          fs: "font-size: 30px",
+          pad: "padding: 12px 20px",
+          rad: "border-radius: 12px",
+          bor: "border: 3px dashed #58a6ff",
+        };
+        const TEXTS = {
+          h1: "Fresh Roast",
+          p: "Small-batch beans, roasted every Tuesday and shipped within a day.",
+          button: "Order now",
+        };
+        let sel = "h1";
+        const active = new Set();
+        const buildCode = $("buildCode"),
+          bpPage = $("bpPage");
+        const setSel = initSeg($("segSel"), (v) => {
+          sel = v;
+          renderBuild();
+        });
+        document.querySelectorAll(".decl").forEach((d) =>
+          d.addEventListener("click", () => {
+            const id = d.dataset.d;
+            active.has(id) ? active.delete(id) : active.add(id);
+            d.classList.toggle("on", active.has(id));
+            renderBuild();
+          }),
+        );
+        $("declReset").addEventListener("click", () => {
+          active.clear();
+          document
+            .querySelectorAll(".decl")
+            .forEach((d) => d.classList.remove("on"));
+          renderBuild();
+        });
+        function renderBuild() {
+          bpPage.innerHTML = `<${sel} id="bpEl">${TEXTS[sel]}</${sel}>`;
+          const el = bpPage.firstElementChild;
+          const lines = [...active].map((id) => DECLS[id]);
+          lines.forEach((l) => {
+            const i = l.indexOf(":");
+            el.style.setProperty(l.slice(0, i).trim(), l.slice(i + 1).trim());
+          });
+          if (lines.length === 0) {
+            buildCode.innerHTML = `<span class="c-sel">${sel}</span> {\n  <span class="t-com"></span>\n}`;
+          } else {
+            const body = lines
+              .map((l) => {
+                const i = l.indexOf(":");
+                return `  <span class="c-prop">${l.slice(0, i)}</span>: <span class="c-val">${l.slice(i + 1).trim()}</span>;`;
+              })
+              .join("\n");
+            buildCode.innerHTML = `<span class="c-sel">${sel}</span> {\n${body}\n}`;
+          }
+        }
+
+        /* ---------- lesson track (45 ticks) ---------- */
+        const track = $("lnTrack");
+        for (let i = 0; i < 45; i++) {
+          const t = document.createElement("span");
+          t.className = "tick" + (i === 0 ? " done" : "");
+          t.title = "lesson " + (i + 1);
+          track.appendChild(t);
+        }
+
+        /* ---------- scroll reveal ---------- */
+        const io = new IntersectionObserver(
+          (es) =>
+            es.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                io.unobserve(e.target);
+              }
+            }),
+          { threshold: 0.12 },
+        );
+        document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+
+        /* ---------- boot ---------- */
+        renderWays();
+        gotoStep(0);
+        renderBuild();
+      })();
+    </script>
+  </body>
+</html>
