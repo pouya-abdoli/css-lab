@@ -1,0 +1,2361 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Box Model — Lesson 06</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' fill='none' stroke='%23f07f4f' stroke-width='2'/%3E%3Crect x='8' y='8' width='16' height='16' fill='none' stroke='%23f2c14e' stroke-width='2'/%3E%3Crect x='13' y='13' width='6' height='6' fill='%2358a6ff'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0e15;
+        --panel: #121826;
+        --panel2: #0d1220;
+        --ink: #10141d;
+        --line: #222c40;
+        --line2: #31405e;
+        --text: #e9eef7;
+        --muted: #8d9ab0;
+        --faint: #5b6a84;
+        --margin-c: #f07f4f;
+        --margin-bg: rgba(240, 127, 79, 0.14);
+        --border-c: #f2c14e;
+        --border-bg: rgba(242, 193, 78, 0.16);
+        --padding-c: #3ecf8e;
+        --padding-bg: rgba(62, 207, 142, 0.14);
+        --content-c: #58a6ff;
+        --content-bg: rgba(88, 166, 255, 0.17);
+        --pink: #ff4f8b;
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: dark;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 15px;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+      ::selection {
+        background: rgba(88, 166, 255, 0.35);
+      }
+      .mono {
+        font-family: var(--mono);
+      }
+      section {
+        scroll-margin-top: 76px;
+      }
+      b {
+        font-weight: 600;
+      }
+
+      .bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            700px 460px at 12% -6%,
+            rgba(242, 193, 78, 0.07),
+            transparent 60%
+          ),
+          radial-gradient(
+            760px 520px at 92% 22%,
+            rgba(88, 166, 255, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            600px 480px at 40% 105%,
+            rgba(62, 207, 142, 0.05),
+            transparent 60%
+          );
+      }
+      .bg::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(233, 238, 247, 0.035) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(233, 238, 247, 0.035) 1px,
+            transparent 1px
+          );
+        background-size: 28px 28px;
+        mask-image: radial-gradient(
+          ellipse 120% 90% at 50% 0%,
+          #000 40%,
+          transparent 100%
+        );
+      }
+      .bg .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.5;
+        animation: drift 26s ease-in-out infinite alternate;
+      }
+      .bg .g1 {
+        width: 420px;
+        height: 420px;
+        left: -120px;
+        top: 30%;
+        background: rgba(240, 127, 79, 0.1);
+      }
+      .bg .g2 {
+        width: 460px;
+        height: 460px;
+        right: -140px;
+        top: 60%;
+        background: rgba(88, 166, 255, 0.1);
+        animation-delay: -12s;
+      }
+      @keyframes drift {
+        from {
+          transform: translateY(-30px);
+        }
+        to {
+          transform: translateY(40px);
+        }
+      }
+
+      /* topbar: lesson № first, nav left — no brand, no logo */
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 12px clamp(16px, 4vw, 44px);
+        background: rgba(11, 14, 21, 0.92);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar nav {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .topbar nav a {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 6px 11px;
+        border-radius: 999px;
+        transition: 0.2s;
+      }
+      .topbar nav a:hover {
+        color: var(--text);
+        background: #161d2c;
+      }
+      .lesson-tag {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--border-c);
+        border: 1px dashed rgba(242, 193, 78, 0.45);
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .wrap {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: 0 clamp(16px, 4vw, 44px);
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        padding: clamp(20px, 4vh, 48px) 0 clamp(30px, 5vh, 56px);
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--padding-c);
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(2.3rem, 5.2vw, 3.7rem);
+        line-height: 1.06;
+        letter-spacing: -0.02em;
+      }
+      .word-style {
+        display: inline-block;
+        padding: 0.02em 0.22em;
+        background: var(--content-bg);
+        border: 0.06em solid var(--content-c);
+        border-radius: 0.14em;
+        color: #bcd8ff;
+        transition: transform 0.3s;
+        cursor: default;
+        margin-top: 10px;
+      }
+      .word-style:hover {
+        transform: rotate(-2deg) scale(1.03);
+      }
+      .lede {
+        color: var(--muted);
+        max-width: 56ch;
+        margin-top: 18px;
+        font-size: 1.05rem;
+      }
+      .lede b {
+        color: var(--text);
+      }
+      .css-full {
+        display: inline-block;
+        margin-top: 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--faint);
+        letter-spacing: 0.08em;
+      }
+      .intro-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 26px;
+        display: grid;
+        place-items: center;
+        gap: 16px;
+        box-shadow: 0 30px 60px -40px rgba(0, 0, 0, 0.8);
+      }
+      .il {
+        transition:
+          background 0.5s,
+          box-shadow 0.5s;
+      }
+      .il-margin {
+        padding: 26px;
+        background: rgba(240, 127, 79, 0.1);
+        outline: 1px dashed rgba(255, 255, 255, 0.14);
+      }
+      .il-border {
+        border: 8px solid rgba(242, 193, 78, 0.55);
+      }
+      .il-padding {
+        padding: 22px;
+        background: rgba(62, 207, 142, 0.13);
+      }
+      .il-content {
+        width: 132px;
+        height: 84px;
+        display: grid;
+        place-items: center;
+        background: rgba(88, 166, 255, 0.2);
+        font-family: var(--mono);
+        font-size: 12px;
+        color: #9cc8ff;
+      }
+      .il-margin.lit {
+        background: rgba(240, 127, 79, 0.34);
+        box-shadow:
+          0 0 0 1px var(--margin-c),
+          0 0 28px rgba(240, 127, 79, 0.35);
+      }
+      .il-border.lit {
+        border-color: var(--border-c);
+        box-shadow:
+          0 0 0 1px var(--border-c),
+          0 0 28px rgba(242, 193, 78, 0.35);
+      }
+      .il-padding.lit {
+        background: rgba(62, 207, 142, 0.34);
+        box-shadow:
+          inset 0 0 0 1px var(--padding-c),
+          0 0 24px rgba(62, 207, 142, 0.3);
+      }
+      .il-content.lit {
+        background: rgba(88, 166, 255, 0.42);
+        box-shadow:
+          inset 0 0 0 1px var(--content-c),
+          0 0 24px rgba(88, 166, 255, 0.35);
+      }
+      .intro-legend {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px 16px;
+      }
+      .intro-legend span {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--faint);
+        transition: color 0.3s;
+      }
+      .intro-legend i {
+        width: 8px;
+        height: 8px;
+        border-radius: 2px;
+        flex: none;
+        opacity: 0.5;
+        transition: 0.3s;
+      }
+      .intro-legend span.on {
+        color: var(--text);
+      }
+      .intro-legend span.on i {
+        opacity: 1;
+        box-shadow: 0 0 10px currentColor;
+      }
+      .intro-note {
+        font-size: 13px;
+        color: var(--muted);
+        border-top: 1px dashed var(--line);
+        padding-top: 14px;
+        min-height: 56px;
+      }
+
+      .sec {
+        padding: clamp(36px, 6vh, 64px) 0;
+      }
+      .sec-head {
+        margin-bottom: 26px;
+        max-width: 72ch;
+      }
+      .sec-head h2 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+        letter-spacing: -0.015em;
+        line-height: 1.15;
+      }
+      .sec-head .lede {
+        margin-top: 10px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 18px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .panel-head h3 {
+        font-family: var(--disp);
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dots i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dots i:nth-child(1) {
+        background: #f07f4f;
+      }
+      .dots i:nth-child(2) {
+        background: #f2c14e;
+      }
+      .dots i:nth-child(3) {
+        background: #3ecf8e;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.85;
+        overflow-x: auto;
+      }
+      .c-sel {
+        color: #7fe0b0;
+      }
+      .c-prop {
+        color: #8ab4ff;
+      }
+      .c-val {
+        color: #f2c14e;
+      }
+      .c-com {
+        color: #5b6a84;
+      }
+      .grp {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+
+      .pick-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 18px;
+        align-items: stretch;
+      }
+      .stage-wrap {
+        padding: 28px;
+        display: grid;
+        place-items: center;
+        min-height: 340px;
+      }
+      .side {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .code-box {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .code-box pre {
+        min-height: 0;
+        font-size: 12.5px;
+      }
+      .side-note {
+        font-size: 12px;
+        color: var(--faint);
+      }
+      .copy {
+        margin-left: auto;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 5px 12px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .copy:hover {
+        color: var(--text);
+        border-color: var(--content-c);
+      }
+      .copy.done {
+        color: var(--padding-c);
+        border-color: var(--padding-c);
+      }
+      .segmented {
+        position: relative;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 1fr;
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        padding: 3px;
+      }
+      .segmented button {
+        position: relative;
+        z-index: 1;
+        background: none;
+        border: 0;
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--muted);
+        padding: 8px 4px;
+        cursor: pointer;
+        transition: color 0.25s;
+        border-radius: 8px;
+      }
+      .segmented button:hover {
+        color: var(--text);
+      }
+      .segmented button.active {
+        color: #fff;
+      }
+      .seg-thumb {
+        position: absolute;
+        top: 3px;
+        bottom: 3px;
+        left: 3px;
+        width: calc((100% - 6px) / 4);
+        background: #26334c;
+        border-radius: 8px;
+        transition:
+          transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+          width 0.28s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      }
+
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        outline: none;
+        cursor: pointer;
+        background: linear-gradient(
+          90deg,
+          var(--ac) var(--fill, 50%),
+          #232c40 var(--fill, 50%)
+        );
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        transition: transform 0.15s;
+      }
+      input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.15);
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+      }
+      .ctl {
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 7px 11px;
+        transition: 0.2s;
+      }
+      .ctl:hover {
+        background: #101725;
+        border-color: var(--line);
+      }
+      .ctl-top {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+      .ctl-top label {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text);
+      }
+      .ctl-val {
+        margin-left: auto;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--ac);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 2px 9px;
+      }
+
+      /* the living box */
+      #canvas {
+        position: relative;
+        flex: 1;
+        min-height: 540px;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+        background: radial-gradient(
+          ellipse 90% 80% at 50% 45%,
+          rgba(255, 255, 255, 0.025),
+          transparent 70%
+        );
+      }
+      #canvas::before,
+      #canvas::after {
+        content: "";
+        position: absolute;
+        background: rgba(233, 238, 247, 0.05);
+        pointer-events: none;
+      }
+      #canvas::before {
+        left: 50%;
+        top: 0;
+        bottom: 0;
+        width: 1px;
+      }
+      #canvas::after {
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+      }
+      #scaler {
+        position: relative;
+        transform-origin: center;
+        transition: transform 0.3s ease;
+      }
+      .l-margin,
+      .l-padding,
+      .l-content {
+        transition:
+          padding 0.22s ease,
+          width 0.22s ease,
+          height 0.22s ease,
+          filter 0.2s,
+          background 0.2s;
+      }
+      .l-border {
+        transition:
+          border-width 0.22s ease,
+          filter 0.2s;
+      }
+      .l-margin {
+        position: relative;
+        padding: 32px;
+        background: var(--margin-bg);
+        outline: 1px dashed rgba(255, 255, 255, 0.16);
+        box-shadow: 0 36px 70px -34px rgba(0, 0, 0, 0.75);
+      }
+      .l-border {
+        position: relative;
+        border: 6px solid rgba(242, 193, 78, 0.7);
+      }
+      .l-padding {
+        position: relative;
+        padding: 24px;
+        background: var(--padding-bg);
+        outline: 1px dashed rgba(255, 255, 255, 0.14);
+      }
+      .l-content {
+        width: 320px;
+        height: 200px;
+        background: var(--content-bg);
+        outline: 1px dashed rgba(255, 255, 255, 0.14);
+        display: grid;
+        place-items: center;
+      }
+      .l-content span {
+        font-family: var(--mono);
+        font-size: 12.5px;
+        color: #a7cdff;
+        pointer-events: none;
+        white-space: nowrap;
+      }
+      .layer-tag {
+        position: absolute;
+        top: 5px;
+        left: 8px;
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      .layer-tag.show {
+        opacity: 0.85;
+      }
+      .l-margin.hot,
+      .l-border.hot,
+      .l-padding.hot,
+      .l-content.hot {
+        filter: brightness(1.6);
+      }
+      .br-h {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: calc(100% + 14px);
+        height: 1px;
+        background: rgba(233, 238, 247, 0.3);
+      }
+      .br-h::before,
+      .br-h::after {
+        content: "";
+        position: absolute;
+        top: -4px;
+        width: 1px;
+        height: 9px;
+        background: rgba(233, 238, 247, 0.3);
+      }
+      .br-h::before {
+        left: 0;
+      }
+      .br-h::after {
+        right: 0;
+      }
+      .br-v {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: calc(100% + 14px);
+        width: 1px;
+        background: rgba(233, 238, 247, 0.3);
+      }
+      .br-v::before,
+      .br-v::after {
+        content: "";
+        position: absolute;
+        left: -4px;
+        height: 1px;
+        width: 9px;
+        background: rgba(233, 238, 247, 0.3);
+      }
+      .br-v::before {
+        top: 0;
+      }
+      .br-v::after {
+        bottom: 0;
+      }
+      .br-h b,
+      .br-v b {
+        position: absolute;
+        font-family: var(--mono);
+        font-weight: 500;
+        font-size: 11px;
+        color: #c9d4e6;
+        background: #0e1320;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 2px 9px;
+        white-space: nowrap;
+      }
+      .br-h b {
+        top: 7px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      .br-v b {
+        top: 50%;
+        left: 7px;
+        transform: translateY(-50%) rotate(90deg);
+        transform-origin: left center;
+      }
+      .canvas-foot {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        padding: 14px 16px;
+        border-top: 1px solid var(--line);
+      }
+      .measure {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 7px 12px;
+      }
+      .measure i {
+        width: 8px;
+        height: 8px;
+        border-radius: 2px;
+        background: var(--dc);
+      }
+      .measure em {
+        font-style: normal;
+        font-size: 11px;
+        color: var(--faint);
+      }
+      .measure b {
+        font-family: var(--mono);
+        font-weight: 500;
+        font-size: 12px;
+      }
+      .formula {
+        border: 1px dashed var(--line2);
+        border-radius: 12px;
+        padding: 12px 14px;
+        background: var(--panel2);
+      }
+      .formula .k {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--faint);
+        display: block;
+        margin-bottom: 6px;
+      }
+      .formula p {
+        font-family: var(--mono);
+        font-size: 12.5px;
+        color: var(--muted);
+      }
+      .formula b {
+        color: var(--text);
+      }
+      .formula .eq {
+        color: var(--border-c);
+      }
+
+      /* ============ stack explorer — isolate & inflate ============ */
+      #stackStage .l-margin,
+      #stackStage .l-border,
+      #stackStage .l-padding,
+      #stackStage .l-content {
+        transition:
+          padding 0.35s ease,
+          border-width 0.35s ease,
+          background 0.35s ease,
+          box-shadow 0.35s ease,
+          border-color 0.35s ease;
+      }
+      #stMargin {
+        padding: 30px;
+      }
+      #stBorder {
+        border-width: 9px;
+      }
+      #stPadding {
+        padding: 26px;
+      }
+      #stContent {
+        width: 190px;
+        height: 120px;
+      }
+      /* content selected */
+      #stackStage[data-sel="content"] .l-content {
+        background: rgba(88, 166, 255, 0.55);
+        box-shadow:
+          0 0 0 2px var(--content-c),
+          0 0 34px rgba(88, 166, 255, 0.5);
+      }
+      #stackStage[data-sel="content"] .l-margin {
+        background: rgba(240, 127, 79, 0.05);
+      }
+      #stackStage[data-sel="content"] .l-border {
+        border-color: rgba(242, 193, 78, 0.25);
+      }
+      #stackStage[data-sel="content"] .l-padding {
+        background: rgba(62, 207, 142, 0.06);
+      }
+      /* padding selected — inflates */
+      #stackStage[data-sel="padding"] .l-padding {
+        background: rgba(62, 207, 142, 0.5);
+        padding: 44px;
+        box-shadow:
+          inset 0 0 0 2px var(--padding-c),
+          0 0 30px rgba(62, 207, 142, 0.35);
+      }
+      #stackStage[data-sel="padding"] .l-margin {
+        background: rgba(240, 127, 79, 0.05);
+      }
+      #stackStage[data-sel="padding"] .l-border {
+        border-color: rgba(242, 193, 78, 0.25);
+      }
+      #stackStage[data-sel="padding"] .l-content {
+        background: rgba(88, 166, 255, 0.08);
+      }
+      /* border selected — inflates */
+      #stackStage[data-sel="border"] .l-border {
+        border-color: var(--border-c);
+        border-width: 18px;
+        box-shadow:
+          0 0 0 2px var(--border-c),
+          0 0 30px rgba(242, 193, 78, 0.35);
+      }
+      #stackStage[data-sel="border"] .l-margin {
+        background: rgba(240, 127, 79, 0.05);
+      }
+      #stackStage[data-sel="border"] .l-padding {
+        background: rgba(62, 207, 142, 0.06);
+      }
+      #stackStage[data-sel="border"] .l-content {
+        background: rgba(88, 166, 255, 0.08);
+      }
+      /* margin selected — inflates */
+      #stackStage[data-sel="margin"] .l-margin {
+        background: rgba(240, 127, 79, 0.45);
+        padding: 50px;
+        box-shadow:
+          0 0 0 2px var(--margin-c),
+          0 0 30px rgba(240, 127, 79, 0.35);
+      }
+      #stackStage[data-sel="margin"] .l-border {
+        border-color: rgba(242, 193, 78, 0.25);
+      }
+      #stackStage[data-sel="margin"] .l-padding {
+        background: rgba(62, 207, 142, 0.06);
+      }
+      #stackStage[data-sel="margin"] .l-content {
+        background: rgba(88, 166, 255, 0.08);
+      }
+
+      .stack-side-btns {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .stack-btn {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: var(--mono);
+        font-size: 12.5px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        padding: 10px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+        text-align: left;
+      }
+      .stack-btn i {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--sc);
+        flex: none;
+      }
+      .stack-btn em {
+        font-style: normal;
+        margin-left: auto;
+        color: var(--faint);
+        font-size: 10.5px;
+      }
+      .stack-btn:hover {
+        color: var(--text);
+        border-color: var(--sc);
+        transform: translateX(4px);
+      }
+      .stack-btn.on {
+        color: var(--text);
+        border-color: var(--sc);
+        box-shadow: 0 0 0 1px var(--sc);
+      }
+      .stack-note {
+        background: var(--panel2);
+        border: 1px dashed var(--line2);
+        border-radius: 12px;
+        padding: 14px 16px;
+        font-size: 13px;
+        color: var(--muted);
+        min-height: 96px;
+      }
+      .stack-note b {
+        color: var(--text);
+      }
+
+      /* showdown */
+      .sd-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: clamp(18px, 3vw, 30px);
+      }
+      .sd-controls {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        margin-bottom: 26px;
+      }
+      .arena {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 20px;
+        align-items: start;
+      }
+      .fighter {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 18px;
+      }
+      .fighter header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+      }
+      .fighter h3 {
+        font-family: var(--mono);
+        font-size: 14px;
+      }
+      .pill {
+        font-family: var(--mono);
+        font-size: 10px;
+        padding: 3px 10px;
+        border-radius: 999px;
+        border: 1px solid;
+      }
+      .pill-warn {
+        color: var(--margin-c);
+        border-color: rgba(240, 127, 79, 0.5);
+      }
+      .pill-ok {
+        color: var(--padding-c);
+        border-color: rgba(62, 207, 142, 0.5);
+      }
+      .stage {
+        position: relative;
+        min-height: 158px;
+        padding: 30px 12px 10px 14px;
+        overflow-x: auto;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.015);
+      }
+      .guide {
+        position: absolute;
+        top: 6px;
+        bottom: 6px;
+        border-left: 1px dashed rgba(233, 238, 247, 0.4);
+        pointer-events: none;
+        transition: left 0.22s ease;
+        z-index: 2;
+      }
+      .guide-lab {
+        position: absolute;
+        top: -2px;
+        left: 5px;
+        font-family: var(--mono);
+        font-size: 9.5px;
+        color: var(--muted);
+        white-space: nowrap;
+        background: var(--panel2);
+        padding: 0 4px;
+      }
+      .sbox {
+        background: var(--padding-bg);
+        border: 6px solid rgba(242, 193, 78, 0.75);
+        outline: 1px dashed rgba(255, 255, 255, 0.15);
+        transition:
+          width 0.22s ease,
+          padding 0.22s ease,
+          border-width 0.22s ease;
+        position: relative;
+        z-index: 1;
+      }
+      .sbox .scontent {
+        height: 84px;
+        background: var(--content-bg);
+        outline: 1px dashed rgba(255, 255, 255, 0.12);
+        display: grid;
+        place-items: center;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: #a7cdff;
+        white-space: nowrap;
+        overflow: hidden;
+      }
+      #boxCB {
+        box-sizing: content-box;
+      }
+      #boxBB {
+        box-sizing: border-box;
+      }
+      .ruler {
+        position: relative;
+        height: 30px;
+        margin: 6px 0 0 14px;
+      }
+      .r-line {
+        position: absolute;
+        left: 0;
+        top: 12px;
+        height: 2px;
+        background: var(--content-c);
+        border-radius: 1px;
+        transition: width 0.22s ease;
+      }
+      .r-line::before,
+      .r-line::after {
+        content: "";
+        position: absolute;
+        top: -4px;
+        width: 2px;
+        height: 10px;
+        background: var(--content-c);
+      }
+      .r-line::before {
+        left: 0;
+      }
+      .r-line::after {
+        right: 0;
+      }
+      .ruler b {
+        position: absolute;
+        top: 2px;
+        font-family: var(--mono);
+        font-weight: 500;
+        font-size: 11.5px;
+        white-space: nowrap;
+        transition: left 0.22s ease;
+      }
+      .math {
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--muted);
+        margin: 8px 0 4px 14px;
+      }
+      .math b {
+        color: var(--text);
+      }
+      .note {
+        font-size: 12px;
+        margin-left: 14px;
+        min-height: 20px;
+      }
+      .note .warn {
+        color: var(--margin-c);
+      }
+      .note .ok {
+        color: var(--padding-c);
+      }
+      .note .dim {
+        color: var(--faint);
+      }
+      .vs {
+        align-self: center;
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: 13px;
+        color: var(--faint);
+        border: 1px solid var(--line);
+        border-radius: 50%;
+        width: 44px;
+        height: 44px;
+        display: grid;
+        place-items: center;
+        background: var(--ink);
+      }
+      .protip {
+        margin-top: 24px;
+        border: 1px dashed var(--line2);
+        border-radius: 12px;
+        padding: 16px 20px;
+        display: flex;
+        gap: 18px;
+        align-items: center;
+        flex-wrap: wrap;
+        background: var(--panel2);
+      }
+      .protip code {
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--padding-c);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 8px 14px;
+      }
+      .protip p {
+        font-size: 13px;
+        color: var(--muted);
+        flex: 1;
+        min-width: 240px;
+      }
+
+      /* border stage */
+      .bd-box {
+        width: 220px;
+        height: 130px;
+        background: var(--content-bg);
+        outline: 1px dashed rgba(255, 255, 255, 0.14);
+        display: grid;
+        place-items: center;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: #a7cdff;
+        border: 8px solid rgba(242, 193, 78, 0.75);
+        transition:
+          border-width 0.2s,
+          border-style 0.2s;
+      }
+
+      /* margin collapse stage */
+      .mwrap {
+        width: 100%;
+        max-width: 420px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 12px;
+        padding: 20px;
+      }
+      .mbox {
+        width: 75%;
+        background: var(--content-bg);
+        border: 1px dashed var(--content-c);
+        border-radius: 8px;
+        padding: 14px;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: #a7cdff;
+        text-align: center;
+      }
+      .gap-read {
+        margin-top: 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 9px 14px;
+      }
+      .gap-read b {
+        color: var(--margin-c);
+      }
+      .gap-read .ok {
+        color: var(--padding-c);
+      }
+
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      @media (min-width: 1180px) {
+        .notes-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media (max-width: 640px) {
+        .notes-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .note-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.3s,
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+      .note-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--nc);
+        opacity: 0.85;
+      }
+      .note-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--nc);
+        box-shadow: 0 24px 44px -28px rgba(0, 0, 0, 0.85);
+      }
+      .note-card h3 {
+        font-family: var(--mono);
+        font-size: 15px;
+        color: var(--nc);
+        margin-bottom: 8px;
+      }
+      .note-card p {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .note-tip {
+        margin-top: 12px;
+        font-size: 11px;
+        color: var(--faint);
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+      }
+      .note-demo {
+        height: 104px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        overflow: hidden;
+      }
+      .demo-layers {
+        padding: 14px;
+        background: rgba(240, 127, 79, 0.15);
+        transition: 0.3s;
+      }
+      .demo-layers > div {
+        border: 4px solid rgba(242, 193, 78, 0.6);
+        padding: 10px;
+        background: rgba(62, 207, 142, 0.15);
+        transition: 0.3s;
+      }
+      .demo-layers > div > div {
+        width: 56px;
+        height: 34px;
+        background: rgba(88, 166, 255, 0.3);
+      }
+      .note-card:hover .demo-layers {
+        padding: 22px;
+      }
+      .note-card:hover .demo-layers > div {
+        padding: 16px;
+      }
+      .demo-pvm {
+        width: 70%;
+        height: 60px;
+        position: relative;
+        margin: 0 auto;
+      }
+      .demo-pvm i {
+        position: absolute;
+        inset: 0;
+        border: 1px dashed var(--margin-c);
+        border-radius: 8px;
+      }
+      .demo-pvm b {
+        position: absolute;
+        inset: 10px;
+        background: var(--padding-bg);
+        border-radius: 6px;
+        transition: 0.35s;
+      }
+      .note-card:hover .demo-pvm b {
+        inset: 4px;
+      }
+      .demo-bbl {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 8px 12px;
+        transition: 0.3s;
+      }
+      .note-card:hover .demo-bbl {
+        color: var(--padding-c);
+        border-color: var(--padding-c);
+      }
+      .demo-col {
+        width: 60%;
+        display: flex;
+        flex-direction: column;
+        gap: 26px;
+        transition: gap 0.4s;
+      }
+      .demo-col i {
+        height: 16px;
+        border-radius: 5px;
+        background: #39415a;
+      }
+      .note-card:hover .demo-col {
+        gap: 12px;
+      }
+
+      .lesson-nav {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px clamp(18px, 3vw, 28px);
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+        align-items: center;
+      }
+      .ln-status {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--padding-c);
+        border: 1px solid rgba(62, 207, 142, 0.45);
+        border-radius: 999px;
+        padding: 3px 10px;
+      }
+      .lesson-nav h3 {
+        font-family: var(--disp);
+        font-size: 17px;
+        margin-top: 8px;
+      }
+      .ln-track {
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .tick {
+        width: 7px;
+        height: 15px;
+        border-radius: 2px;
+        background: #212a3e;
+        transition: 0.2s;
+      }
+      .tick.done {
+        background: var(--padding-c);
+        box-shadow: 0 0 8px rgba(62, 207, 142, 0.55);
+      }
+      .tick:hover {
+        background: var(--line2);
+      }
+      .ln-next {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        text-align: right;
+      }
+      .ln-next span {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .ln-next b {
+        font-family: var(--disp);
+        font-size: 15px;
+        color: var(--text);
+      }
+      footer {
+        border-top: 1px solid var(--line);
+        margin-top: 40px;
+        padding: 30px 0 44px;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+        color: var(--faint);
+        font-size: 12.5px;
+      }
+      footer .mono {
+        font-size: 11.5px;
+      }
+      footer .sp {
+        margin-left: auto;
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+      @media (max-width: 1020px) {
+        .intro {
+          grid-template-columns: 1fr;
+        }
+        .pick-grid {
+          grid-template-columns: 1fr;
+        }
+        .sd-controls {
+          grid-template-columns: 1fr;
+        }
+        .arena {
+          grid-template-columns: 1fr;
+        }
+        .vs {
+          margin: 0 auto;
+        }
+        .lesson-nav {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .ln-next {
+          align-items: center;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg">
+      <span class="glow g1"></span><span class="glow g2"></span>
+    </div>
+
+    <header class="topbar">
+      <span class="lesson-tag">lesson 06 / 45</span>
+      <nav>
+        <a href="#stack">the-stack</a>
+        <a href="#playground">playground</a>
+        <a href="#sizing">box-sizing</a>
+        <a href="#border">border</a>
+        <a href="#margin">margin</a>
+        <a href="#notes">cheat-codes</a>
+      </nav>
+    </header>
+
+    <div class="wrap">
+      <!-- ============ intro ============ -->
+      <section class="intro">
+        <div>
+          <p class="eyebrow">lesson 06 · interactive</p>
+          <h1>Every element is a <span class="word-style">box</span>.</h1>
+          <p class="lede">
+            Four layers wrap everything you see: <b>content</b> at the core,
+            cushioned by <b>padding</b>, framed by a <b>border</b>, pushed
+            around by <b>margin</b>. Don't memorize the box — grab the sliders
+            and feel it.
+          </p>
+          <span class="css-full"
+            >C · ONTENT · P · ADDING · B · ORDER · M · ARGIN</span
+          >
+        </div>
+        <div class="intro-panel">
+          <div>
+            <div class="il il-margin" id="ilMargin">
+              <div class="il il-border" id="ilBorder">
+                <div class="il il-padding" id="ilPadding">
+                  <div class="il il-content" id="ilContent">hello</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="intro-legend">
+            <span data-k="margin"
+              ><i style="background: var(--margin-c)"></i>margin</span
+            >
+            <span data-k="border"
+              ><i style="background: var(--border-c)"></i>border</span
+            >
+            <span data-k="padding"
+              ><i style="background: var(--padding-c)"></i>padding</span
+            >
+            <span data-k="content"
+              ><i style="background: var(--content-c)"></i>content</span
+            >
+          </div>
+          <p class="intro-note" id="introNote"></p>
+        </div>
+      </section>
+
+      <!-- ============ 01 · the stack ============ -->
+      <section id="stack" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">01 · the stack</p>
+          <h2>Content ↓ padding ↓ border ↓ margin</h2>
+          <p class="lede">
+            Inside-out, that's the whole model. Click a layer — it
+            <b>inflates and glows</b>
+            while the others fade to ghosts, so you see exactly where each one
+            lives.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>the four layers</h3>
+            </div>
+            <div class="stage-wrap">
+              <div id="stackStage" data-sel="content">
+                <div class="l-margin" id="stMargin">
+                  <div class="l-border" id="stBorder">
+                    <div class="l-padding" id="stPadding">
+                      <div class="l-content" id="stContent">
+                        <span>content</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <p class="grp">isolate a layer</p>
+            <div class="stack-side-btns" id="stackBtns">
+              <button
+                class="stack-btn on"
+                data-layer="content"
+                style="--sc: var(--content-c)"
+              >
+                <i></i>content<em>width · height</em>
+              </button>
+              <button
+                class="stack-btn"
+                data-layer="padding"
+                style="--sc: var(--padding-c)"
+              >
+                <i></i>padding<em>padding</em>
+              </button>
+              <button
+                class="stack-btn"
+                data-layer="border"
+                style="--sc: var(--border-c)"
+              >
+                <i></i>border<em>border-width</em>
+              </button>
+              <button
+                class="stack-btn"
+                data-layer="margin"
+                style="--sc: var(--margin-c)"
+              >
+                <i></i>margin<em>margin</em>
+              </button>
+            </div>
+            <p class="stack-note" id="stackNote"></p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 02 · playground ============ -->
+      <section id="playground" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">02 · the playground</p>
+          <h2>width · height · padding · border · margin</h2>
+          <p class="lede">
+            Five sliders, one living box. The measurement brackets show how much
+            space the box <em>actually</em> takes — which is rarely the width
+            you declared.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel" style="display: flex; flex-direction: column">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>live box — hover a layer to inspect</h3>
+            </div>
+            <div id="canvas">
+              <div id="scaler">
+                <div class="l-margin" data-layer="margin" id="cvMargin">
+                  <span class="layer-tag" id="tagMargin" style="color: #ffb08c"
+                    >margin</span
+                  >
+                  <div class="l-border" data-layer="border" id="cvBorder">
+                    <div class="l-padding" data-layer="padding" id="cvPadding">
+                      <span
+                        class="layer-tag"
+                        id="tagPadding"
+                        style="color: #8fe6bd"
+                        >padding</span
+                      >
+                      <div
+                        class="l-content"
+                        data-layer="content"
+                        id="cvContent"
+                      >
+                        <span id="contentRead">320 × 200</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="br-h"><b id="brHW">380px</b></div>
+                <div class="br-v"><b id="brVH">260px</b></div>
+              </div>
+            </div>
+            <div class="canvas-foot">
+              <span class="measure" style="--dc: var(--content-c)"
+                ><i></i><em>content</em><b id="chipContent">320 × 200</b></span
+              >
+              <span class="measure" style="--dc: var(--border-c)"
+                ><i></i><em>full box</em><b id="chipBox">380 × 260</b></span
+              >
+              <span class="measure" style="--dc: var(--margin-c)"
+                ><i></i><em>incl. margin</em><b id="chipAll">444 × 324</b></span
+              >
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rW">width</label
+                ><output class="ctl-val" id="vW">320px</output>
+              </div>
+              <input
+                type="range"
+                id="rW"
+                min="60"
+                max="400"
+                value="320"
+                step="2"
+              />
+            </div>
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rH">height</label
+                ><output class="ctl-val" id="vH">200px</output>
+              </div>
+              <input
+                type="range"
+                id="rH"
+                min="60"
+                max="280"
+                value="200"
+                step="2"
+              />
+            </div>
+            <div class="ctl" style="--ac: var(--padding-c)">
+              <div class="ctl-top">
+                <label for="rP">padding</label
+                ><output class="ctl-val" id="vP">24px</output>
+              </div>
+              <input type="range" id="rP" min="0" max="80" value="24" />
+            </div>
+            <div class="ctl" style="--ac: var(--border-c)">
+              <div class="ctl-top">
+                <label for="rB">border</label
+                ><output class="ctl-val" id="vB">6px</output>
+              </div>
+              <input type="range" id="rB" min="0" max="24" value="6" />
+            </div>
+            <div class="segmented" id="segBstyle" style="margin: -4px 11px 0">
+              <span class="seg-thumb"></span>
+              <button data-v="solid" class="active">solid</button>
+              <button data-v="dashed">dashed</button>
+              <button data-v="dotted">dotted</button>
+              <button data-v="double">double</button>
+            </div>
+            <div class="ctl" style="--ac: var(--margin-c)">
+              <div class="ctl-top">
+                <label for="rM">margin</label
+                ><output class="ctl-val" id="vM">32px</output>
+              </div>
+              <input type="range" id="rM" min="0" max="80" value="32" />
+            </div>
+            <div class="formula">
+              <span class="k">the math, live</span>
+              <p id="formulaEl"></p>
+            </div>
+            <div class="code-box" style="position: relative">
+              <button class="copy" id="btnCopy">copy</button>
+              <pre id="codeEl"></pre>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 03 · box-sizing ============ -->
+      <section id="sizing" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">03 · box-sizing</p>
+          <h2>Same CSS, two different boxes</h2>
+          <p class="lede">
+            Both boxes get the <b>identical</b> width, padding and border. Only
+            <span class="mono" style="color: var(--border-c)">box-sizing</span>
+            differs. <b>content-box</b>: width = content only.
+            <b>border-box</b>: width = the whole visible box — content shrinks
+            to fit.
+          </p>
+        </div>
+        <div class="sd-panel">
+          <div class="sd-controls">
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="swW">width (both boxes)</label
+                ><output class="ctl-val" id="swVW">300px</output>
+              </div>
+              <input
+                type="range"
+                id="swW"
+                min="180"
+                max="340"
+                value="300"
+                step="2"
+              />
+            </div>
+            <div class="ctl" style="--ac: var(--padding-c)">
+              <div class="ctl-top">
+                <label for="swP">padding</label
+                ><output class="ctl-val" id="swVP">20px</output>
+              </div>
+              <input type="range" id="swP" min="0" max="40" value="20" />
+            </div>
+            <div class="ctl" style="--ac: var(--border-c)">
+              <div class="ctl-top">
+                <label for="swB">border</label
+                ><output class="ctl-val" id="swVB">6px</output>
+              </div>
+              <input type="range" id="swB" min="0" max="14" value="6" />
+            </div>
+          </div>
+          <div class="arena">
+            <article class="fighter">
+              <header>
+                <h3>content-box</h3>
+                <span class="pill pill-warn">the historical default</span>
+              </header>
+              <div class="stage">
+                <div class="guide" id="guideCB">
+                  <span class="guide-lab" id="glabCB">declared 300px</span>
+                </div>
+                <div class="sbox" id="boxCB">
+                  <div class="scontent">content</div>
+                </div>
+              </div>
+              <div class="ruler">
+                <i class="r-line" id="rlCB"></i><b id="rnCB">352px</b>
+              </div>
+              <p class="math" id="mathCB"></p>
+              <p class="note" id="noteCB"></p>
+            </article>
+            <div class="vs">VS</div>
+            <article class="fighter">
+              <header>
+                <h3>border-box</h3>
+                <span class="pill pill-ok">what you'd expect</span>
+              </header>
+              <div class="stage">
+                <div class="guide" id="guideBB">
+                  <span class="guide-lab" id="glabBB">declared 300px</span>
+                </div>
+                <div class="sbox" id="boxBB">
+                  <div class="scontent">content</div>
+                </div>
+              </div>
+              <div class="ruler">
+                <i class="r-line" id="rlBB"></i><b id="rnBB">300px</b>
+              </div>
+              <p class="math" id="mathBB"></p>
+              <p class="note" id="noteBB"></p>
+            </article>
+          </div>
+          <div class="protip">
+            <code>*, *::before, *::after { box-sizing: border-box; }</code>
+            <p>
+              The one-liner at the top of almost every modern codebase. With it,
+              <b>width means the width you see</b> — no more surprise math.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 04 · border ============ -->
+      <section id="border" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">04 · border</p>
+          <h2>The frame that counts</h2>
+          <p class="lede">
+            Border is the only layer you can see on its own — and its thickness
+            <b>adds to the box's size</b> (unless you use border-box). Style it
+            freely.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>the frame</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="bd-box" id="bdBox">content</div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--border-c)">
+              <div class="ctl-top">
+                <label for="rBd">border-width</label
+                ><output class="ctl-val" id="oBd">8px</output>
+              </div>
+              <input type="range" id="rBd" min="0" max="24" value="8" />
+            </div>
+            <div class="segmented" id="segBd">
+              <span class="seg-thumb"></span>
+              <button data-v="solid" class="active">solid</button>
+              <button data-v="dashed">dashed</button>
+              <button data-v="dotted">dotted</button>
+              <button data-v="double">double</button>
+            </div>
+            <div class="code-box"><pre id="codeBd"></pre></div>
+            <p class="side-note">
+              Border sits between padding and margin. Backgrounds stop at the
+              border's outer edge — margin never gets painted.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 05 · margin ============ -->
+      <section id="margin" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">05 · margin</p>
+          <h2>Invisible space — with a trick</h2>
+          <p class="lede">
+            Margin is transparent and pushes neighbours away. But stack two
+            boxes and their vertical margins <b>collapse</b>: the gap is the
+            bigger one, not the sum. Drag and watch the browser do math you
+            didn't ask for.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>the collapse, live</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="mwrap">
+                <div class="mbox" id="maBox">box A · margin-bottom</div>
+                <div class="mbox" id="mbBox">box B · margin-top</div>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--margin-c)">
+              <div class="ctl-top">
+                <label for="rMa">A's margin-bottom</label
+                ><output class="ctl-val" id="oMa">40px</output>
+              </div>
+              <input type="range" id="rMa" min="0" max="80" value="40" />
+            </div>
+            <div class="ctl" style="--ac: var(--border-c)">
+              <div class="ctl-top">
+                <label for="rMb">B's margin-top</label
+                ><output class="ctl-val" id="oMb">30px</output>
+              </div>
+              <input type="range" id="rMb" min="0" max="80" value="30" />
+            </div>
+            <p class="gap-read" id="gapRead"></p>
+            <div class="code-box"><pre id="codeMa"></pre></div>
+            <p class="side-note">
+              Only vertical margins collapse, only in normal flow. Horizontal
+              neighbours never do — flex &amp; grid opt out entirely.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 06 · field notes ============ -->
+      <section id="notes" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">06 · field notes</p>
+          <h2>Cheat codes from lesson 06</h2>
+        </div>
+        <div class="notes-grid">
+          <article class="note-card" style="--nc: var(--content-c)">
+            <div class="note-demo">
+              <div class="demo-layers">
+                <div><div></div></div>
+              </div>
+            </div>
+            <h3>the stack, inside-out</h3>
+            <p>
+              Content → padding → border → margin. Every CSS layout question is
+              eventually a question about which layer is misbehaving.
+            </p>
+            <p class="note-tip mono">↳ hover: the layers inflate</p>
+          </article>
+          <article class="note-card" style="--nc: var(--padding-c)">
+            <div class="note-demo demo-pvm"><i></i><b></b></div>
+            <h3>padding vs margin</h3>
+            <p>
+              The background paints through <b>padding</b> — it's part of the
+              box's body. <b>Margin</b> is transparent forever: pure distance
+              between boxes.
+            </p>
+            <p class="note-tip mono">
+              ↳ hover: padding swells inside the frame
+            </p>
+          </article>
+          <article class="note-card" style="--nc: var(--border-c)">
+            <div class="note-demo">
+              <span class="demo-bbl">* { box-sizing: border-box; }</span>
+            </div>
+            <h3>border-box everywhere</h3>
+            <p>
+              With border-box, <span class="mono">width</span> means the width
+              you see. Padding &amp; border squeeze the content instead of
+              stretching the box. Ship the one-liner.
+            </p>
+            <p class="note-tip mono">↳ hover: the fix lights up</p>
+          </article>
+          <article class="note-card" style="--nc: var(--margin-c)">
+            <div class="note-demo">
+              <div class="demo-col"><i></i><i></i></div>
+            </div>
+            <h3>margins collapse</h3>
+            <p>
+              Stacked vertical margins merge to the bigger one: 40px + 30px
+              ships a 40px gap. Surprising, ancient, and everywhere. Horizontal
+              margins never collapse.
+            </p>
+            <p class="note-tip mono">↳ hover: the gap collapses</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ lesson nav ============ -->
+      <div class="lesson-nav reveal">
+        <div>
+          <span class="ln-status">✓ completed</span>
+          <h3>06 — Box Model</h3>
+        </div>
+        <div class="ln-track" id="lnTrack"></div>
+        <div class="ln-next">
+          <span>up next</span>
+          <b>07 · Width &amp; Height</b>
+        </div>
+      </div>
+
+      <footer>
+        <span class="mono">drag things, break things, learn things.</span>
+        <span class="sp mono">45 lessons · lesson 06 · the box model</span>
+      </footer>
+    </div>
+    <!-- /wrap -->
+
+    <script>
+      (() => {
+        const $ = (id) => document.getElementById(id);
+        const rule = (sel, decls) =>
+          `<span class="c-sel">${sel}</span> {\n${decls
+            .map((d) => {
+              const i = d.indexOf(":");
+              return `  <span class="c-prop">${d.slice(0, i)}</span>: <span class="c-val">${d.slice(i + 1).trim()}</span>;`;
+            })
+            .join("\n")}\n}`;
+        function range(el, out, fmt, cb) {
+          const f = () => {
+            const v = +el.value;
+            out.textContent = fmt(v);
+            const min = +el.min,
+              max = +el.max;
+            el.style.setProperty(
+              "--fill",
+              ((v - min) / (max - min)) * 100 + "%",
+            );
+            cb(v);
+          };
+          el.addEventListener("input", f);
+          f();
+        }
+        function initSeg(seg, onPick) {
+          const btns = [...seg.querySelectorAll("button")],
+            thumb = seg.querySelector(".seg-thumb"),
+            n = btns.length;
+          function set(i) {
+            btns.forEach((b, j) => b.classList.toggle("active", i === j));
+            thumb.style.width = `calc((100% - 6px)/${n})`;
+            thumb.style.transform = `translateX(${i * 100}%)`;
+          }
+          btns.forEach((b, i) =>
+            b.addEventListener("click", () => {
+              set(i);
+              onPick(b.dataset.v);
+            }),
+          );
+          set(0);
+        }
+
+        /* ---------- intro cycle ---------- */
+        const SEQ = ["margin", "border", "padding", "content"];
+        const IL = {
+          margin: $("ilMargin"),
+          border: $("ilBorder"),
+          padding: $("ilPadding"),
+          content: $("ilContent"),
+        };
+        const NOTES = {
+          margin:
+            '<b style="color:var(--margin-c)">margin</b> — invisible outside space. It positions the box among its neighbours.',
+          border:
+            '<b style="color:var(--border-c)">border</b> — the frame. Visible, stylable, drawn between padding and margin.',
+          padding:
+            '<b style="color:var(--padding-c)">padding</b> — the inside cushion between border and content. Background shows here.',
+          content:
+            '<b style="color:var(--content-c)">content</b> — text, images, video… the reason the box exists at all.',
+        };
+        const legendRows = [...document.querySelectorAll(".intro-legend span")];
+        let ii = 0;
+        function stepIntro() {
+          SEQ.forEach((k) => IL[k].classList.remove("lit"));
+          legendRows.forEach((r) => r.classList.remove("on"));
+          const k = SEQ[ii];
+          IL[k].classList.add("lit");
+          legendRows.find((r) => r.dataset.k === k).classList.add("on");
+          $("introNote").innerHTML = NOTES[k];
+          ii = (ii + 1) % 4;
+        }
+        stepIntro();
+        setInterval(stepIntro, 1800);
+
+        /* ---------- 01 stack explorer (isolate & inflate) ---------- */
+        const STACK_NOTES = {
+          content:
+            '<b>content</b> — the actual stuff: text, images, video. Sized by <span class="mono">width</span> &amp; <span class="mono">height</span> (or by the content itself, if you let it).',
+          padding:
+            "<b>padding</b> — breathing room inside the border. The element's background paints through it. Grows the box outward. Watch it inflate.",
+          border:
+            '<b>border</b> — the frame between padding and margin. Its width adds to the total size. Controlled by <span class="mono">border-width / style / color</span>.',
+          margin:
+            "<b>margin</b> — invisible outside space. Pushes neighbours away, never gets painted. Vertical margins collapse. Watch it inflate.",
+        };
+        $("stackBtns").addEventListener("click", (e) => {
+          const b = e.target.closest(".stack-btn");
+          if (!b) return;
+          document
+            .querySelectorAll(".stack-btn")
+            .forEach((x) => x.classList.remove("on"));
+          b.classList.add("on");
+          $("stackStage").dataset.sel = b.dataset.layer;
+          $("stackNote").innerHTML = STACK_NOTES[b.dataset.layer];
+        });
+        $("stackNote").innerHTML = STACK_NOTES.content;
+
+        /* ---------- 02 playground ---------- */
+        const S = { w: 320, h: 200, p: 24, b: 6, m: 32, style: "solid" };
+        let codePlain = "";
+        const canvas = $("canvas"),
+          scaler = $("scaler");
+        function render() {
+          const { w, h, p, b, m, style } = S;
+          $("cvContent").style.width = w + "px";
+          $("cvContent").style.height = h + "px";
+          $("cvPadding").style.padding = p + "px";
+          $("cvBorder").style.borderWidth = b + "px";
+          $("cvBorder").style.borderStyle = style;
+          $("cvMargin").style.padding = m + "px";
+          $("tagMargin").classList.toggle("show", m >= 16);
+          $("tagPadding").classList.toggle("show", p >= 18);
+          $("contentRead").textContent = w + " × " + h;
+          const boxW = w + 2 * p + 2 * b,
+            boxH = h + 2 * p + 2 * b,
+            allW = boxW + 2 * m,
+            allH = boxH + 2 * m;
+          $("brHW").textContent = boxW + "px";
+          $("brVH").textContent = boxH + "px";
+          $("chipContent").textContent = w + " × " + h;
+          $("chipBox").textContent = boxW + " × " + boxH;
+          $("chipAll").textContent = allW + " × " + allH;
+          $("formulaEl").innerHTML =
+            `total width = <b>${w}</b> + <b>${p}</b>×2 + <b>${b}</b>×2 <span class="eq">= ${boxW}px</span>`;
+          codePlain = `.element {\n  width: ${w}px;\n  height: ${h}px;\n  padding: ${p}px;\n  border: ${b}px ${style} #f2c14e;\n  margin: ${m}px;\n}`;
+          $("codeEl").innerHTML = rule(".element", [
+            `width: ${w}px`,
+            `height: ${h}px`,
+            `padding: ${p}px`,
+            `border: ${b}px ${style} #f2c14e`,
+            `margin: ${m}px`,
+          ]);
+          const sc = Math.min(
+            1,
+            (canvas.clientWidth - 64) / allW,
+            (canvas.clientHeight - 64) / allH,
+          );
+          scaler.style.transform = `scale(${Math.max(0.3, sc)})`;
+        }
+        range(
+          $("rW"),
+          $("vW"),
+          (v) => v + "px",
+          (v) => {
+            S.w = v;
+            render();
+          },
+        );
+        range(
+          $("rH"),
+          $("vH"),
+          (v) => v + "px",
+          (v) => {
+            S.h = v;
+            render();
+          },
+        );
+        range(
+          $("rP"),
+          $("vP"),
+          (v) => v + "px",
+          (v) => {
+            S.p = v;
+            render();
+          },
+        );
+        range(
+          $("rB"),
+          $("vB"),
+          (v) => v + "px",
+          (v) => {
+            S.b = v;
+            render();
+          },
+        );
+        range(
+          $("rM"),
+          $("vM"),
+          (v) => v + "px",
+          (v) => {
+            S.m = v;
+            render();
+          },
+        );
+        initSeg($("segBstyle"), (v) => {
+          S.style = v;
+          render();
+        });
+        document.querySelectorAll("#canvas [data-layer]").forEach((el) => {
+          el.addEventListener("mouseenter", () => el.classList.add("hot"));
+          el.addEventListener("mouseleave", () => el.classList.remove("hot"));
+        });
+        $("btnCopy").addEventListener("click", async () => {
+          try {
+            await navigator.clipboard.writeText(codePlain);
+          } catch {
+            const ta = document.createElement("textarea");
+            ta.value = codePlain;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand("copy");
+            ta.remove();
+          }
+          $("btnCopy").textContent = "copied ✓";
+          $("btnCopy").classList.add("done");
+          setTimeout(() => {
+            $("btnCopy").textContent = "copy";
+            $("btnCopy").classList.remove("done");
+          }, 1400);
+        });
+        render();
+
+        /* ---------- 03 showdown ---------- */
+        const SD = { w: 300, p: 20, b: 6 };
+        const boxCB = $("boxCB"),
+          boxBB = $("boxBB");
+        function renderSD() {
+          const { w, p, b } = SD;
+          [boxCB, boxBB].forEach((el) => {
+            el.style.width = w + "px";
+            el.style.padding = p + "px";
+            el.style.borderWidth = b + "px";
+          });
+          const owCB = boxCB.offsetWidth,
+            owBB = boxBB.offsetWidth,
+            cw = Math.max(0, w - 2 * p - 2 * b);
+          $("rlCB").style.width = owCB + "px";
+          $("rnCB").style.left = owCB + 10 + "px";
+          $("rnCB").textContent = owCB + "px total";
+          $("rlBB").style.width = owBB + "px";
+          $("rnBB").style.left = owBB + 10 + "px";
+          $("rnBB").textContent = owBB + "px total";
+          $("guideCB").style.left = 14 + w + "px";
+          $("guideBB").style.left = 14 + w + "px";
+          $("glabCB").textContent = $("glabBB").textContent =
+            "declared " + w + "px";
+          $("mathCB").innerHTML = `${w} + ${p}×2 + ${b}×2 = <b>${owCB}px</b>`;
+          $("mathBB").innerHTML =
+            `${w} stays <b>${owBB}px</b> · content shrinks to <b>${cw}px</b>`;
+          $("noteCB").innerHTML =
+            p + b
+              ? `<span class="warn">↯ spills ${2 * p + 2 * b}px past the width you declared</span>`
+              : `<span class="dim">no padding or border yet — the two boxes match</span>`;
+          $("noteBB").innerHTML =
+            `<span class="ok">✓ stays exactly ${w}px — padding &amp; border squeeze inside</span>`;
+        }
+        range(
+          $("swW"),
+          $("swVW"),
+          (v) => v + "px",
+          (v) => {
+            SD.w = v;
+            renderSD();
+          },
+        );
+        range(
+          $("swP"),
+          $("swVP"),
+          (v) => v + "px",
+          (v) => {
+            SD.p = v;
+            renderSD();
+          },
+        );
+        range(
+          $("swB"),
+          $("swVB"),
+          (v) => v + "px",
+          (v) => {
+            SD.b = v;
+            renderSD();
+          },
+        );
+
+        /* ---------- 04 border ---------- */
+        function renderBd(st) {
+          $("codeBd").innerHTML = rule(".card", [
+            `border: ${+$("rBd").value}px ${st} #f2c14e`,
+          ]);
+        }
+        range(
+          $("rBd"),
+          $("oBd"),
+          (v) => v + "px",
+          (v) => {
+            $("bdBox").style.borderWidth = v + "px";
+            renderBd($("bdBox").style.borderStyle || "solid");
+          },
+        );
+        initSeg($("segBd"), (v) => {
+          $("bdBox").style.borderStyle = v;
+          renderBd(v);
+        });
+        renderBd("solid");
+
+        /* ---------- 05 margin collapse ---------- */
+        function renderMa() {
+          const a = +$("rMa").value,
+            b = +$("rMb").value;
+          $("maBox").style.marginBottom = a + "px";
+          $("mbBox").style.marginTop = b + "px";
+          const actual = Math.max(a, b);
+          $("gapRead").innerHTML =
+            `declared ${a} + ${b} = ${a + b}px · actual gap: <b>${actual}px</b> — <span class="ok">the bigger one wins</span>`;
+          $("codeMa").innerHTML =
+            rule(".a", [`margin-bottom: ${a}px`]) +
+            "\n" +
+            rule(".b", [`margin-top: ${b}px`]);
+        }
+        range($("rMa"), $("oMa"), (v) => v + "px", renderMa);
+        range($("rMb"), $("oMb"), (v) => v + "px", renderMa);
+
+        /* ---------- lesson track ---------- */
+        const t = $("lnTrack");
+        for (let i = 0; i < 45; i++) {
+          const s = document.createElement("span");
+          s.className = "tick" + (i < 6 ? " done" : "");
+          s.title = "lesson " + (i + 1);
+          t.appendChild(s);
+        }
+
+        /* ---------- reveal ---------- */
+        const io = new IntersectionObserver(
+          (es) =>
+            es.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                io.unobserve(e.target);
+              }
+            }),
+          { threshold: 0.12 },
+        );
+        document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      })();
+    </script>
+  </body>
+</html>
