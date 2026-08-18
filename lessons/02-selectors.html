@@ -155,36 +155,7 @@
         background: rgba(11, 14, 21, 0.92);
         border-bottom: 1px solid var(--line);
       }
-      .brand {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-family: var(--disp);
-        font-weight: 700;
-      }
-      .logo {
-        width: 22px;
-        height: 22px;
-        border: 2px solid var(--margin-c);
-        position: relative;
-        flex: none;
-        transition: transform 0.4s;
-      }
-      .logo::before {
-        content: "";
-        position: absolute;
-        inset: 3px;
-        border: 2px solid var(--border-c);
-      }
-      .logo::after {
-        content: "";
-        position: absolute;
-        inset: 8px;
-        background: var(--content-c);
-      }
-      .brand:hover .logo {
-        transform: rotate(90deg);
-      }
+
       .brand small {
         color: var(--faint);
         font-weight: 500;
@@ -814,20 +785,97 @@
       }
 
       /* attribute stage */
+      .sp-title {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #8a8f98;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #e4e0d6;
+      }
       .linklist {
         display: flex;
         flex-direction: column;
-        gap: 11px;
-        font-size: 14px;
-        align-items: flex-start;
+        font-size: 13.5px;
       }
       .linklist a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
         color: #0d8a72;
         text-decoration: none;
-        border-bottom: 1px dashed currentColor;
+        padding: 9px 10px;
+        border-bottom: 1px dashed #e0dbd0;
+        transition: background 0.2s;
       }
-      .linklist input {
-        margin-top: 2px;
+      .linklist a:last-child {
+        border-bottom: none;
+      }
+      .linklist a:hover {
+        background: rgba(13, 138, 114, 0.07);
+      }
+      .li-ic {
+        width: 27px;
+        height: 27px;
+        flex: none;
+        display: grid;
+        place-items: center;
+        background: #fff;
+        border: 1px solid #e0dbd0;
+        border-radius: 8px;
+        font-size: 13px;
+      }
+      .li-tag {
+        margin-left: auto;
+        font: 600 9px var(--mono);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #6b7280;
+        background: #f0ece2;
+        border-radius: 999px;
+        padding: 3px 9px;
+      }
+      .li-tag.warn {
+        color: #a05a00;
+        background: #ffe9c2;
+      }
+      .formrow {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-top: 14px;
+      }
+      .formrow input[type="text"] {
+        flex: 1;
+        background: #fff;
+        border: 1px solid #dcd7cc;
+        border-radius: 9px;
+        padding: 9px 12px;
+        font-family: var(--body);
+        font-size: 13px;
+        color: var(--page-ink);
+        outline: none;
+        transition: 0.2s;
+      }
+      .formrow input[type="text"]:focus {
+        border-color: var(--content-c);
+        box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.2);
+      }
+      .check {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 13px;
+        color: #454b57;
+        cursor: pointer;
+      }
+      .check input {
+        width: 16px;
+        height: 16px;
+        accent-color: #ff6b57;
+        cursor: pointer;
       }
 
       /* ============ field notes ============ */
@@ -903,7 +951,7 @@
         border-radius: 6px;
         padding: 3px 7px;
         transition: 0.3s;
-        transform: translateY(10px);
+        transform: translateY(2px);
         opacity: 0.35;
       }
       .note-card:hover .demo-family .tk {
@@ -939,6 +987,7 @@
       .demo-classid .many {
         display: flex;
         gap: 5px;
+        padding-left: 30%;
       }
       .demo-classid .many i {
         width: 10px;
@@ -993,6 +1042,7 @@
         align-items: flex-end;
         gap: 10px;
         height: 64px;
+        padding-left: 27%;
       }
       .demo-spec i {
         width: 26px;
@@ -1156,7 +1206,6 @@
     </div>
 
     <header class="topbar">
-      <div class="brand"><span class="logo"></span>css<small>.lab</small></div>
       <span class="lesson-tag">lesson 02 / 45</span>
       <nav>
         <a href="#element">element</a>
@@ -1527,19 +1576,37 @@
             </div>
             <div class="stage-wrap">
               <div class="stage-page" id="stage7">
+                <p class="sp-title">Aurora Coffee · resources</p>
                 <div class="linklist">
                   <a href="https://aurora.coffee" data-pick
-                    >https://aurora.coffee</a
+                    ><span class="li-ic">🔒</span>https://aurora.coffee<span
+                      class="li-tag"
+                      >secure</span
+                    ></a
                   >
                   <a href="http://old.aurora.coffee" data-pick
-                    >http://old.aurora.coffee</a
+                    ><span class="li-ic">⚠</span>http://old.aurora.coffee<span
+                      class="li-tag warn"
+                      >insecure</span
+                    ></a
                   >
-                  <a href="menu.pdf" data-pick>menu.pdf</a>
+                  <a href="menu.pdf" data-pick
+                    ><span class="li-ic">📄</span>menu.pdf<span class="li-tag"
+                      >pdf</span
+                    ></a
+                  >
                   <a href="mailto:hi@aurora.coffee" data-pick
-                    >mailto:hi@aurora.coffee</a
+                    ><span class="li-ic">✉</span>mailto:hi@aurora.coffee<span
+                      class="li-tag"
+                      >email</span
+                    ></a
                   >
+                </div>
+                <div class="formrow">
                   <input type="text" placeholder="name" data-pick />
-                  <input type="checkbox" data-pick />
+                  <label class="check"
+                    ><input type="checkbox" data-pick /> subscribe</label
+                  >
                 </div>
               </div>
             </div>
@@ -1661,7 +1728,7 @@
         <span class="mono"
           >css.lab — drag things, break things, learn things.</span
         >
-        <span class="sp mono">45 lessons · lesson 02 · selectors ⭐⭐</span>
+        <span class="sp mono">45 lessons · lesson 02 · selectors</span>
       </footer>
     </div>
     <!-- /wrap -->
