@@ -869,10 +869,10 @@
         background: var(--ink);
       }
       .role-row {
-        display: flex;
-        gap: 14px;
+        display: grid;
+        grid-template-columns: 1fr 60px 1fr;
+        gap: 16px;
         margin-top: 16px;
-        flex-wrap: wrap;
       }
       .role {
         flex: 1;
@@ -1961,6 +1961,7 @@
               look.</span
             >
           </div>
+          <div></div>
           <div class="role css">
             <b>CSS = the adjectives</b
             ><span
