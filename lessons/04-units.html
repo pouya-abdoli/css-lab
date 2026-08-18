@@ -1,0 +1,1977 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Units — Lesson 04</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' fill='none' stroke='%23f07f4f' stroke-width='2'/%3E%3Crect x='8' y='8' width='16' height='16' fill='none' stroke='%23f2c14e' stroke-width='2'/%3E%3Crect x='13' y='13' width='6' height='6' fill='%2358a6ff'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0e15;
+        --panel: #121826;
+        --panel2: #0d1220;
+        --ink: #10141d;
+        --line: #222c40;
+        --line2: #31405e;
+        --text: #e9eef7;
+        --muted: #8d9ab0;
+        --faint: #5b6a84;
+        --margin-c: #f07f4f;
+        --border-c: #f2c14e;
+        --padding-c: #3ecf8e;
+        --content-c: #58a6ff;
+        --pink: #ff4f8b;
+        --page: #f7f4ee;
+        --page-ink: #1c1f26;
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: dark;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 15px;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+      ::selection {
+        background: rgba(88, 166, 255, 0.35);
+      }
+      .mono {
+        font-family: var(--mono);
+      }
+      section {
+        scroll-margin-top: 76px;
+      }
+      b {
+        font-weight: 600;
+      }
+
+      .bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            700px 460px at 12% -6%,
+            rgba(242, 193, 78, 0.07),
+            transparent 60%
+          ),
+          radial-gradient(
+            760px 520px at 92% 22%,
+            rgba(88, 166, 255, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            600px 480px at 40% 105%,
+            rgba(62, 207, 142, 0.05),
+            transparent 60%
+          );
+      }
+      .bg::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(233, 238, 247, 0.035) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(233, 238, 247, 0.035) 1px,
+            transparent 1px
+          );
+        background-size: 28px 28px;
+        mask-image: radial-gradient(
+          ellipse 120% 90% at 50% 0%,
+          #000 40%,
+          transparent 100%
+        );
+      }
+      .bg .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.5;
+        animation: drift 26s ease-in-out infinite alternate;
+      }
+      .bg .g1 {
+        width: 420px;
+        height: 420px;
+        left: -120px;
+        top: 30%;
+        background: rgba(240, 127, 79, 0.1);
+      }
+      .bg .g2 {
+        width: 460px;
+        height: 460px;
+        right: -140px;
+        top: 60%;
+        background: rgba(88, 166, 255, 0.1);
+        animation-delay: -12s;
+      }
+      @keyframes drift {
+        from {
+          transform: translateY(-30px);
+        }
+        to {
+          transform: translateY(40px);
+        }
+      }
+
+      /* topbar: lesson № first, nav left — no brand, no logo */
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 12px clamp(16px, 4vw, 44px);
+        background: rgba(11, 14, 21, 0.92);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar nav {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .topbar nav a {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 6px 11px;
+        border-radius: 999px;
+        transition: 0.2s;
+      }
+      .topbar nav a:hover {
+        color: var(--text);
+        background: #161d2c;
+      }
+      .lesson-tag {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--border-c);
+        border: 1px dashed rgba(242, 193, 78, 0.45);
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .wrap {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: 0 clamp(16px, 4vw, 44px);
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        padding: clamp(20px, 4vh, 48px) 0 clamp(30px, 5vh, 56px);
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--padding-c);
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(2.3rem, 5.2vw, 3.7rem);
+        line-height: 1.06;
+        letter-spacing: -0.02em;
+      }
+      .word-style {
+        display: inline-block;
+        padding: 0.02em 0.22em;
+        background: rgba(242, 193, 78, 0.16);
+        border: 0.06em solid var(--border-c);
+        border-radius: 0.14em;
+        color: #ffe3a1;
+        transition: transform 0.3s;
+        cursor: default;
+      }
+      .word-style:hover {
+        transform: rotate(-2deg) scale(1.03);
+      }
+      .lede {
+        color: var(--muted);
+        max-width: 56ch;
+        margin-top: 18px;
+        font-size: 1.05rem;
+      }
+      .lede b {
+        color: var(--text);
+      }
+      .css-full {
+        display: inline-block;
+        margin-top: 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--faint);
+        letter-spacing: 0.08em;
+      }
+      .intro-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 26px;
+        display: grid;
+        place-items: center;
+        gap: 16px;
+        box-shadow: 0 30px 60px -40px rgba(0, 0, 0, 0.8);
+      }
+      .intro-track {
+        width: 100%;
+        max-width: 300px;
+        height: 64px;
+        background: var(--ink);
+        border: 1px solid var(--line2);
+        border-radius: 10px;
+        position: relative;
+        overflow: hidden;
+      }
+      #introBar {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        background: linear-gradient(90deg, var(--content-c), var(--padding-c));
+        border-radius: 0 8px 8px 0;
+        transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .intro-fmt {
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--content-c);
+        background: var(--ink);
+        border: 1px solid var(--line2);
+        border-radius: 9px;
+        padding: 7px 16px;
+      }
+      .imode {
+        font-size: 11px;
+        color: var(--faint);
+        letter-spacing: 0.1em;
+      }
+
+      .sec {
+        padding: clamp(36px, 6vh, 64px) 0;
+      }
+      .sec-head {
+        margin-bottom: 26px;
+        max-width: 72ch;
+      }
+      .sec-head h2 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+        letter-spacing: -0.015em;
+        line-height: 1.15;
+      }
+      .sec-head .lede {
+        margin-top: 10px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 18px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .panel-head h3 {
+        font-family: var(--disp);
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dots i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dots i:nth-child(1) {
+        background: #f07f4f;
+      }
+      .dots i:nth-child(2) {
+        background: #f2c14e;
+      }
+      .dots i:nth-child(3) {
+        background: #3ecf8e;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.85;
+        overflow-x: auto;
+      }
+      .c-sel {
+        color: #7fe0b0;
+      }
+      .c-prop {
+        color: #8ab4ff;
+      }
+      .c-val {
+        color: #f2c14e;
+      }
+      .c-com {
+        color: #5b6a84;
+      }
+      .grp {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+
+      .pick-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 18px;
+        align-items: stretch;
+      }
+      .stage-wrap {
+        padding: 28px;
+        display: grid;
+        place-items: center;
+        min-height: 340px;
+      }
+      .side {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .code-box {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .code-box pre {
+        min-height: 0;
+        font-size: 12.5px;
+      }
+      .side-note {
+        font-size: 12px;
+        color: var(--faint);
+      }
+      .ghost {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--faint);
+        background: none;
+        border: 1px dashed var(--line2);
+        border-radius: 8px;
+        padding: 7px 12px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .ghost:hover {
+        color: var(--content-c);
+        border-color: var(--content-c);
+      }
+
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        outline: none;
+        cursor: pointer;
+        background: linear-gradient(
+          90deg,
+          var(--ac) var(--fill, 50%),
+          #232c40 var(--fill, 50%)
+        );
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        transition: transform 0.15s;
+      }
+      input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.15);
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+      }
+      .ctl {
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 7px 11px;
+        transition: 0.2s;
+      }
+      .ctl:hover {
+        background: #101725;
+        border-color: var(--line);
+      }
+      .ctl-top {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+      .ctl-top label {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text);
+      }
+      .ctl-val {
+        margin-left: auto;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--ac);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 2px 9px;
+      }
+
+      /* rulers & stages */
+      .ruler {
+        position: relative;
+        height: 30px;
+        width: 100%;
+        max-width: 470px;
+      }
+      .r-line {
+        position: absolute;
+        left: 0;
+        top: 12px;
+        height: 2px;
+        background: var(--content-c);
+        border-radius: 1px;
+        transition: width 0.2s;
+      }
+      .r-line::before,
+      .r-line::after {
+        content: "";
+        position: absolute;
+        top: -4px;
+        width: 2px;
+        height: 10px;
+        background: var(--content-c);
+      }
+      .r-line::before {
+        left: 0;
+      }
+      .r-line::after {
+        right: 0;
+      }
+      .ruler b {
+        position: absolute;
+        top: 2px;
+        font-family: var(--mono);
+        font-weight: 500;
+        font-size: 11.5px;
+        color: var(--text);
+        white-space: nowrap;
+        transition: left 0.2s;
+      }
+      .unit-stage {
+        width: 100%;
+        max-width: 470px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .px-box {
+        height: 74px;
+        background: var(--content-bg);
+        border: 1px dashed var(--content-c);
+        border-radius: 10px;
+        transition: width 0.2s;
+      }
+      .win-read {
+        font-size: 11px;
+        color: var(--faint);
+      }
+      /* FIX: parent-box now uses outline (takes no space) so content width == slider value */
+      .parent-box {
+        width: 100%;
+        background: repeating-linear-gradient(
+          45deg,
+          rgba(240, 127, 79, 0.12) 0 10px,
+          transparent 10px 20px
+        );
+        outline: 1px dashed var(--margin-c);
+        border-radius: 12px;
+        transition: width 0.2s;
+      }
+      .child-box {
+        height: 64px;
+        background: var(--padding-bg);
+        border: 1px dashed var(--padding-c);
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: #8fe6bd;
+        transition: width 0.2s;
+      }
+      .er-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 12px;
+      }
+      .er-lab {
+        font-size: 11.5px;
+        color: var(--muted);
+        width: 96px;
+        flex: none;
+      }
+      .er-box {
+        display: inline-block;
+        background: var(--content-bg);
+        border: 1px dashed var(--content-c);
+        border-radius: 8px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: #a7cdff;
+        transition: padding 0.2s;
+      }
+      .er-box.rem {
+        background: var(--padding-bg);
+        border-color: var(--padding-c);
+        color: #8fe6bd;
+      }
+      .er-row b {
+        font-size: 11.5px;
+        color: var(--text);
+      }
+      .nest-wrap {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 16px;
+      }
+      .nest {
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 10px;
+        font-size: 11px;
+      }
+      .nest div {
+        font-size: 1.5em;
+        border: 1px dashed var(--line2);
+        border-radius: 8px;
+        padding: 5px;
+        margin-top: 6px;
+        color: var(--margin-c);
+        font-family: var(--mono);
+      }
+      .nest.remn div {
+        font-size: 1.5rem;
+        color: var(--padding-c);
+      }
+      .nest-cap {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--faint);
+        margin-top: 6px;
+      }
+      .fvp {
+        position: relative;
+        border: 1px solid var(--line2);
+        border-radius: 12px;
+        background: var(--panel2);
+        overflow: hidden;
+        transition:
+          width 0.25s,
+          height 0.25s;
+      }
+      .fvp-el {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 50%;
+        height: 50%;
+        background: var(--content-bg);
+        border-right: 1px dashed var(--content-c);
+        border-bottom: 1px dashed var(--content-c);
+        display: grid;
+        place-items: center;
+      }
+      .fvp-el span {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: #a7cdff;
+      }
+      .fvp-tag {
+        position: absolute;
+        right: 8px;
+        top: 8px;
+        font-size: 10px;
+        color: var(--faint);
+      }
+      .phone {
+        position: relative;
+        width: 236px;
+        height: 368px;
+        border: 2px solid var(--line2);
+        border-radius: 26px;
+        background: var(--panel2);
+        overflow: hidden;
+      }
+      .p-bar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--muted);
+        background: var(--ink);
+        border-bottom: 1px solid var(--line);
+        transition: transform 0.45s ease;
+      }
+      .phone.full .p-bar {
+        transform: translateY(-100%);
+      }
+      .p-body {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: 36px;
+        transition: top 0.45s ease;
+        overflow: hidden;
+      }
+      .phone.full .p-body {
+        top: 0;
+      }
+      .vbars {
+        position: absolute;
+        left: 14px;
+        right: 14px;
+        bottom: 14px;
+        top: 14px;
+        display: flex;
+        gap: 10px;
+        align-items: flex-end;
+      }
+      .vbar {
+        flex: 1;
+        border-radius: 8px 8px 0 0;
+        position: relative;
+        transition: height 0.45s ease;
+      }
+      .vbar span {
+        position: absolute;
+        top: 6px;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-family: var(--mono);
+        font-size: 10px;
+        color: #0e1017;
+        font-weight: 700;
+      }
+      #barSvh {
+        height: 304px;
+        background: var(--border-c);
+      }
+      #barLvh {
+        height: 340px;
+        background: var(--margin-c);
+      }
+      #barDvh {
+        height: 100%;
+        background: var(--padding-c);
+      }
+
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      @media (min-width: 1180px) {
+        .notes-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media (max-width: 640px) {
+        .notes-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .note-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.3s,
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+      .note-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--nc);
+        opacity: 0.85;
+      }
+      .note-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--nc);
+        box-shadow: 0 24px 44px -28px rgba(0, 0, 0, 0.85);
+      }
+      .note-card h3 {
+        font-family: var(--mono);
+        font-size: 15px;
+        color: var(--nc);
+        margin-bottom: 8px;
+      }
+      .note-card p {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .note-tip {
+        margin-top: 12px;
+        font-size: 11px;
+        color: var(--faint);
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+      }
+      .note-demo {
+        height: 104px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        overflow: hidden;
+      }
+      .demo-abs {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        padding-top: 35px;
+      }
+      .demo-abs i {
+        display: block;
+        height: 12px;
+        border-radius: 4px;
+        background: var(--content-c);
+        width: 60%;
+        transition: 0.4s;
+      }
+      .demo-abs i:nth-child(2) {
+        background: #39415a;
+        width: 60%;
+      }
+      .note-card:hover .demo-abs i:nth-child(2) {
+        width: 95%;
+      }
+      .demo-rem {
+        font-family: var(--mono);
+        font-size: 11.5px;
+        display: flex;
+        gap: 8px;
+      }
+      .demo-rem i {
+        font-style: normal;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 4px 10px;
+        transition: 0.3s;
+        opacity: 0.5;
+      }
+      .note-card:hover .demo-rem i {
+        opacity: 1;
+        transform: translateY(-3px);
+      }
+      .note-card:hover .demo-rem i:nth-child(2) {
+        transition-delay: 0.08s;
+      }
+      .demo-em {
+        font-family: var(--body);
+        font-size: 12px;
+        background: var(--margin-c);
+        color: #fff;
+        border: none;
+        border-radius: 999px;
+        padding: 0.6em 1.3em;
+        font-weight: 600;
+        transition: font-size 0.3s;
+      }
+      .note-card:hover .demo-em {
+        font-size: 17px;
+      }
+      .demo-vhf {
+        width: 56px;
+        height: 74px;
+        border: 2px solid var(--line2);
+        border-radius: 10px;
+        position: relative;
+        overflow: hidden;
+        margin: 0 auto;
+        align-self: center; /* 👈 centers vertically */
+      }
+      .demo-vhf i {
+        position: absolute;
+        left: 6px;
+        right: 6px;
+        bottom: 6px;
+        height: 70%;
+        border-radius: 4px;
+        background: var(--padding-c);
+        transition: height 0.4s;
+      }
+      .note-card:hover .demo-vhf i {
+        height: 45%;
+      }
+
+      .lesson-nav {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px clamp(18px, 3vw, 28px);
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+        align-items: center;
+      }
+      .ln-status {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--padding-c);
+        border: 1px solid rgba(62, 207, 142, 0.45);
+        border-radius: 999px;
+        padding: 3px 10px;
+      }
+      .lesson-nav h3 {
+        font-family: var(--disp);
+        font-size: 17px;
+        margin-top: 8px;
+      }
+      .ln-track {
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .tick {
+        width: 7px;
+        height: 15px;
+        border-radius: 2px;
+        background: #212a3e;
+        transition: 0.2s;
+      }
+      .tick.done {
+        background: var(--padding-c);
+        box-shadow: 0 0 8px rgba(62, 207, 142, 0.55);
+      }
+      .tick:hover {
+        background: var(--line2);
+      }
+      .ln-next {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        text-align: right;
+      }
+      .ln-next span {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .ln-next b {
+        font-family: var(--disp);
+        font-size: 15px;
+        color: var(--text);
+      }
+      footer {
+        border-top: 1px solid var(--line);
+        margin-top: 40px;
+        padding: 30px 0 44px;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+        color: var(--faint);
+        font-size: 12.5px;
+      }
+      footer .mono {
+        font-size: 11.5px;
+      }
+      footer .sp {
+        margin-left: auto;
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+      @media (max-width: 1020px) {
+        .intro {
+          grid-template-columns: 1fr;
+        }
+        .pick-grid {
+          grid-template-columns: 1fr;
+        }
+        .lesson-nav {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .ln-next {
+          align-items: center;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg">
+      <span class="glow g1"></span><span class="glow g2"></span>
+    </div>
+
+    <header class="topbar">
+      <span class="lesson-tag">lesson 04 / 45</span>
+      <nav>
+        <a href="#px">px</a>
+        <a href="#percent">%</a>
+        <a href="#emrem">em / rem</a>
+        <a href="#viewport">vw / vh</a>
+        <a href="#mobile">dvh · svh · lvh</a>
+        <a href="#which">which-unit</a>
+        <a href="#notes">cheat-codes</a>
+      </nav>
+    </header>
+
+    <div class="wrap">
+      <!-- ============ intro ============ -->
+      <section class="intro">
+        <div>
+          <p class="eyebrow">lesson 04 · interactive</p>
+          <h1>
+            px is a fact. The rest are
+            <span class="word-style">relationships</span>.
+          </h1>
+          <p class="lede">
+            CSS speaks nine size units. <b>px</b> stands alone — absolute. But
+            <b>%</b>, <b>em</b>, <b>rem</b>, <b>vw</b>, <b>vh</b>, <b>dvh</b>,
+            <b>svh</b>, <b>lvh</b> all answer "how big?" by pointing at
+            something else: a parent, the root, or the viewport.
+          </p>
+          <span class="css-full">M · EASURE · W · ITH · M · EANING</span>
+        </div>
+        <div class="intro-panel">
+          <div class="intro-track">
+            <div id="introBar" style="width: 160px"></div>
+          </div>
+          <span class="intro-fmt" id="introFmt">width: 160px → 160px</span>
+          <p class="imode mono">same box, different promises…</p>
+        </div>
+      </section>
+
+      <!-- ============ 01 · px ============ -->
+      <section id="px" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">01 · px — pixels</p>
+          <h2>The absolute unit</h2>
+          <p class="lede">
+            A px value never asks anyone for permission. Drag the slider — and
+            notice the readout below: resize your window all you want, the box
+            doesn't care.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>fixed, always</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="unit-stage">
+                <div class="px-box" id="pxBox" style="width: 240px"></div>
+                <div class="ruler">
+                  <i class="r-line" id="pxRuler" style="width: 240px"></i
+                  ><b id="pxNum">240px</b>
+                </div>
+                <p class="win-read mono" id="winRead"></p>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rPx">width</label
+                ><output class="ctl-val" id="oPx">240px</output>
+              </div>
+              <input type="range" id="rPx" min="40" max="400" value="240" />
+            </div>
+            <div class="code-box"><pre id="codePx"></pre></div>
+            <p class="side-note">
+              Perfect for borders, shadows, and anything that must stay
+              razor-exact. Dangerous for layout — it can't adapt to the screen.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 02 · % ============ -->
+      <section id="percent" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">02 · % — percentages</p>
+          <h2>"How big is my parent?"</h2>
+          <p class="lede">
+            A percentage is always a question about something else. Stretch the
+            parent — the child follows, because 50% of a big box is a big box.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>child lives inside parent</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="unit-stage">
+                <div class="parent-box" id="parBox">
+                  <div class="child-box" id="childBox">
+                    <span id="childPx"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--margin-c)">
+              <div class="ctl-top">
+                <label for="rPar">parent width</label
+                ><output class="ctl-val" id="oPar">440px</output>
+              </div>
+              <input type="range" id="rPar" min="220" max="440" value="440" />
+            </div>
+            <div class="ctl" style="--ac: var(--padding-c)">
+              <div class="ctl-top">
+                <label for="rChild">child width</label
+                ><output class="ctl-val" id="oChild">50%</output>
+              </div>
+              <input type="range" id="rChild" min="10" max="100" value="50" />
+            </div>
+            <div class="code-box"><pre id="codePct"></pre></div>
+            <p class="side-note" id="pctMath"></p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 03 · em & rem ============ -->
+      <section id="emrem" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">03 · em &amp; rem</p>
+          <h2>Local vs. root</h2>
+          <p class="lede">
+            <b>em</b> rides on the <i>parent's</i> font-size. <b>rem</b> rides
+            on the <i>root's</i> (html) font-size — one lever for the whole
+            page. And watch the nested boxes: em compounds, rem stays sane.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>1em vs 1rem, live</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="unit-stage">
+                <div class="er-row">
+                  <span class="er-lab mono">padding: 1em</span>
+                  <div class="er-box" id="emBox">box</div>
+                  <b class="mono" id="emVal"></b>
+                </div>
+                <div class="er-row">
+                  <span class="er-lab mono">padding: 1rem</span>
+                  <div class="er-box rem" id="remBox">box</div>
+                  <b class="mono" id="remVal"></b>
+                </div>
+                <div class="nest-wrap">
+                  <div>
+                    <div class="nest">
+                      <div>
+                        1.5em
+                        <div>
+                          1.5em
+                          <div>1.5em</div>
+                        </div>
+                      </div>
+                    </div>
+                    <p class="nest-cap">em compounds: 1.5 × 1.5 × 1.5…</p>
+                  </div>
+                  <div>
+                    <div class="nest remn">
+                      <div>
+                        1.5rem
+                        <div>
+                          1.5rem
+                          <div>1.5rem</div>
+                        </div>
+                      </div>
+                    </div>
+                    <p class="nest-cap">rem stays put: always root × 1.5</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--border-c)">
+              <div class="ctl-top">
+                <label for="rRoot">root font-size (html)</label
+                ><output class="ctl-val" id="oRoot">16px</output>
+              </div>
+              <input type="range" id="rRoot" min="12" max="24" value="16" />
+            </div>
+            <div class="ctl" style="--ac: var(--margin-c)">
+              <div class="ctl-top">
+                <label for="rParent">parent font-size</label
+                ><output class="ctl-val" id="oParent">16px</output>
+              </div>
+              <input type="range" id="rParent" min="12" max="32" value="16" />
+            </div>
+            <div class="code-box"><pre id="codeEm"></pre></div>
+            <p class="side-note">
+              rem for type &amp; spacing systems. em when a piece should scale
+              with its own text — like button padding.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 04 · vw & vh ============ -->
+      <section id="viewport" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">04 · vw &amp; vh</p>
+          <h2>1vw = 1% of the viewport</h2>
+          <p class="lede">
+            Viewport units ignore parents entirely — they only ask "how big is
+            the window?". Resize the fake viewport and watch 50vw / 50vh
+            recalculate.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>a viewport you can resize</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="fvp" id="fvp" style="width: 400px; height: 240px">
+                <div class="fvp-el"><span id="fvpLab">50vw × 50vh</span></div>
+                <span class="fvp-tag mono">fake viewport</span>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rVw">viewport width</label
+                ><output class="ctl-val" id="oVw">400px</output>
+              </div>
+              <input type="range" id="rVw" min="220" max="470" value="400" />
+            </div>
+            <div class="ctl" style="--ac: var(--padding-c)">
+              <div class="ctl-top">
+                <label for="rVh">viewport height</label
+                ><output class="ctl-val" id="oVh">240px</output>
+              </div>
+              <input type="range" id="rVh" min="160" max="300" value="240" />
+            </div>
+            <div class="code-box"><pre id="codeVp"></pre></div>
+            <p class="side-note" id="vpMath"></p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 05 · dvh svh lvh ============ -->
+      <section id="mobile" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">05 · dvh · svh · lvh</p>
+          <h2>The mobile viewport family</h2>
+          <p class="lede">
+            On phones the viewport <b>moves</b> — the URL bar slides away as you
+            scroll. <b>svh</b> assumes it's visible (small). <b>lvh</b> assumes
+            it's gone (large). <b>dvh</b> follows reality, live. Toggle the bar.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>phone mock — toggle the address bar</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="phone" id="phone">
+                <div class="p-bar">aurora.coffee</div>
+                <div class="p-body">
+                  <div class="vbars">
+                    <div class="vbar" id="barSvh"><span>svh</span></div>
+                    <div class="vbar" id="barLvh"><span>lvh</span></div>
+                    <div class="vbar" id="barDvh"><span>dvh</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <button class="ghost" id="barToggle" style="padding: 10px 16px">
+              hide address bar ⌄
+            </button>
+            <div class="code-box"><pre id="codeVh"></pre></div>
+            <p class="side-note">
+              <b style="color: var(--border-c)">svh</b> = worst case, never
+              overflows. <b style="color: var(--margin-c)">lvh</b> = best case,
+              may clip. <b style="color: var(--padding-c)">dvh</b> = dynamic,
+              always right. For fullscreen mobile UIs, reach for
+              <span class="mono">100dvh</span>.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 06 · when to use each ============ -->
+      <section id="which" class="sec reveal">
+        <style>
+          .w6-wrap {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: clamp(18px, 3vw, 28px);
+          }
+          .w6-units {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 18px;
+          }
+          .w6-uchip {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--muted);
+            background: var(--ink);
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            padding: 8px 15px;
+            cursor: pointer;
+            transition: 0.2s;
+          }
+          .w6-uchip:hover {
+            color: var(--text);
+            transform: translateY(-2px);
+          }
+          .w6-uchip.on {
+            color: #0e1017;
+            background: var(--uc, var(--padding-c));
+            border-color: var(--uc, var(--padding-c));
+            font-weight: 600;
+          }
+          .w6-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+          }
+          .w6-card {
+            position: relative;
+            font-family: var(--mono);
+            font-size: 11.5px;
+            color: var(--muted);
+            background: var(--ink);
+            border: 1px solid var(--line);
+            border-radius: 11px;
+            padding: 14px 14px 30px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: left;
+            line-height: 1.55;
+          }
+          .w6-card:hover {
+            color: var(--text);
+            border-color: var(--content-c);
+            transform: translateY(-2px);
+          }
+          .w6-card.on {
+            color: var(--text);
+            border-color: var(--padding-c);
+            box-shadow: 0 0 0 1px var(--padding-c);
+          }
+          .w6-card.dim {
+            opacity: 0.28;
+            filter: saturate(0.4);
+          }
+          .w6-card.lit {
+            color: var(--text);
+            border-color: var(--uc);
+            box-shadow: 0 0 0 1px var(--uc);
+          }
+          .w6-badge {
+            position: absolute;
+            bottom: 8px;
+            left: 14px;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            color: var(--uc);
+            border: 1px solid var(--uc);
+            border-radius: 999px;
+            padding: 2px 9px;
+            opacity: 0;
+            transition: 0.2s;
+          }
+          .w6-card.revealed .w6-badge,
+          .w6-card.lit .w6-badge {
+            opacity: 1;
+          }
+          .w6-answer {
+            margin-top: 16px;
+            background: var(--panel2);
+            border: 1px dashed var(--line2);
+            border-radius: 12px;
+            padding: 18px;
+            display: flex;
+            gap: 18px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            min-height: 96px;
+          }
+          .w6-unit {
+            font-family: var(--disp);
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: var(--uc);
+            min-width: 96px;
+          }
+          .w6-detail {
+            flex: 1;
+            min-width: 220px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+          }
+          .w6-rel {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--faint);
+          }
+          .w6-rel b {
+            color: var(--text);
+          }
+          .w6-why {
+            font-size: 13px;
+            color: var(--muted);
+          }
+          .w6-avoid {
+            font-family: var(--mono);
+            font-size: 10.5px;
+            color: var(--margin-c);
+          }
+          .w6-code {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--border-c);
+            background: var(--ink);
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 9px 14px;
+            align-self: center;
+          }
+          .w6-table {
+            margin-top: 20px;
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--mono);
+            font-size: 11.5px;
+          }
+          .w6-table th {
+            text-align: left;
+            color: var(--faint);
+            font-weight: 500;
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--line2);
+            font-size: 10px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+          }
+          .w6-table td {
+            padding: 9px 10px;
+            border-bottom: 1px solid var(--line);
+            color: var(--muted);
+            vertical-align: top;
+            line-height: 1.5;
+          }
+          .w6-table td:first-child {
+            font-weight: 700;
+            white-space: nowrap;
+          }
+          .w6-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+          }
+          @media (max-width: 900px) {
+            .w6-grid {
+              grid-template-columns: repeat(2, 1fr);
+            }
+          }
+          @media (max-width: 640px) {
+            .w6-grid {
+              grid-template-columns: 1fr;
+            }
+            .w6-table {
+              font-size: 10.5px;
+            }
+          }
+        </style>
+
+        <div class="sec-head">
+          <p class="eyebrow">06 · when to use each</p>
+          <h2>Which unit wins?</h2>
+          <p class="lede">
+            Twelve real jobs — two per unit. Click a scenario to see the winning
+            unit and <b>why</b>, or filter by unit to see every job it's good
+            at. The cheat table at the bottom is the whole lesson in one glance.
+          </p>
+        </div>
+
+        <div class="w6-wrap">
+          <div class="w6-units" id="w6Units"></div>
+          <div class="w6-grid" id="w6Grid"></div>
+          <div class="w6-answer" id="w6Ans">
+            <span class="side-note"
+              >click a scenario — or filter by unit above ↑</span
+            >
+          </div>
+          <table class="w6-table">
+            <thead>
+              <tr>
+                <th>unit</th>
+                <th>relative to</th>
+                <th>reach for</th>
+                <th>avoid</th>
+              </tr>
+            </thead>
+            <tbody id="w6Table"></tbody>
+          </table>
+        </div>
+
+        <script>
+          (() => {
+            const $ = (id) => document.getElementById(id);
+            const UNITS = {
+              px: {
+                c: "#58a6ff",
+                rel: "nothing — it's absolute",
+                use: "borders, shadows, hairlines, fixed assets",
+                avoid: "layout widths & type scale (can't adapt)",
+              },
+              "%": {
+                c: "#f07f4f",
+                rel: "the parent element",
+                use: "fluid columns, splits, ratio-based widths",
+                avoid:
+                  "vertical heights (parent needs a height) & nesting math",
+              },
+              em: {
+                c: "#f2c14e",
+                rel: "the element's own / parent font-size",
+                use: "padding around text, icons, local scaling",
+                avoid: "long nested chains (it compounds)",
+              },
+              rem: {
+                c: "#3ecf8e",
+                rel: "the root (html) font-size",
+                use: "type scale, spacing rhythm, radii",
+                avoid: "pieces that should scale locally (that's em)",
+              },
+              "vw/vh": {
+                c: "#ff4f8b",
+                rel: "the viewport (window)",
+                use: "heroes, fluid type via clamp(), window sections",
+                avoid: "raw body text — always clamp() it",
+              },
+              dvh: {
+                c: "#7fe0b0",
+                rel: "the dynamic viewport (URL bar included)",
+                use: "mobile fullscreen: modals, sheets, app shells",
+                avoid: "desktop — plain vh is fine there",
+              },
+            };
+            const SCEN = [
+              {
+                q: "a 1px hairline divider",
+                u: "px",
+                why: 'Hairlines want exact pixels. "0.0625rem" is the same line with extra math and zero benefit.',
+                code: "border-bottom: 1px solid #222c40;",
+              },
+              {
+                q: "a readable article column",
+                u: "%",
+                why: '"Most of my parent" is a percentage\'s native language — the column breathes with the layout for free.',
+                code: "width: 80%;",
+              },
+              {
+                q: "site-wide heading scale",
+                u: "rem",
+                why: "h1–h6 in rem means one root change rescales the whole hierarchy. That's a type system, not a guess.",
+                code: "font-size: 2.25rem;",
+              },
+              {
+                q: "button padding that grows with its label",
+                u: "em",
+                why: "em rides the element's own font-size — bigger button text automatically gets proportionally bigger padding.",
+                code: "padding: .6em 1.2em;",
+              },
+              {
+                q: "a hero that fills the screen",
+                u: "vw/vh",
+                why: "The window is the reference. Viewport units ignore the parent chain completely.",
+                code: "height: 100vh;",
+              },
+              {
+                q: "a mobile bottom sheet / modal",
+                u: "dvh",
+                why: "Phone viewports move as the URL bar hides. dvh follows reality, so the sheet never overflows or gaps.",
+                code: "height: 100dvh;",
+              },
+              {
+                q: "shadow under a floating card",
+                u: "px",
+                why: "Shadows are optical, not structural — fixed offsets keep the depth consistent at every size.",
+                code: "box-shadow: 0 8px 24px rgba(0,0,0,.4);",
+              },
+              {
+                q: "a sidebar that takes a third",
+                u: "%",
+                why: "Splits are ratios. 33.333% states the intent louder than any pixel guess ever could.",
+                code: "width: 33.333%;",
+              },
+              {
+                q: "an icon sitting next to text",
+                u: "em",
+                why: "Size the icon in em and it tracks whatever font-size the surrounding text uses — aligned forever.",
+                code: "width: 1em; height: 1em;",
+              },
+              {
+                q: "margins & spacing rhythm",
+                u: "rem",
+                why: "Spacing in rem stays consistent across the site, and users who enlarge root text get a more accessible page.",
+                code: "margin-block: 1.5rem;",
+              },
+              {
+                q: "display type that scales with the window",
+                u: "vw/vh",
+                why: "A touch of vw makes headlines fluid — wrapped in clamp() so they never get too tiny or absurd.",
+                code: "font-size: clamp(2rem, 5vw, 4rem);",
+              },
+              {
+                q: "a fullscreen app shell on a phone",
+                u: "dvh",
+                why: "svh clips, lvh gaps — dvh tracks the dynamic viewport frame by frame as chrome appears and hides.",
+                code: "min-height: 100dvh;",
+              },
+            ];
+
+            /* unit filter chips */
+            const chipsBox = $("w6Units");
+            ["all", ...Object.keys(UNITS)].forEach((u, i) => {
+              const b = document.createElement("button");
+              b.className = "w6-uchip" + (i === 0 ? " on" : "");
+              b.textContent = u === "all" ? "show all" : u;
+              if (u !== "all") b.style.setProperty("--uc", UNITS[u].c);
+              b.addEventListener("click", () => {
+                chipsBox
+                  .querySelectorAll(".w6-uchip")
+                  .forEach((x) => x.classList.remove("on"));
+                b.classList.add("on");
+                filter(u);
+              });
+              chipsBox.appendChild(b);
+            });
+
+            /* scenario cards */
+            const grid = $("w6Grid");
+            SCEN.forEach((s) => {
+              const c = document.createElement("button");
+              c.className = "w6-card";
+              c.style.setProperty("--uc", UNITS[s.u].c);
+              c.dataset.u = s.u;
+              c.innerHTML = `${s.q}<span class="w6-badge">${s.u}</span>`;
+              c.addEventListener("click", () => {
+                grid
+                  .querySelectorAll(".w6-card")
+                  .forEach((x) => x.classList.remove("on"));
+                c.classList.add("on");
+                c.classList.add("revealed");
+                $("w6Ans").innerHTML = `
+                  <span class="w6-unit" style="--uc:${UNITS[s.u].c}">${s.u}</span>
+                  <div class="w6-detail">
+                    <p class="w6-rel">relative to: <b>${UNITS[s.u].rel}</b></p>
+                    <p class="w6-why">${s.why}</p>
+                    <p class="w6-avoid">avoid: ${UNITS[s.u].avoid}</p>
+                  </div>
+                  <code class="w6-code">${s.code}</code>`;
+              });
+              grid.appendChild(c);
+            });
+
+            /* filter: light up every job a unit wins */
+            function filter(u) {
+              grid.querySelectorAll(".w6-card").forEach((c) => {
+                c.classList.toggle("lit", u !== "all" && c.dataset.u === u);
+                c.classList.toggle("dim", u !== "all" && c.dataset.u !== u);
+                if (u !== "all") c.classList.add("revealed");
+              });
+              if (u === "all") {
+                grid
+                  .querySelectorAll(".w6-card")
+                  .forEach((c) => c.classList.remove("lit", "dim"));
+                $("w6Ans").innerHTML =
+                  '<span class="side-note">click a scenario — or filter by unit above ↑</span>';
+              } else {
+                const n = SCEN.filter((s) => s.u === u).length;
+                $("w6Ans").innerHTML = `
+                  <span class="w6-unit" style="--uc:${UNITS[u].c}">${u}</span>
+                  <div class="w6-detail">
+                    <p class="w6-rel">relative to: <b>${UNITS[u].rel}</b></p>
+                    <p class="w6-why"><b>${n} scenarios</b> lit above — click any for the full reasoning. Also great for: ${UNITS[u].use}.</p>
+                    <p class="w6-avoid">avoid: ${UNITS[u].avoid}</p>
+                  </div>`;
+              }
+            }
+
+            /* cheat table */
+            $("w6Table").innerHTML = Object.entries(UNITS)
+              .map(
+                ([u, m]) =>
+                  `<tr><td style="color:${m.c}">${u}</td><td>${m.rel}</td><td>${m.use}</td><td>${m.avoid}</td></tr>`,
+              )
+              .join("");
+          })();
+        </script>
+      </section>
+
+      <!-- ============ 07 · field notes ============ -->
+      <section id="notes" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">07 · field notes</p>
+          <h2>Cheat codes from lesson 04</h2>
+        </div>
+        <div class="notes-grid">
+          <article class="note-card" style="--nc: var(--content-c)">
+            <div class="note-demo demo-abs"><i></i><i></i></div>
+            <h3>absolute vs relative</h3>
+            <p>
+              <span class="mono">px</span> is a fixed fact. Everything else — %,
+              em, rem, vw, vh — is a relationship: to a parent, the root, or the
+              viewport. Pick the relationship you want.
+            </p>
+            <p class="note-tip mono">↳ hover: one stays, one stretches</p>
+          </article>
+          <article class="note-card" style="--nc: var(--padding-c)">
+            <div class="note-demo demo-rem">
+              <i>rem → type &amp; spacing</i><i>px → borders &amp; shadows</i>
+            </div>
+            <h3>the default split</h3>
+            <p>
+              rem for fonts and layout rhythm (one root change rescales all). px
+              where precision matters: 1px borders, 0 2px 8px shadows.
+            </p>
+            <p class="note-tip mono">↳ hover: the split lights up</p>
+          </article>
+          <article class="note-card" style="--nc: var(--margin-c)">
+            <div class="note-demo"><button class="demo-em">button</button></div>
+            <h3>em is local</h3>
+            <p>
+              em scales with the element's own font-size. That's why
+              <span class="mono">padding: .6em 1.2em</span> keeps a button
+              proportional whether its text is 14px or 20px.
+            </p>
+            <p class="note-tip mono">↳ hover: text grows, padding follows</p>
+          </article>
+          <article class="note-card" style="--nc: var(--border-c)">
+            <div class="note-demo demo-vhf"><i></i></div>
+            <h3>the vh family</h3>
+            <p>
+              vh broke mobile fullscreen — URL bars shrink the real viewport.
+              svh / lvh / dvh fixed it: small, large, dynamic. Use
+              <span class="mono">dvh</span> when it's supported.
+            </p>
+            <p class="note-tip mono">↳ hover: the bar eats the viewport</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ lesson nav ============ -->
+      <div class="lesson-nav reveal">
+        <div>
+          <span class="ln-status">✓ completed</span>
+          <h3>04 — Units</h3>
+        </div>
+        <div class="ln-track" id="lnTrack"></div>
+        <div class="ln-next">
+          <span>up next</span>
+          <b>05 · Typography</b>
+        </div>
+      </div>
+
+      <footer>
+        <span class="mono">drag things, break things, learn things.</span>
+        <span class="sp mono">45 lessons · lesson 04 · units</span>
+      </footer>
+    </div>
+    <!-- /wrap -->
+
+    <script>
+      (() => {
+        const $ = (id) => document.getElementById(id);
+        const rule = (sel, decls) =>
+          `<span class="c-sel">${sel}</span> {\n${decls
+            .map((d) => {
+              const i = d.indexOf(":");
+              return `  <span class="c-prop">${d.slice(0, i)}</span>: <span class="c-val">${d.slice(i + 1).trim()}</span>;`;
+            })
+            .join("\n")}\n}`;
+        function range(el, out, fmt, cb) {
+          const f = () => {
+            const v = +el.value;
+            out.textContent = fmt(v);
+            const min = +el.min,
+              max = +el.max;
+            el.style.setProperty(
+              "--fill",
+              ((v - min) / (max - min)) * 100 + "%",
+            );
+            cb(v);
+          };
+          el.addEventListener("input", f);
+          f();
+        }
+
+        /* ---------- intro cycle ---------- */
+        const track = 300;
+        const FORMATS = () => [
+          { t: "width: 160px → 160px", w: 160 },
+          { t: "width: 50% → 150px (of 300 parent)", w: 150 },
+          { t: "width: 10rem → 160px (root 16)", w: 160 },
+          {
+            t: `width: 10vw → ${Math.round(innerWidth / 10)}px (your window!)`,
+            w: Math.min(track, Math.round(innerWidth / 10)),
+          },
+        ];
+        let fi = 0;
+        setInterval(() => {
+          const F = FORMATS();
+          fi = (fi + 1) % F.length;
+          $("introFmt").textContent = F[fi].t;
+          $("introBar").style.width = Math.min(track, F[fi].w) + "px";
+        }, 2200);
+
+        /* ---------- 01 px ---------- */
+        function winRead() {
+          $("winRead").textContent =
+            `window: ${innerWidth}px — resize it. the box won't care.`;
+        }
+        addEventListener("resize", winRead);
+        winRead();
+        range(
+          $("rPx"),
+          $("oPx"),
+          (v) => v + "px",
+          (v) => {
+            $("pxBox").style.width = v + "px";
+            $("pxRuler").style.width = v + "px";
+            $("pxNum").style.left = v + 10 + "px";
+            $("pxNum").textContent = v + "px";
+            $("codePx").innerHTML = rule(".box", [`width: ${v}px`]);
+          },
+        );
+
+        /* ---------- 02 % (FIX: parent uses outline, so content width === slider value) ---------- */
+        let par = 440;
+        function renderPct(c) {
+          $("parBox").style.width = par + "px";
+          $("childBox").style.width = c + "%";
+          const px = Math.round((par * c) / 100);
+          $("childPx").textContent = `${c}% = ${px}px`;
+          $("pctMath").innerHTML =
+            `<b style="color:var(--padding-c)">${c}%</b> of ${par}px parent = <b>${px}px</b>. % always asks: "of what?"`;
+          $("codePct").innerHTML = rule(".child", [`width: ${c}%`]);
+        }
+        range(
+          $("rPar"),
+          $("oPar"),
+          (v) => {
+            par = v;
+            return v + "px";
+          },
+          () => renderPct(+$("rChild").value),
+        );
+        range($("rChild"), $("oChild"), (v) => v + "%", renderPct);
+
+        /* ---------- 03 em / rem ---------- */
+        let root = 16;
+        function renderEm(p) {
+          $("emBox").style.fontSize = p + "px";
+          $("emBox").style.padding = "1em";
+          $("remBox").style.padding = root + "px";
+          $("emVal").textContent = `1em = ${p}px here`;
+          $("remVal").textContent = `1rem = ${root}px always`;
+          $("codeEm").innerHTML =
+            rule(".a", [`padding: 1em   /* ${p}px */`]) +
+            "\n" +
+            rule(".b", [`padding: 1rem  /* ${root}px */`]);
+        }
+        range(
+          $("rRoot"),
+          $("oRoot"),
+          (v) => {
+            root = v;
+            return v + "px";
+          },
+          () => renderEm(+$("rParent").value),
+        );
+        range($("rParent"), $("oParent"), (v) => v + "px", renderEm);
+
+        /* ---------- 04 vw / vh ---------- */
+        function renderVp(h) {
+          const w = +$("rVw").value;
+          $("fvp").style.width = w + "px";
+          $("fvp").style.height = h + "px";
+          $("fvpLab").textContent =
+            `50vw × 50vh = ${Math.round(w / 2)} × ${Math.round(h / 2)}px`;
+          $("vpMath").innerHTML =
+            `50vw = <b>${Math.round(w / 2)}px</b> · 50vh = <b>${Math.round(h / 2)}px</b> — viewport units ignore the parent.`;
+          $("codeVp").innerHTML = rule(".hero", [
+            `width: 50vw`,
+            `height: 50vh`,
+          ]);
+        }
+        range(
+          $("rVw"),
+          $("oVw"),
+          (v) => v + "px",
+          () => renderVp(+$("rVh").value),
+        );
+        range($("rVh"), $("oVh"), (v) => v + "px", renderVp);
+
+        /* ---------- 05 dvh/svh/lvh ---------- */
+        let full = false;
+        $("barToggle").addEventListener("click", () => {
+          full = !full;
+          $("phone").classList.toggle("full", full);
+          $("barToggle").textContent = full
+            ? "show address bar "
+            : "hide address bar ";
+          $("codeVh").innerHTML = rule(".sheet", [
+            `height: 100svh  /* ${full ? 304 : 304}px — assumes bar */`,
+            `height: 100lvh  /* 340px — assumes no bar */`,
+            `height: 100dvh  /* ${full ? 340 : 304}px — follows reality */`,
+          ]);
+        });
+        $("codeVh").innerHTML = rule(".sheet", [
+          `height: 100svh`,
+          `height: 100lvh`,
+          `height: 100dvh`,
+        ]);
+
+        /* ---------- lesson track ---------- */
+        const t = $("lnTrack");
+        for (let i = 0; i < 45; i++) {
+          const s = document.createElement("span");
+          s.className = "tick" + (i < 4 ? " done" : "");
+          s.title = "lesson " + (i + 1);
+          t.appendChild(s);
+        }
+
+        /* ---------- reveal ---------- */
+        const io = new IntersectionObserver(
+          (es) =>
+            es.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                io.unobserve(e.target);
+              }
+            }),
+          { threshold: 0.12 },
+        );
+        document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      })();
+    </script>
+  </body>
+</html>
