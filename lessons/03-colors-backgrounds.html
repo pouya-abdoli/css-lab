@@ -1,0 +1,1868 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Colors &amp; Backgrounds — Lesson 03</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' fill='none' stroke='%23f07f4f' stroke-width='2'/%3E%3Crect x='8' y='8' width='16' height='16' fill='none' stroke='%23f2c14e' stroke-width='2'/%3E%3Crect x='13' y='13' width='6' height='6' fill='%2358a6ff'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0e15;
+        --panel: #121826;
+        --panel2: #0d1220;
+        --ink: #10141d;
+        --line: #222c40;
+        --line2: #31405e;
+        --text: #e9eef7;
+        --muted: #8d9ab0;
+        --faint: #5b6a84;
+        --margin-c: #f07f4f;
+        --border-c: #f2c14e;
+        --padding-c: #3ecf8e;
+        --content-c: #58a6ff;
+        --pink: #ff4f8b;
+        --page: #f7f4ee;
+        --page-ink: #1c1f26;
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: dark;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 15px;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+      ::selection {
+        background: rgba(88, 166, 255, 0.35);
+      }
+      .mono {
+        font-family: var(--mono);
+      }
+      section {
+        scroll-margin-top: 76px;
+      }
+      b {
+        font-weight: 600;
+      }
+
+      .bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            700px 460px at 12% -6%,
+            rgba(242, 193, 78, 0.07),
+            transparent 60%
+          ),
+          radial-gradient(
+            760px 520px at 92% 22%,
+            rgba(88, 166, 255, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            600px 480px at 40% 105%,
+            rgba(62, 207, 142, 0.05),
+            transparent 60%
+          );
+      }
+      .bg::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(233, 238, 247, 0.035) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(233, 238, 247, 0.035) 1px,
+            transparent 1px
+          );
+        background-size: 28px 28px;
+        mask-image: radial-gradient(
+          ellipse 120% 90% at 50% 0%,
+          #000 40%,
+          transparent 100%
+        );
+      }
+      .bg .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.5;
+        animation: drift 26s ease-in-out infinite alternate;
+      }
+      .bg .g1 {
+        width: 420px;
+        height: 420px;
+        left: -120px;
+        top: 30%;
+        background: rgba(240, 127, 79, 0.1);
+      }
+      .bg .g2 {
+        width: 460px;
+        height: 460px;
+        right: -140px;
+        top: 60%;
+        background: rgba(88, 166, 255, 0.1);
+        animation-delay: -12s;
+      }
+      @keyframes drift {
+        from {
+          transform: translateY(-30px);
+        }
+        to {
+          transform: translateY(40px);
+        }
+      }
+
+      /* topbar: lesson № first, nav left — no brand */
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 12px clamp(16px, 4vw, 44px);
+        background: rgba(11, 14, 21, 0.92);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar nav {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .topbar nav a {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 6px 11px;
+        border-radius: 999px;
+        transition: 0.2s;
+      }
+      .topbar nav a:hover {
+        color: var(--text);
+        background: #161d2c;
+      }
+      .lesson-tag {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--border-c);
+        border: 1px dashed rgba(242, 193, 78, 0.45);
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .wrap {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: 0 clamp(16px, 4vw, 44px);
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        padding: clamp(20px, 4vh, 48px) 0 clamp(30px, 5vh, 56px);
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--padding-c);
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(2.3rem, 5.2vw, 3.7rem);
+        line-height: 1.06;
+        letter-spacing: -0.02em;
+      }
+      .word-style {
+        display: inline-block;
+        padding: 0.02em 0.22em;
+        background: rgba(242, 193, 78, 0.16);
+        border: 0.06em solid var(--border-c);
+        border-radius: 0.14em;
+        color: #ffe3a1;
+        transition: transform 0.3s;
+        cursor: default;
+        margin-top: 10px;
+      }
+      .word-style:hover {
+        transform: rotate(-2deg) scale(1.03);
+      }
+      .lede {
+        color: var(--muted);
+        max-width: 56ch;
+        margin-top: 18px;
+        font-size: 1.05rem;
+      }
+      .lede b {
+        color: var(--text);
+      }
+      .css-full {
+        display: inline-block;
+        margin-top: 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--faint);
+        letter-spacing: 0.08em;
+      }
+      .intro-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 26px;
+        display: grid;
+        place-items: center;
+        gap: 16px;
+        box-shadow: 0 30px 60px -40px rgba(0, 0, 0, 0.8);
+      }
+      #introSwatch {
+        width: 100%;
+        max-width: 300px;
+        height: 150px;
+        border-radius: 14px;
+        border: 1px solid var(--line2);
+        transition: background 0.5s;
+      }
+      .intro-fmt {
+        font-family: var(--mono);
+        font-size: 13px;
+        color: var(--content-c);
+        background: var(--ink);
+        border: 1px solid var(--line2);
+        border-radius: 9px;
+        padding: 7px 16px;
+      }
+      .imode {
+        font-size: 11px;
+        color: var(--faint);
+        letter-spacing: 0.1em;
+      }
+
+      .sec {
+        padding: clamp(36px, 6vh, 64px) 0;
+      }
+      .sec-head {
+        margin-bottom: 26px;
+        max-width: 72ch;
+      }
+      .sec-head h2 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+        letter-spacing: -0.015em;
+        line-height: 1.15;
+      }
+      .sec-head .lede {
+        margin-top: 10px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 18px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .panel-head h3 {
+        font-family: var(--disp);
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dots i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dots i:nth-child(1) {
+        background: #f07f4f;
+      }
+      .dots i:nth-child(2) {
+        background: #f2c14e;
+      }
+      .dots i:nth-child(3) {
+        background: #3ecf8e;
+      }
+      .segmented {
+        position: relative;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 1fr;
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        padding: 3px;
+      }
+      .segmented button {
+        position: relative;
+        z-index: 1;
+        background: none;
+        border: 0;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        padding: 8px 4px;
+        cursor: pointer;
+        transition: color 0.25s;
+        border-radius: 8px;
+      }
+      .segmented button:hover {
+        color: var(--text);
+      }
+      .segmented button.active {
+        color: #fff;
+      }
+      .seg-thumb {
+        position: absolute;
+        top: 3px;
+        bottom: 3px;
+        left: 3px;
+        width: calc((100% - 6px) / 3);
+        background: #26334c;
+        border-radius: 8px;
+        transition:
+          transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+          width 0.28s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.85;
+        overflow-x: auto;
+      }
+      .c-sel {
+        color: #7fe0b0;
+      }
+      .c-prop {
+        color: #8ab4ff;
+      }
+      .c-val {
+        color: #f2c14e;
+      }
+      .c-com {
+        color: #5b6a84;
+      }
+      .grp {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+
+      .pick-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 18px;
+        align-items: stretch;
+      }
+      .stage-wrap {
+        padding: 28px;
+        display: grid;
+        place-items: center;
+        min-height: 340px;
+      }
+      .side {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .sel-chip {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .sel-chip:hover {
+        color: var(--text);
+        border-color: var(--content-c);
+        transform: translateY(-2px);
+      }
+      .sel-chip.on {
+        color: #0e1017;
+        background: var(--content-c);
+        border-color: var(--content-c);
+        font-weight: 600;
+      }
+      .code-box {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .code-box pre {
+        min-height: 0;
+        font-size: 12.5px;
+      }
+      .side-note {
+        font-size: 12px;
+        color: var(--faint);
+      }
+      .ghost {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--faint);
+        background: none;
+        border: 1px dashed var(--line2);
+        border-radius: 8px;
+        padding: 7px 12px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .ghost:hover {
+        color: var(--content-c);
+        border-color: var(--content-c);
+      }
+
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        outline: none;
+        cursor: pointer;
+        background: linear-gradient(
+          90deg,
+          var(--ac) var(--fill, 50%),
+          #232c40 var(--fill, 50%)
+        );
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        transition: transform 0.15s;
+      }
+      input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.15);
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+      }
+      #rHue {
+        background: linear-gradient(
+          90deg,
+          hsl(0, 75%, 60%),
+          hsl(60, 75%, 60%),
+          hsl(120, 75%, 60%),
+          hsl(180, 75%, 60%),
+          hsl(240, 75%, 60%),
+          hsl(300, 75%, 60%),
+          hsl(360, 75%, 60%)
+        );
+      }
+      .ctl {
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 7px 11px;
+        transition: 0.2s;
+      }
+      .ctl:hover {
+        background: #101725;
+        border-color: var(--line);
+      }
+      .ctl-top {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+      .ctl-top label {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text);
+      }
+      .ctl-val {
+        margin-left: auto;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--ac);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 2px 9px;
+      }
+
+      input[type="color"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 48px;
+        height: 34px;
+        border: 1px solid var(--line2);
+        border-radius: 9px;
+        background: none;
+        padding: 2px;
+        cursor: pointer;
+      }
+      input[type="color"]::-webkit-color-swatch-wrapper {
+        padding: 2px;
+      }
+      input[type="color"]::-webkit-color-swatch {
+        border: none;
+        border-radius: 6px;
+      }
+      input[type="color"]::-moz-color-swatch {
+        border: none;
+        border-radius: 6px;
+      }
+      .picker-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .picker-row label {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        flex: 1;
+      }
+
+      .color-card {
+        border-radius: 14px;
+        max-width: 470px;
+        width: 100%;
+        padding: 30px;
+        transition: all 0.25s;
+        font-family: var(--body);
+      }
+      .color-card h3 {
+        font-family: var(--disp);
+        font-size: 1.5rem;
+        margin-bottom: 8px;
+      }
+      .color-card p {
+        font-size: 14px;
+        line-height: 1.65;
+      }
+      .swatch-big {
+        height: 130px;
+        border-radius: 12px;
+        border: 1px solid var(--line2);
+        transition: background 0.2s;
+        width: 100%;
+      }
+      .checker {
+        background: repeating-conic-gradient(#2a3247 0 25%, #171d2b 0 50%) 0
+          0/22px 22px;
+        border-radius: 12px;
+      }
+      .hexmap {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        font-family: var(--mono);
+        font-size: 12px;
+      }
+      .hexmap span {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        color: var(--muted);
+      }
+      .hexmap b {
+        min-width: 30px;
+        text-align: center;
+        border-radius: 6px;
+        padding: 2px 6px;
+        color: #0e1017;
+        font-weight: 700;
+      }
+      .bg-stage {
+        width: 100%;
+        max-width: 470px;
+        height: 250px;
+        border: 1px solid var(--line2);
+        border-radius: 12px;
+        background-color: var(--panel2);
+        transition: all 0.25s;
+        position: relative;
+        overflow: hidden;
+      }
+      .bg-stage .overlay {
+        position: absolute;
+        left: 12px;
+        bottom: 12px;
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: #fff;
+        background: rgba(11, 14, 21, 0.6);
+        padding: 4px 11px;
+        border-radius: 999px;
+      }
+      .pos-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+      }
+      .pos-grid button {
+        font-family: var(--mono);
+        font-size: 9.5px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 8px 2px;
+        cursor: pointer;
+        transition: 0.15s;
+      }
+      .pos-grid button:hover {
+        color: var(--text);
+      }
+      .pos-grid button.on {
+        color: #0e1017;
+        background: var(--content-c);
+        border-color: var(--content-c);
+        font-weight: 600;
+      }
+
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 16px;
+      }
+      .note-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.3s,
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+      .note-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--nc);
+        opacity: 0.85;
+      }
+      .note-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--nc);
+        box-shadow: 0 24px 44px -28px rgba(0, 0, 0, 0.85);
+      }
+      .note-card h3 {
+        font-family: var(--mono);
+        font-size: 15px;
+        color: var(--nc);
+        margin-bottom: 8px;
+      }
+      .note-card p {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .note-tip {
+        margin-top: 12px;
+        font-size: 11px;
+        color: var(--faint);
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+      }
+      .note-demo {
+        height: 104px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        overflow: hidden;
+      }
+      .demo-lang {
+        font-family: var(--mono);
+        font-size: 11px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        align-items: center;
+      }
+      .demo-lang i {
+        font-style: normal;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 3px 10px;
+        transition: 0.3s;
+        transform: translateY(3px);
+        opacity: 0.35;
+        margin-top: 3.5px;
+      }
+      .note-card:hover .demo-lang i {
+        transform: none;
+        opacity: 1;
+      }
+      .note-card:hover .demo-lang i:nth-child(2) {
+        transition-delay: 0.08s;
+      }
+      .note-card:hover .demo-lang i:nth-child(3) {
+        transition-delay: 0.16s;
+      }
+      .demo-alpha {
+        height: 64px;
+        border-radius: 10px;
+        background: repeating-conic-gradient(#2a3247 0 25%, #171d2b 0 50%) 0
+          0/18px 18px;
+        position: relative;
+      }
+      .demo-alpha i {
+        position: absolute;
+        inset: 0;
+        margin: auto;
+        width: 70%;
+        height: 70%;
+        border-radius: 8px;
+        background: rgba(88, 166, 255, 0.55);
+        transition: 0.35s;
+      }
+      .note-card:hover .demo-alpha i {
+        background: rgba(88, 166, 255, 0.95);
+      }
+      .demo-grad {
+        height: 56px;
+        border-radius: 10px;
+        background: linear-gradient(
+          90deg,
+          var(--margin-c),
+          var(--border-c),
+          var(--padding-c),
+          var(--content-c)
+        );
+        background-size: 300% 100%;
+        transition: background-position 1s ease;
+      }
+      .note-card:hover .demo-grad {
+        background-position: 100% 0;
+      }
+      .demo-shorth {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--muted);
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      .demo-shorth em {
+        font-style: normal;
+        transition: 0.3s;
+        opacity: 0.45;
+      }
+      .note-card:hover .demo-shorth em {
+        opacity: 1;
+        transform: translateX(4px);
+      }
+
+      .lesson-nav {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px clamp(18px, 3vw, 28px);
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+        align-items: center;
+      }
+      .ln-status {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--padding-c);
+        border: 1px solid rgba(62, 207, 142, 0.45);
+        border-radius: 999px;
+        padding: 3px 10px;
+      }
+      .lesson-nav h3 {
+        font-family: var(--disp);
+        font-size: 17px;
+        margin-top: 8px;
+      }
+      .ln-track {
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .tick {
+        width: 7px;
+        height: 15px;
+        border-radius: 2px;
+        background: #212a3e;
+        transition: 0.2s;
+      }
+      .tick.done {
+        background: var(--padding-c);
+        box-shadow: 0 0 8px rgba(62, 207, 142, 0.55);
+      }
+      .tick:hover {
+        background: var(--line2);
+      }
+      .ln-next {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        text-align: right;
+      }
+      .ln-next span {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .ln-next b {
+        font-family: var(--disp);
+        font-size: 15px;
+        color: var(--muted);
+      }
+      .ln-next .soon {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--border-c);
+        border: 1px dashed rgba(242, 193, 78, 0.4);
+        border-radius: 999px;
+        padding: 2px 9px;
+      }
+      footer {
+        border-top: 1px solid var(--line);
+        margin-top: 40px;
+        padding: 30px 0 44px;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+        color: var(--faint);
+        font-size: 12.5px;
+      }
+      footer .mono {
+        font-size: 11.5px;
+      }
+      footer .sp {
+        margin-left: auto;
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+      @media (max-width: 1020px) {
+        .intro {
+          grid-template-columns: 1fr;
+        }
+        .pick-grid {
+          grid-template-columns: 1fr;
+        }
+        .lesson-nav {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .ln-next {
+          align-items: center;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg">
+      <span class="glow g1"></span><span class="glow g2"></span>
+    </div>
+
+    <header class="topbar">
+      <span class="lesson-tag">lesson 03 / 45</span>
+      <nav>
+        <a href="#colors">colors</a>
+        <a href="#hex">hex</a>
+        <a href="#rgb">rgb</a>
+        <a href="#hsl">hsl</a>
+        <a href="#image">image</a>
+        <a href="#gradients">gradients</a>
+        <a href="#size">size</a>
+        <a href="#position">position</a>
+        <a href="#repeat">repeat</a>
+        <a href="#notes">cheat-codes</a>
+      </nav>
+    </header>
+
+    <div class="wrap">
+      <!-- ============ intro ============ -->
+      <section class="intro">
+        <div>
+          <p class="eyebrow">lesson 03 · interactive</p>
+          <h1>
+            Every color online is a <span class="word-style">decision</span>.
+          </h1>
+          <p class="lede">
+            Ten properties control every color and backdrop on the web — from
+            one word of text to layered, positioned, repeating artwork. Learn
+            the <b>three color languages</b> (hex, rgb, hsl) and the
+            <b>five background controls</b>, all live.
+          </p>
+          <span class="css-full">P · AINT · E · VERY · P · IXEL</span>
+        </div>
+        <div class="intro-panel">
+          <div id="introSwatch"></div>
+          <span class="intro-fmt" id="introFmt">#ff6b57</span>
+          <p class="imode mono">
+            one color, three languages — watch them swap…
+          </p>
+        </div>
+      </section>
+
+      <!-- ============ 01 · color & background-color ============ -->
+      <section id="colors" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">01 · color &amp; background-color</p>
+          <h2>Two properties, infinite moods</h2>
+          <p class="lede">
+            <span class="mono" style="color: var(--content-c)">color</span>
+            paints text.
+            <span class="mono" style="color: var(--border-c)"
+              >background-color</span
+            >
+            paints the box behind it. Pick both — the card and the CSS follow.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>live card</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="color-card" id="colorCard">
+                <h3>Aurora Coffee</h3>
+                <p>
+                  Small-batch beans, roasted every Tuesday and shipped within 24
+                  hours. No subscriptions, no nonsense.
+                </p>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <p class="grp">pick colors</p>
+            <div class="picker-row">
+              <label for="colText">color (text)</label
+              ><input type="color" id="colText" value="#1c1f26" />
+            </div>
+            <div class="picker-row">
+              <label for="colBg">background-color</label
+              ><input type="color" id="colBg" value="#fff7e8" />
+            </div>
+            <button class="ghost" id="swapBtn">⇄ swap them</button>
+            <div class="code-box"><pre id="codeC"></pre></div>
+            <p class="side-note">
+              Bad combos are part of the lesson too — if you can't read it,
+              you've learned about contrast.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 02 · hex ============ -->
+      <section id="hex" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">02 · hex</p>
+          <h2>HEX — the designer's shorthand</h2>
+          <p class="lede">
+            A hex code is just three numbers — red, green, blue — written in
+            base-16. Drag the channels and read the code like a label:
+            <span class="mono" style="color: var(--border-c)">#rr gg bb</span>.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>live swatch</h3>
+            </div>
+            <div class="stage-wrap">
+              <div style="width: 100%; max-width: 470px">
+                <div
+                  class="swatch-big"
+                  id="hexSwatch"
+                  style="height: 170px"
+                ></div>
+                <div class="hexmap" id="hexMap" style="margin-top: 16px"></div>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--margin-c)">
+              <div class="ctl-top">
+                <label for="hxR">red</label
+                ><output class="ctl-val" id="oxR">ff</output>
+              </div>
+              <input type="range" id="hxR" min="0" max="255" value="255" />
+            </div>
+            <div class="ctl" style="--ac: var(--padding-c)">
+              <div class="ctl-top">
+                <label for="hxG">green</label
+                ><output class="ctl-val" id="oxG">6b</output>
+              </div>
+              <input type="range" id="hxG" min="0" max="255" value="107" />
+            </div>
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="hxB">blue</label
+                ><output class="ctl-val" id="oxB">57</output>
+              </div>
+              <input type="range" id="hxB" min="0" max="255" value="87" />
+            </div>
+            <div class="code-box"><pre id="codeHex"></pre></div>
+            <p class="side-note" id="shortNote"></p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 03 · rgb / rgba ============ -->
+      <section id="rgb" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">03 · rgb / rgba</p>
+          <h2>RGB — the machine's language, plus alpha</h2>
+          <p class="lede">
+            Same three channels, decimal notation — and a fourth: <b>alpha</b>,
+            the transparency. The checkerboard behind the swatch is there so you
+            can actually see it fade.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>alpha over a checkerboard</h3>
+            </div>
+            <div class="stage-wrap">
+              <div
+                class="checker"
+                style="width: 100%; max-width: 470px; padding: 0"
+              >
+                <div
+                  class="swatch-big"
+                  id="rgbaSwatch"
+                  style="border: none; border-radius: 12px"
+                ></div>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--margin-c)">
+              <div class="ctl-top">
+                <label for="rR">red</label
+                ><output class="ctl-val" id="oR">255</output>
+              </div>
+              <input type="range" id="rR" min="0" max="255" value="255" />
+            </div>
+            <div class="ctl" style="--ac: var(--padding-c)">
+              <div class="ctl-top">
+                <label for="rG">green</label
+                ><output class="ctl-val" id="oG">107</output>
+              </div>
+              <input type="range" id="rG" min="0" max="255" value="107" />
+            </div>
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rB">blue</label
+                ><output class="ctl-val" id="oB">87</output>
+              </div>
+              <input type="range" id="rB" min="0" max="255" value="87" />
+            </div>
+            <div class="ctl" style="--ac: var(--border-c)">
+              <div class="ctl-top">
+                <label for="rA">alpha</label
+                ><output class="ctl-val" id="oA">1</output>
+              </div>
+              <input
+                type="range"
+                id="rA"
+                min="0"
+                max="1"
+                step="0.05"
+                value="1"
+              />
+            </div>
+            <div class="code-box"><pre id="codeRgba"></pre></div>
+            <p class="side-note">
+              Alpha 0 = fully transparent, 1 = solid. rgba() is how overlays,
+              shadows and glass effects are born.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 04 · hsl / hsla ============ -->
+      <section id="hsl" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">04 · hsl / hsla</p>
+          <h2>HSL — the human's language</h2>
+          <p class="lede">
+            <b>Hue</b> is a place on the color wheel (0–360°).
+            <b>Saturation</b> is intensity. <b>Lightness</b> is how bright. Want
+            "the same blue, but calmer"? Lower the saturation. Try that in hex.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>live swatch</h3>
+            </div>
+            <div class="stage-wrap">
+              <div
+                class="swatch-big"
+                id="hslSwatch"
+                style="height: 170px; width: 100%; max-width: 470px"
+              ></div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--pink)">
+              <div class="ctl-top">
+                <label for="rHue">hue</label
+                ><output class="ctl-val" id="oH">7°</output>
+              </div>
+              <input type="range" id="rHue" min="0" max="360" value="7" />
+            </div>
+            <div class="ctl" style="--ac: var(--padding-c)">
+              <div class="ctl-top">
+                <label for="rS">saturation</label
+                ><output class="ctl-val" id="oS">100%</output>
+              </div>
+              <input type="range" id="rS" min="0" max="100" value="100" />
+            </div>
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rL">lightness</label
+                ><output class="ctl-val" id="oL">67%</output>
+              </div>
+              <input type="range" id="rL" min="0" max="100" value="67" />
+            </div>
+            <div class="ctl" style="--ac: var(--border-c)">
+              <div class="ctl-top">
+                <label for="rA2">alpha</label
+                ><output class="ctl-val" id="oA2">1</output>
+              </div>
+              <input
+                type="range"
+                id="rA2"
+                min="0"
+                max="1"
+                step="0.05"
+                value="1"
+              />
+            </div>
+            <div class="chips" id="hslPresets">
+              <button class="sel-chip" data-h="7" data-s="100" data-l="67">
+                vivid
+              </button>
+              <button class="sel-chip" data-h="210" data-s="70" data-l="82">
+                pastel
+              </button>
+              <button class="sel-chip" data-h="160" data-s="45" data-l="28">
+                moody
+              </button>
+              <button class="sel-chip" data-h="280" data-s="85" data-l="60">
+                neon
+              </button>
+            </div>
+            <div class="code-box"><pre id="codeHsl"></pre></div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 05 · background-image ============ -->
+      <section id="image" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">05 · background-image</p>
+          <h2>Artwork behind the content</h2>
+          <p class="lede">
+            A background image sits <b>behind</b> the content, inside the
+            border-box. Swap the pattern — text stays perfectly readable on top.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>pattern layer</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="bg-stage" id="stageI">
+                <span class="overlay">content floats above the background</span>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <p class="grp">pick a pattern</p>
+            <div class="chips" id="patChips">
+              <button class="sel-chip on" data-p="dots">dots</button>
+              <button class="sel-chip" data-p="stripes">stripes</button>
+              <button class="sel-chip" data-p="checkers">checkers</button>
+              <button class="sel-chip" data-p="grid">grid</button>
+            </div>
+            <div class="code-box"><pre id="codeImg"></pre></div>
+            <p class="side-note">
+              In real projects this is
+              <span class="mono">url("hero.jpg")</span> or an SVG. Here we use
+              tiny inline SVGs so the file stays self-contained.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 06 · gradients ============ -->
+      <section id="gradients" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">06 · gradients</p>
+          <h2>Colors that travel</h2>
+          <p class="lede">
+            A gradient is a generated <b>image</b> — so it lives in
+            background-image. Pick a type, an angle, two stops. Or steal a
+            preset.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>live gradient</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="bg-stage" id="stageG" style="height: 270px"></div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="segmented" id="segGrad">
+              <span class="seg-thumb"></span>
+              <button data-v="linear" class="active">linear</button>
+              <button data-v="radial">radial</button>
+            </div>
+            <div class="ctl" style="--ac: var(--border-c)">
+              <div class="ctl-top">
+                <label for="angRange">angle</label
+                ><output class="ctl-val" id="oAng">135°</output>
+              </div>
+              <input type="range" id="angRange" min="0" max="360" value="135" />
+            </div>
+            <div class="picker-row">
+              <label for="gStop1">stop 1</label
+              ><input type="color" id="gStop1" value="#ff6b57" />
+            </div>
+            <div class="picker-row">
+              <label for="gStop2">stop 2</label
+              ><input type="color" id="gStop2" value="#58a6ff" />
+            </div>
+            <div class="chips" id="gradPresets">
+              <button
+                class="sel-chip"
+                data-c1="#ff6b57"
+                data-c2="#f2c14e"
+                data-a="25"
+              >
+                sunset
+              </button>
+              <button
+                class="sel-chip"
+                data-c1="#58a6ff"
+                data-c2="#3ecf8e"
+                data-a="180"
+              >
+                ocean
+              </button>
+              <button
+                class="sel-chip"
+                data-c1="#ff4f8b"
+                data-c2="#58a6ff"
+                data-a="135"
+              >
+                berry
+              </button>
+            </div>
+            <div class="code-box"><pre id="codeGrad"></pre></div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 07 · background-size ============ -->
+      <section id="size" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">07 · background-size</p>
+          <h2>auto, cover, contain</h2>
+          <p class="lede">
+            One image, three fates. <b>auto</b> keeps its natural size.
+            <b>cover</b> fills the box and crops the overflow.
+            <b>contain</b> fits the whole image, gaps and all.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>the coffee-cup image</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="bg-stage" id="stageS"></div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <p class="grp">pick a size</p>
+            <div class="segmented" id="segSize">
+              <span class="seg-thumb"></span>
+              <button data-v="auto" class="active">auto</button>
+              <button data-v="cover">cover</button>
+              <button data-v="contain">contain</button>
+            </div>
+            <div class="code-box"><pre id="codeSize"></pre></div>
+            <p class="side-note" id="noteSize"></p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 08 · background-position ============ -->
+      <section id="position" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">08 · background-position</p>
+          <h2>Place the artwork</h2>
+          <p class="lede">
+            Nine keyword anchors, like a numpad for your box. Click a cell — the
+            image jumps there.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>no-repeat, size auto</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="bg-stage" id="stageP"></div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <p class="grp">pick a position</p>
+            <div class="pos-grid" id="posGrid">
+              <button data-v="left top">↖ top left</button
+              ><button data-v="center top">↑ top</button
+              ><button data-v="right top">↗ top right</button>
+              <button data-v="left center">← left</button
+              ><button data-v="center" class="on">• center</button
+              ><button data-v="right center">→ right</button>
+              <button data-v="left bottom">↙ bottom left</button
+              ><button data-v="center bottom">↓ bottom</button
+              ><button data-v="right bottom">↘ bottom right</button>
+            </div>
+            <div class="code-box"><pre id="codePos"></pre></div>
+            <p class="side-note">
+              You can also use lengths and percentages:
+              <span class="mono">background-position: 20px 80%;</span>
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 09 · background-repeat ============ -->
+      <section id="repeat" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">09 · background-repeat</p>
+          <h2>Tile it — or don't</h2>
+          <p class="lede">
+            By default a small image tiles forever. You can limit it to one
+            axis, or stop it entirely.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>tiling behaviour</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="bg-stage" id="stageRp"></div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <p class="grp">pick a repeat</p>
+            <div class="segmented" id="segRep">
+              <span class="seg-thumb"></span>
+              <button data-v="repeat" class="active">repeat</button>
+              <button data-v="repeat-x">repeat-x</button>
+              <button data-v="repeat-y">repeat-y</button>
+              <button data-v="no-repeat">no-repeat</button>
+            </div>
+            <div class="code-box"><pre id="codeRep"></pre></div>
+            <p class="side-note">
+              <span class="mono">repeat-x</span> makes borders and dividers.
+              <span class="mono">no-repeat</span> is what heroes and logos want.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 10 · field notes ============ -->
+      <section id="notes" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">10 · field notes</p>
+          <h2>Cheat codes from lesson 03</h2>
+        </div>
+        <div class="notes-grid">
+          <article class="note-card" style="--nc: var(--content-c)">
+            <div class="note-demo demo-lang">
+              <i style="color: #7fe0b0">#ff6b57</i>
+              <i style="color: #8ab4ff">rgb(255, 107, 87)</i>
+              <i style="color: #f2c14e">hsl(7, 100%, 67%)</i>
+            </div>
+            <h3>three languages, one color</h3>
+            <p>
+              Hex for design tools, rgb for machines and alpha, hsl for humans.
+              The browser reads all three identically — pick whichever you can
+              reason about.
+            </p>
+            <p class="note-tip mono">↳ hover: the translations arrive</p>
+          </article>
+          <article class="note-card" style="--nc: var(--border-c)">
+            <div class="note-demo demo-alpha"><i></i></div>
+            <h3>alpha needs a backdrop</h3>
+            <p>
+              Transparency only means something <b>over</b> something. That's
+              why design tools show a checkerboard behind transparent colors —
+              and why your rgba() overlay needs content under it.
+            </p>
+            <p class="note-tip mono">↳ hover: opacity solidifies</p>
+          </article>
+          <article class="note-card" style="--nc: var(--margin-c)">
+            <div class="note-demo demo-grad"></div>
+            <h3>gradients are images</h3>
+            <p>
+              Not colors — <b>images</b>. So they use background-image, can
+              layer with other backgrounds, and obey size / position / repeat
+              just like any picture.
+            </p>
+            <p class="note-tip mono">↳ hover: the gradient travels</p>
+          </article>
+          <article class="note-card" style="--nc: var(--padding-c)">
+            <div class="note-demo demo-shorth">
+              <em>background: #0d1220 url("cup.svg")</em>
+              <em>&nbsp;&nbsp;center / cover no-repeat;</em>
+            </div>
+            <h3>the shorthand</h3>
+            <p>
+              Color, image, position, size and repeat can collapse into one
+              <span class="mono">background:</span> line. Read it left to right
+              and it's the same five controls.
+            </p>
+            <p class="note-tip mono">↳ hover: the one-liner lights up</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ lesson nav ============ -->
+      <div class="lesson-nav reveal">
+        <div>
+          <span class="ln-status">✓ completed</span>
+          <h3>03 — Colors &amp; Backgrounds</h3>
+        </div>
+        <div class="ln-track" id="lnTrack"></div>
+        <div class="ln-next">
+          <span>up next</span>
+          <b>04 · Units </b>
+        </div>
+      </div>
+
+      <footer>
+        <span class="mono">drag things, break things, learn things.</span>
+        <span class="sp mono"
+          >45 lessons · lesson 03 · colors &amp; backgrounds</span
+        >
+      </footer>
+    </div>
+    <!-- /wrap -->
+
+    <script>
+      (() => {
+        const $ = (id) => document.getElementById(id);
+        const rule = (sel, decls) =>
+          `<span class="c-sel">${sel}</span> {\n${decls
+            .map((d) => {
+              const i = d.indexOf(":");
+              return `  <span class="c-prop">${d.slice(0, i)}</span>: <span class="c-val">${d.slice(i + 1).trim()}</span>;`;
+            })
+            .join("\n")}\n}`;
+        const hex2 = (v) => (+v).toString(16).padStart(2, "0");
+
+        function initSeg(seg, onPick) {
+          const btns = [...seg.querySelectorAll("button")],
+            thumb = seg.querySelector(".seg-thumb"),
+            n = btns.length;
+          function set(i) {
+            btns.forEach((b, j) => b.classList.toggle("active", i === j));
+            thumb.style.width = `calc((100% - 6px)/${n})`;
+            thumb.style.transform = `translateX(${i * 100}%)`;
+          }
+          btns.forEach((b, i) =>
+            b.addEventListener("click", () => {
+              set(i);
+              onPick(b.dataset.v);
+            }),
+          );
+          set(0);
+        }
+        function range(el, out, fmt, cb) {
+          const f = () => {
+            const v = +el.value;
+            out.textContent = fmt(v);
+            const min = +el.min,
+              max = +el.max;
+            el.style.setProperty(
+              "--fill",
+              ((v - min) / (max - min)) * 100 + "%",
+            );
+            cb(v);
+          };
+          el.addEventListener("input", f);
+          f();
+        }
+
+        /* ---------- intro: one color, three languages ---------- */
+        const FORMATS = [
+          { t: "#ff6b57", bg: "#ff6b57" },
+          { t: "rgb(255, 107, 87)", bg: "rgb(255,107,87)" },
+          { t: "hsl(7, 100%, 67%)", bg: "hsl(7,100%,67%)" },
+          {
+            t: "linear-gradient(90deg, #ff6b57, #f2c14e)",
+            bg: "linear-gradient(90deg,#ff6b57,#f2c14e)",
+          },
+        ];
+        let fi = 0;
+        setInterval(() => {
+          fi = (fi + 1) % FORMATS.length;
+          $("introFmt").textContent = FORMATS[fi].t;
+          $("introSwatch").style.background = FORMATS[fi].bg;
+        }, 2100);
+        $("introSwatch").style.background = FORMATS[0].bg;
+
+        /* ---------- 01 colors ---------- */
+        function renderC() {
+          const t = $("colText").value,
+            b = $("colBg").value;
+          $("colorCard").style.color = t;
+          $("colorCard").style.backgroundColor = b;
+          $("codeC").innerHTML = rule(".card", [
+            `color: ${t}`,
+            `background-color: ${b}`,
+          ]);
+        }
+        $("colText").addEventListener("input", renderC);
+        $("colBg").addEventListener("input", renderC);
+        $("swapBtn").addEventListener("click", () => {
+          const a = $("colText");
+          const b = $("colBg");
+          const tmp = a.value;
+          a.value = b.value;
+          b.value = tmp;
+          renderC();
+        });
+        renderC();
+
+        /* ---------- 02 hex ---------- */
+        function renderHex() {
+          const r = +$("hxR").value,
+            g = +$("hxG").value,
+            b = +$("hxB").value;
+          const h = `#${hex2(r)}${hex2(g)}${hex2(b)}`;
+          $("hexSwatch").style.background = h;
+          $("hexMap").innerHTML =
+            `<span><b style="background:rgb(${r},0,0);color:#fff">${hex2(r)}</b> red → ${r}</span>` +
+            `<span><b style="background:rgb(0,${g},0);color:#fff">${hex2(g)}</b> green → ${g}</span>` +
+            `<span><b style="background:rgb(0,0,${b});color:#fff">${hex2(b)}</b> blue → ${b}</span>`;
+          $("codeHex").innerHTML = rule(".card", [`background-color: ${h}`]);
+          const p = [hex2(r), hex2(g), hex2(b)];
+          $("shortNote").innerHTML = p.every((x) => x[0] === x[1])
+            ? `<b style="color:var(--padding-c)">Shorthand possible:</b> <span class="mono">${"#" + p.map((x) => x[0]).join("")}</span> — when both digits repeat, one is enough.`
+            : "Each pair is one channel: #rr gg bb. When both digits repeat (like #ff6655), a 3-digit shorthand exists.";
+        }
+        range($("hxR"), $("oxR"), (v) => hex2(v), renderHex);
+        range($("hxG"), $("oxG"), (v) => hex2(v), renderHex);
+        range($("hxB"), $("oxB"), (v) => hex2(v), renderHex);
+
+        /* ---------- 03 rgb/rgba ---------- */
+        function renderRgba() {
+          const r = +$("rR").value,
+            g = +$("rG").value,
+            b = +$("rB").value,
+            a = +$("rA").value;
+          $("rgbaSwatch").style.background = `rgba(${r},${g},${b},${a})`;
+          const fn =
+            a < 1 ? `rgba(${r}, ${g}, ${b}, ${a})` : `rgb(${r}, ${g}, ${b})`;
+          $("codeRgba").innerHTML = rule(".card", [`background-color: ${fn}`]);
+        }
+        range($("rR"), $("oR"), (v) => v, renderRgba);
+        range($("rG"), $("oG"), (v) => v, renderRgba);
+        range($("rB"), $("oB"), (v) => v, renderRgba);
+        range($("rA"), $("oA"), (v) => v, renderRgba);
+
+        /* ---------- 04 hsl/hsla ---------- */
+        function renderHsl() {
+          const h = +$("rHue").value,
+            s = +$("rS").value,
+            l = +$("rL").value,
+            a = +$("rA2").value;
+          $("hslSwatch").style.background = `hsla(${h},${s}%,${l}%,${a})`;
+          const fn =
+            a < 1
+              ? `hsla(${h}, ${s}%, ${l}%, ${a})`
+              : `hsl(${h}, ${s}%, ${l}%)`;
+          $("codeHsl").innerHTML = rule(".card", [`background-color: ${fn}`]);
+        }
+        range($("rHue"), $("oH"), (v) => v + "°", renderHsl);
+        range($("rS"), $("oS"), (v) => v + "%", renderHsl);
+        range($("rL"), $("oL"), (v) => v + "%", renderHsl);
+        range($("rA2"), $("oA2"), (v) => v, renderHsl);
+        $("hslPresets").addEventListener("click", (e) => {
+          const c = e.target.closest(".sel-chip");
+          if (!c) return;
+          $("rHue").value = c.dataset.h;
+          $("rS").value = c.dataset.s;
+          $("rL").value = c.dataset.l;
+          ["rHue", "rS", "rL"].forEach((id) =>
+            $(id).dispatchEvent(new Event("input")),
+          );
+        });
+
+        /* ---------- 05 background-image ---------- */
+        const PATTERNS = {
+          dots: `url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='26'%20height='26'%3E%3Ccircle%20cx='7'%20cy='7'%20r='3.5'%20fill='%23ff6b57'/%3E%3C/svg%3E")`,
+          stripes: `url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='22'%20height='22'%3E%3Cpath%20d='M-5%205L5%20-5M0%2022L22%200M17%2027L27%2017'%20stroke='%2358a6ff'%20stroke-width='3'/%3E%3C/svg%3E")`,
+          checkers: `url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='26'%20height='26'%3E%3Crect%20width='13'%20height='13'%20fill='%233ecf8e'/%3E%3Crect%20x='13'%20y='13'%20width='13'%20height='13'%20fill='%233ecf8e'/%3E%3C/svg%3E")`,
+          grid: `url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='26'%20height='26'%3E%3Cpath%20d='M26%200H0V26'%20fill='none'%20stroke='%23f2c14e'%20stroke-width='1.5'/%3E%3C/svg%3E")`,
+        };
+        const CUP = `url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='140'%20height='140'%3E%3Ccircle%20cx='70'%20cy='70'%20r='56'%20fill='%23ff6b57'/%3E%3Ccircle%20cx='70'%20cy='70'%20r='38'%20fill='%23f7f4ee'/%3E%3Ccircle%20cx='70'%20cy='70'%20r='20'%20fill='%236b4a39'/%3E%3C/svg%3E")`;
+        let curPat = "dots";
+        function renderImg() {
+          $("stageI").style.backgroundImage = PATTERNS[curPat];
+          $("codeImg").innerHTML = rule(".card", [
+            `background-image: url("${curPat}.svg")`,
+          ]);
+        }
+        $("patChips").addEventListener("click", (e) => {
+          const c = e.target.closest(".sel-chip");
+          if (!c) return;
+          document
+            .querySelectorAll("#patChips .sel-chip")
+            .forEach((x) => x.classList.remove("on"));
+          c.classList.add("on");
+          curPat = c.dataset.p;
+          renderImg();
+        });
+        renderImg();
+
+        /* ---------- 06 gradients ---------- */
+        const G = { type: "linear", ang: 135, c1: "#ff6b57", c2: "#58a6ff" };
+        function renderGrad() {
+          const img =
+            G.type === "linear"
+              ? `linear-gradient(${G.ang}deg, ${G.c1}, ${G.c2})`
+              : `radial-gradient(circle, ${G.c1}, ${G.c2})`;
+          $("stageG").style.backgroundImage = img;
+          $("codeGrad").innerHTML = rule(".card", [`background-image: ${img}`]);
+        }
+        initSeg($("segGrad"), (v) => {
+          G.type = v;
+          renderGrad();
+        });
+        range(
+          $("angRange"),
+          $("oAng"),
+          (v) => v + "°",
+          (v) => {
+            G.ang = v;
+            renderGrad();
+          },
+        );
+        $("gStop1").addEventListener("input", (e) => {
+          G.c1 = e.target.value;
+          renderGrad();
+        });
+        $("gStop2").addEventListener("input", (e) => {
+          G.c2 = e.target.value;
+          renderGrad();
+        });
+        $("gradPresets").addEventListener("click", (e) => {
+          const c = e.target.closest(".sel-chip");
+          if (!c) return;
+          G.c1 = c.dataset.c1;
+          G.c2 = c.dataset.c2;
+          G.ang = +c.dataset.a;
+          $("gStop1").value = G.c1;
+          $("gStop2").value = G.c2;
+          $("angRange").value = G.ang;
+          $("angRange").dispatchEvent(new Event("input"));
+        });
+        renderGrad();
+
+        /* ---------- 07 size ---------- */
+        const SIZE_NOTES = {
+          auto: "auto — the image at its natural size. Always. Even when it tiles or overflows.",
+          cover:
+            "cover — scale until the box is fully covered. Overflow gets cropped. The hero-image default.",
+          contain:
+            "contain — scale until the whole image fits. Empty gaps may show around it.",
+        };
+        function renderSize(v) {
+          const s = $("stageS");
+          s.style.backgroundImage = CUP;
+          s.style.backgroundRepeat = "no-repeat";
+          s.style.backgroundPosition = "center";
+          s.style.backgroundSize = v;
+          $("codeSize").innerHTML = rule(".card", [
+            `background: url("cup.svg") center / ${v} no-repeat`,
+          ]);
+          $("noteSize").innerHTML = SIZE_NOTES[v];
+        }
+        initSeg($("segSize"), renderSize);
+        renderSize("auto");
+
+        /* ---------- 08 position ---------- */
+        let curPos = "center";
+        function renderPos() {
+          const s = $("stageP");
+          s.style.backgroundImage = CUP;
+          s.style.backgroundRepeat = "no-repeat";
+          s.style.backgroundSize = "auto";
+          s.style.backgroundPosition = curPos;
+          $("codePos").innerHTML = rule(".card", [
+            `background-image: url("cup.svg")`,
+            `background-repeat: no-repeat`,
+            `background-position: ${curPos}`,
+          ]);
+        }
+        $("posGrid").addEventListener("click", (e) => {
+          const c = e.target.closest("button");
+          if (!c) return;
+          document
+            .querySelectorAll("#posGrid button")
+            .forEach((x) => x.classList.remove("on"));
+          c.classList.add("on");
+          curPos = c.dataset.v;
+          renderPos();
+        });
+        renderPos();
+
+        /* ---------- 09 repeat ---------- */
+        function renderRep(v) {
+          const s = $("stageRp");
+          s.style.backgroundImage = PATTERNS.dots;
+          s.style.backgroundSize = "auto";
+          s.style.backgroundPosition = "left top";
+          s.style.backgroundRepeat = v;
+          $("codeRep").innerHTML = rule(".card", [
+            `background-image: url("dots.svg")`,
+            `background-repeat: ${v}`,
+          ]);
+        }
+        initSeg($("segRep"), renderRep);
+        renderRep("repeat");
+
+        /* ---------- lesson track ---------- */
+        const track = $("lnTrack");
+        for (let i = 0; i < 45; i++) {
+          const t = document.createElement("span");
+          t.className = "tick" + (i < 3 ? " done" : "");
+          t.title = "lesson " + (i + 1);
+          track.appendChild(t);
+        }
+
+        /* ---------- reveal ---------- */
+        const io = new IntersectionObserver(
+          (es) =>
+            es.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                io.unobserve(e.target);
+              }
+            }),
+          { threshold: 0.12 },
+        );
+        document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      })();
+    </script>
+  </body>
+</html>
