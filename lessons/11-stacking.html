@@ -1,0 +1,1626 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stacking — Lesson 11</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' fill='none' stroke='%23f07f4f' stroke-width='2'/%3E%3Crect x='8' y='8' width='16' height='16' fill='none' stroke='%23f2c14e' stroke-width='2'/%3E%3Crect x='13' y='13' width='6' height='6' fill='%2358a6ff'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0e15;
+        --panel: #121826;
+        --panel2: #0d1220;
+        --ink: #10141d;
+        --line: #222c40;
+        --line2: #31405e;
+        --text: #e9eef7;
+        --muted: #8d9ab0;
+        --faint: #5b6a84;
+        --margin-c: #f07f4f;
+        --margin-bg: rgba(240, 127, 79, 0.14);
+        --border-c: #f2c14e;
+        --border-bg: rgba(242, 193, 78, 0.16);
+        --padding-c: #3ecf8e;
+        --padding-bg: rgba(62, 207, 142, 0.14);
+        --content-c: #58a6ff;
+        --content-bg: rgba(88, 166, 255, 0.17);
+        --pink: #ff4f8b;
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: dark;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 15px;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+      ::selection {
+        background: rgba(88, 166, 255, 0.35);
+      }
+      .mono {
+        font-family: var(--mono);
+      }
+      section {
+        scroll-margin-top: 76px;
+      }
+      b {
+        font-weight: 600;
+      }
+
+      .bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            700px 460px at 12% -6%,
+            rgba(242, 193, 78, 0.07),
+            transparent 60%
+          ),
+          radial-gradient(
+            760px 520px at 92% 22%,
+            rgba(88, 166, 255, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            600px 480px at 40% 105%,
+            rgba(62, 207, 142, 0.05),
+            transparent 60%
+          );
+      }
+      .bg::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(233, 238, 247, 0.035) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(233, 238, 247, 0.035) 1px,
+            transparent 1px
+          );
+        background-size: 28px 28px;
+        mask-image: radial-gradient(
+          ellipse 120% 90% at 50% 0%,
+          #000 40%,
+          transparent 100%
+        );
+      }
+      .bg .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.5;
+        animation: drift 26s ease-in-out infinite alternate;
+      }
+      .bg .g1 {
+        width: 420px;
+        height: 420px;
+        left: -120px;
+        top: 30%;
+        background: rgba(240, 127, 79, 0.1);
+      }
+      .bg .g2 {
+        width: 460px;
+        height: 460px;
+        right: -140px;
+        top: 60%;
+        background: rgba(88, 166, 255, 0.1);
+        animation-delay: -12s;
+      }
+      @keyframes drift {
+        from {
+          transform: translateY(-30px);
+        }
+        to {
+          transform: translateY(40px);
+        }
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 12px clamp(16px, 4vw, 44px);
+        background: rgba(11, 14, 21, 0.92);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar nav {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .topbar nav a {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 6px 11px;
+        border-radius: 999px;
+        transition: 0.2s;
+      }
+      .topbar nav a:hover {
+        color: var(--text);
+        background: #161d2c;
+      }
+      .lesson-tag {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--border-c);
+        border: 1px dashed rgba(242, 193, 78, 0.45);
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .wrap {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: 0 clamp(16px, 4vw, 44px);
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        padding: clamp(20px, 4vh, 48px) 0 clamp(30px, 5vh, 56px);
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--padding-c);
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(2.3rem, 5.2vw, 3.7rem);
+        line-height: 1.06;
+        letter-spacing: -0.02em;
+      }
+      .word-style {
+        display: inline-block;
+        padding: 0.02em 0.22em;
+        background: var(--border-bg);
+        border: 0.06em solid var(--border-c);
+        border-radius: 0.14em;
+        color: #ffe3a1;
+        transition: transform 0.3s;
+        cursor: default;
+        margin-top: 10px;
+      }
+      .word-style:hover {
+        transform: rotate(-2deg) scale(1.03);
+      }
+      .lede {
+        color: var(--muted);
+        max-width: 56ch;
+        margin-top: 18px;
+        font-size: 1.05rem;
+      }
+      .lede b {
+        color: var(--text);
+      }
+      .css-full {
+        display: inline-block;
+        margin-top: 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--faint);
+        letter-spacing: 0.08em;
+      }
+      .intro-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 26px;
+        display: grid;
+        place-items: center;
+        gap: 16px;
+        box-shadow: 0 30px 60px -40px rgba(0, 0, 0, 0.8);
+      }
+      .zt-stage {
+        position: relative;
+        width: 220px;
+        height: 150px;
+      }
+      .zt {
+        position: absolute;
+        width: 130px;
+        height: 74px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        font-family: var(--mono);
+        font-size: 11px;
+        font-weight: 700;
+        color: #0e1017;
+        transition: all 0.45s;
+      }
+      .zt-r {
+        background: var(--margin-c);
+        left: 0;
+        top: 12px;
+      }
+      .zt-b {
+        background: var(--content-c);
+        left: 44px;
+        top: 38px;
+      }
+      .zt-g {
+        background: var(--padding-c);
+        left: 88px;
+        top: 64px;
+      }
+      .intro-fmt {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--content-c);
+        background: var(--ink);
+        border: 1px solid var(--line2);
+        border-radius: 9px;
+        padding: 7px 16px;
+        min-height: 36px;
+      }
+      .imode {
+        font-size: 11px;
+        color: var(--faint);
+        letter-spacing: 0.1em;
+      }
+
+      .sec {
+        padding: clamp(36px, 6vh, 64px) 0;
+      }
+      .sec-head {
+        margin-bottom: 26px;
+        max-width: 72ch;
+      }
+      .sec-head h2 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+        letter-spacing: -0.015em;
+        line-height: 1.15;
+      }
+      .sec-head .lede {
+        margin-top: 10px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 18px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .panel-head h3 {
+        font-family: var(--disp);
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dots i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dots i:nth-child(1) {
+        background: #f07f4f;
+      }
+      .dots i:nth-child(2) {
+        background: #f2c14e;
+      }
+      .dots i:nth-child(3) {
+        background: #3ecf8e;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.85;
+        overflow-x: auto;
+      }
+      .c-sel {
+        color: #7fe0b0;
+      }
+      .c-prop {
+        color: #8ab4ff;
+      }
+      .c-val {
+        color: #f2c14e;
+      }
+      .c-com {
+        color: #5b6a84;
+      }
+      .grp {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+
+      .pick-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 18px;
+        align-items: stretch;
+      }
+      .stage-wrap {
+        padding: 28px;
+        display: grid;
+        place-items: center;
+        min-height: 340px;
+        gap: 14px;
+      }
+      .side {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .code-box {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .code-box pre {
+        min-height: 0;
+        font-size: 12.5px;
+      }
+      .side-note {
+        font-size: 12px;
+        color: var(--faint);
+      }
+      .ghost-btn {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--faint);
+        background: none;
+        border: 1px dashed var(--line2);
+        border-radius: 8px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .ghost-btn:hover {
+        color: var(--content-c);
+        border-color: var(--content-c);
+      }
+      .segmented {
+        position: relative;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 1fr;
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        padding: 3px;
+      }
+      .segmented button {
+        position: relative;
+        z-index: 1;
+        background: none;
+        border: 0;
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--muted);
+        padding: 8px 4px;
+        cursor: pointer;
+        transition: color 0.25s;
+        border-radius: 8px;
+      }
+      .segmented button:hover {
+        color: var(--text);
+      }
+      .segmented button.active {
+        color: #fff;
+      }
+      .seg-thumb {
+        position: absolute;
+        top: 3px;
+        bottom: 3px;
+        left: 3px;
+        width: calc((100% - 6px) / 2);
+        background: #26334c;
+        border-radius: 8px;
+        transition:
+          transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+          width 0.28s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      }
+
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        outline: none;
+        cursor: pointer;
+        background: linear-gradient(
+          90deg,
+          var(--ac) var(--fill, 50%),
+          #232c40 var(--fill, 50%)
+        );
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        transition: transform 0.15s;
+      }
+      input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.15);
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+      }
+      .ctl {
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 7px 11px;
+        transition: 0.2s;
+      }
+      .ctl:hover {
+        background: #101725;
+        border-color: var(--line);
+      }
+      .ctl-top {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+      .ctl-top label {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text);
+      }
+      .ctl-val {
+        margin-left: auto;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--ac);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 2px 9px;
+      }
+      .read {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 14px;
+      }
+      .read b {
+        color: var(--text);
+      }
+      .verdict {
+        font-family: var(--mono);
+        font-size: 13px;
+        text-align: center;
+        padding: 14px 18px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        background: var(--ink);
+        width: 100%;
+        max-width: 420px;
+        transition: all 0.25s ease;
+      }
+
+      /* 01 z cards */
+      .z-stage {
+        position: relative;
+        width: 100%;
+        max-width: 420px;
+        height: 270px;
+      }
+      .z-card {
+        position: absolute;
+        width: 190px;
+        height: 130px;
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        font-family: var(--mono);
+        font-size: 12px;
+        font-weight: 700;
+        color: #0e1017;
+        transition:
+          z-index 0s,
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+      .z-card small {
+        font-weight: 500;
+        opacity: 0.75;
+      }
+      .zc-r {
+        background: var(--margin-c);
+        left: 6%;
+        top: 8%;
+      }
+      .zc-b {
+        background: var(--content-c);
+        left: 28%;
+        top: 32%;
+      }
+      .zc-g {
+        background: var(--padding-c);
+        left: 50%;
+        top: 56%;
+      }
+
+      /* 02 contexts */
+      .ctx-stage {
+        position: relative;
+        width: 100%;
+        max-width: 440px;
+        height: 280px;
+      }
+      .ctx {
+        position: absolute;
+        border-radius: 14px;
+        padding: 14px;
+        font-family: var(--mono);
+        font-size: 10.5px;
+      }
+      .ctx-a {
+        background: rgba(88, 166, 255, 0.14);
+        border: 1px solid var(--content-c);
+        left: 4%;
+        top: 10%;
+        width: 62%;
+        height: 70%;
+        color: #a7cdff;
+      }
+      .ctx-b {
+        background: rgba(240, 127, 79, 0.16);
+        border: 1px solid var(--margin-c);
+        left: 40%;
+        top: 34%;
+        width: 56%;
+        height: 56%;
+        color: #ffc9ae;
+      }
+      .ctx-kid {
+        position: absolute;
+        background: var(--padding-c);
+        color: #0e1017;
+        font-weight: 700;
+        border-radius: 10px;
+        padding: 12px 14px;
+        left: 12%;
+        bottom: -14%;
+        width: 70%;
+        transition: all 0.2s;
+      }
+
+      /* 03 fails */
+      .fail-stage {
+        position: relative;
+        width: 100%;
+        max-width: 420px;
+        height: 240px;
+      }
+      .fail-base {
+        position: absolute;
+        z-index: 10;
+        left: 20%;
+        top: 26%;
+        width: 60%;
+        height: 52%;
+        background: var(--border-bg);
+        border: 1px solid var(--border-c);
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: #ffe3a1;
+        transition: all 0.25s ease;
+      }
+      .fail-target {
+        position: absolute;
+        left: 34%;
+        top: 40%;
+        width: 60%;
+        height: 52%;
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: #a7cdff;
+        transition: all 0.25s ease;
+      }
+
+      /* 04 order */
+      .ord-stage {
+        position: relative;
+        width: 100%;
+        max-width: 420px;
+        height: 240px;
+      }
+      .ord {
+        position: absolute;
+        width: 62%;
+        height: 56%;
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        font-family: var(--mono);
+        font-size: 11px;
+        font-weight: 700;
+        transition: all 0.3s;
+      }
+      .ord-1 {
+        background: var(--padding-c);
+        color: #0e1017;
+        left: 12%;
+        top: 14%;
+      }
+      .ord-2 {
+        background: var(--pink);
+        color: #fff;
+        left: 28%;
+        top: 34%;
+      }
+
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      @media (min-width: 1180px) {
+        .notes-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media (max-width: 640px) {
+        .notes-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .note-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.3s,
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+      .note-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--nc);
+        opacity: 0.85;
+      }
+      .note-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--nc);
+        box-shadow: 0 24px 44px -28px rgba(0, 0, 0, 0.85);
+      }
+      .note-card h3 {
+        font-family: var(--mono);
+        font-size: 15px;
+        color: var(--nc);
+        margin-bottom: 8px;
+      }
+      .note-card p {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .note-tip {
+        margin-top: 12px;
+        font-size: 11px;
+        color: var(--faint);
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+      }
+      .note-demo {
+        height: 104px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        overflow: hidden;
+      }
+      .demo-z {
+        position: relative;
+        width: 70px;
+        height: 60px;
+      }
+      .demo-z i {
+        position: absolute;
+        width: 44px;
+        height: 30px;
+        border-radius: 6px;
+        transition: 0.35s;
+      }
+      .demo-z i:nth-child(1) {
+        background: var(--margin-c);
+        left: 0;
+        top: 0;
+      }
+      .demo-z i:nth-child(2) {
+        background: var(--content-c);
+        left: 14px;
+        top: 16px;
+      }
+      .note-card:hover .demo-z i:nth-child(1) {
+        transform: translate(14px, 16px);
+      }
+      .note-card:hover .demo-z i:nth-child(2) {
+        transform: translate(-14px, -16px);
+      }
+      .demo-seal {
+        position: relative;
+        width: 75%;
+        height: 64px;
+      }
+      .demo-seal .p1,
+      .demo-seal .p2 {
+        position: absolute;
+        top: 0;
+        width: 46%;
+        height: 100%;
+        border-radius: 8px;
+      }
+      .demo-seal .p1 {
+        left: 0;
+        background: rgba(88, 166, 255, 0.15);
+        border: 1px solid var(--content-c);
+      }
+      .demo-seal .p2 {
+        right: 0;
+        background: rgba(240, 127, 79, 0.15);
+        border: 1px solid var(--margin-c);
+      }
+      .demo-seal .k {
+        position: absolute;
+        left: 8%;
+        bottom: -6px;
+        background: var(--padding-c);
+        color: #0e1017;
+        font: 700 9px var(--mono);
+        border-radius: 6px;
+        padding: 5px 8px;
+        transition: 0.35s;
+      }
+      .note-card:hover .demo-seal .k {
+        transform: translateY(-14px);
+      }
+      .demo-dom {
+        width: 60%;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .demo-dom i {
+        height: 16px;
+        border-radius: 5px;
+        background: #39415a;
+        transition: 0.35s;
+      }
+      .demo-dom i:last-child {
+        background: var(--pink);
+      }
+      .note-card:hover .demo-dom {
+        flex-direction: column-reverse;
+      }
+      .demo-paint {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--muted);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        width: 70%;
+      }
+      .demo-paint em {
+        font-style: normal;
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        padding: 2px 8px;
+        transition: 0.3s;
+        opacity: 0.5;
+      }
+      .note-card:hover .demo-paint em {
+        opacity: 1;
+      }
+      .note-card:hover .demo-paint em:nth-child(2) {
+        transition-delay: 0.06s;
+      }
+      .note-card:hover .demo-paint em:nth-child(3) {
+        transition-delay: 0.12s;
+      }
+
+      .lesson-nav {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px clamp(18px, 3vw, 28px);
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+        align-items: center;
+      }
+      .ln-status {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--padding-c);
+        border: 1px solid rgba(62, 207, 142, 0.45);
+        border-radius: 999px;
+        padding: 3px 10px;
+      }
+      .lesson-nav h3 {
+        font-family: var(--disp);
+        font-size: 17px;
+        margin-top: 8px;
+      }
+      .ln-track {
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .tick {
+        width: 7px;
+        height: 15px;
+        border-radius: 2px;
+        background: #212a3e;
+        transition: 0.2s;
+      }
+      .tick.done {
+        background: var(--padding-c);
+        box-shadow: 0 0 8px rgba(62, 207, 142, 0.55);
+      }
+      .tick:hover {
+        background: var(--line2);
+      }
+      .ln-next {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        text-align: right;
+      }
+      .ln-next span {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .ln-next b {
+        font-family: var(--disp);
+        font-size: 15px;
+        color: var(--text);
+      }
+      footer {
+        border-top: 1px solid var(--line);
+        margin-top: 40px;
+        padding: 30px 0 44px;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+        color: var(--faint);
+        font-size: 12.5px;
+      }
+      footer .mono {
+        font-size: 11.5px;
+      }
+      footer .sp {
+        margin-left: auto;
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+      @media (max-width: 1020px) {
+        .intro {
+          grid-template-columns: 1fr;
+        }
+        .pick-grid {
+          grid-template-columns: 1fr;
+        }
+        .lesson-nav {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .ln-next {
+          align-items: center;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg">
+      <span class="glow g1"></span><span class="glow g2"></span>
+    </div>
+
+    <header class="topbar">
+      <span class="lesson-tag">lesson 11 / 45</span>
+      <nav>
+        <a href="#z">z-index</a>
+        <a href="#contexts">stacking-contexts</a>
+        <a href="#fails">why-it-fails</a>
+        <a href="#order">dom-order</a>
+        <a href="#notes">cheat-codes</a>
+      </nav>
+    </header>
+
+    <div class="wrap">
+      <!-- ============ intro ============ -->
+      <section class="intro">
+        <div>
+          <p class="eyebrow">lesson 11 · interactive</p>
+          <h1>On top? It's a <span class="word-style">contest</span>.</h1>
+          <p class="lede">
+            When boxes overlap, the browser runs a quiet competition:
+            <b>z-index</b> scores it, <b>stacking contexts</b> seal the rooms,
+            and <b>DOM order</b> breaks the ties. Learn the rules — and why
+            <span class="mono">z-index: 9999</span> sometimes loses.
+          </p>
+          <span class="css-full">W · HO · P · AINTS · L · AST</span>
+        </div>
+        <div class="intro-panel">
+          <div class="zt-stage">
+            <div class="zt zt-r" id="ztR">red</div>
+            <div class="zt zt-b" id="ztB">blue</div>
+            <div class="zt zt-g" id="ztG">green</div>
+          </div>
+          <span class="intro-fmt" id="introFmt">z-index: 3 · 2 · 1</span>
+          <p class="imode mono">same boxes, new winner each round…</p>
+        </div>
+      </section>
+
+      <!-- ============ 01 · z-index ============ -->
+      <section id="z" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">01 · z-index</p>
+          <h2>The third axis</h2>
+          <p class="lede">
+            X is horizontal, Y is vertical, <b>Z is toward your face</b>. Higher
+            z-index paints on top — but only on positioned elements (or
+            flex/grid items). Drag all three and read the live leaderboard.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>who paints last?</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="z-stage">
+                <div class="z-card zc-r" id="zcR">
+                  red <small id="zvR">z:2</small>
+                </div>
+                <div class="z-card zc-b" id="zcB">
+                  blue <small id="zvB">z:1</small>
+                </div>
+                <div class="z-card zc-g" id="zcG">
+                  green <small id="zvG">z:0</small>
+                </div>
+              </div>
+              <p class="read" id="zOrder"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--margin-c)">
+              <div class="ctl-top">
+                <label for="rZR">red z-index</label
+                ><output class="ctl-val" id="oZR">2</output>
+              </div>
+              <input type="range" id="rZR" min="0" max="5" value="2" />
+            </div>
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rZB">blue z-index</label
+                ><output class="ctl-val" id="oZB">1</output>
+              </div>
+              <input type="range" id="rZB" min="0" max="5" value="1" />
+            </div>
+            <div class="ctl" style="--ac: var(--padding-c)">
+              <div class="ctl-top">
+                <label for="rZG">green z-index</label
+                ><output class="ctl-val" id="oZG">0</output>
+              </div>
+              <input type="range" id="rZG" min="0" max="5" value="0" />
+            </div>
+            <div class="code-box"><pre id="codeZ"></pre></div>
+            <p class="side-note">
+              Ties? Then DOM order decides — later in the HTML wins. Negative
+              z-index sinks <i>behind</i> normal content.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 02 · stacking contexts ============ -->
+      <section id="contexts" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">02 · stacking contexts</p>
+          <h2>Sealed rooms</h2>
+          <p class="lede">
+            The green kid lives inside the blue parent. Crank the kid to
+            <b>9999</b> — it still can't beat the orange parent, because
+            contests happen <i>between rooms</i>, not inside them. A child never
+            escapes its context.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>9999 vs 2 — watch it lose</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="ctx-stage">
+                <div class="ctx ctx-a" id="ctxA">
+                  blue parent
+                  <div class="ctx-kid" id="ctxKid">green kid · z: 9999</div>
+                </div>
+                <div class="ctx ctx-b" id="ctxB">orange parent</div>
+              </div>
+              <p class="read" id="ctxRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rCA">blue parent z</label
+                ><output class="ctl-val" id="oCA">1</output>
+              </div>
+              <input type="range" id="rCA" min="0" max="3" value="1" />
+            </div>
+            <div class="ctl" style="--ac: var(--margin-c)">
+              <div class="ctl-top">
+                <label for="rCB">orange parent z</label
+                ><output class="ctl-val" id="oCB">2</output>
+              </div>
+              <input type="range" id="rCB" min="0" max="3" value="2" />
+            </div>
+            <div class="ctl" style="--ac: var(--padding-c)">
+              <div class="ctl-top">
+                <label for="rCK">green kid z</label
+                ><output class="ctl-val" id="oCK">9999</output>
+              </div>
+              <input type="range" id="rCK" min="1" max="9999" value="9999" />
+            </div>
+            <div class="code-box"><pre id="codeCtx"></pre></div>
+            <p class="side-note" id="ctxNote"></p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 03 · why z-index fails ============ -->
+      <section id="fails" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">03 · why z-index sometimes doesn't work</p>
+          <h2>The static silence</h2>
+          <p class="lede">
+            The #1 z-index bug: the element is <b>position: static</b>. The
+            amber box is positioned and scored; the blue one has a huge z-index
+            but is static — so it stays buried. Flip it to relative and the
+            number finally counts.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>the number that nobody reads</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="fail-stage">
+                <div class="fail-base" id="failBase">
+                  amber · positioned · z: 10
+                </div>
+                <div class="fail-target" id="failTarget">blue · z: 50</div>
+              </div>
+              <p class="verdict" id="failRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="segmented" id="segFail">
+              <span class="seg-thumb"></span>
+              <button data-v="static" class="active">position: static</button>
+              <button data-v="relative">position: relative</button>
+            </div>
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rFail">blue z-index</label
+                ><output class="ctl-val" id="oFail">50</output>
+              </div>
+              <input type="range" id="rFail" min="1" max="99" value="50" />
+            </div>
+            <div class="code-box"><pre id="codeFail"></pre></div>
+            <p class="side-note" id="failNote"></p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 04 · DOM order tiebreak ============ -->
+      <section id="order" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">04 · the tiebreak: DOM order</p>
+          <h2>No z-index? Later wins</h2>
+          <p class="lede">
+            Both boxes are positioned, neither has a z-index. The browser shrugs
+            and paints in <b>HTML order</b> — last one written, top one seen.
+            Swap the order and watch pink and green trade places.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>same CSS, swapped HTML</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="ord-stage" id="ordStage">
+                <div class="ord ord-1" id="ord1">green · written 1st</div>
+                <div class="ord ord-2" id="ord2">pink · written 2nd</div>
+              </div>
+              <p class="read" id="ordRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <button class="ghost-btn" id="swapBtn">⇅ swap DOM order</button>
+            <div class="code-box"><pre id="codeOrd"></pre></div>
+            <p class="side-note">
+              This is why "just add z-index" works: any positioned element with
+              a z-index beats the DOM-order queue. Flex &amp; grid items join
+              this contest too — no position needed.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 05 · field notes ============ -->
+      <section id="notes" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">05 · field notes</p>
+          <h2>Cheat codes from lesson 11</h2>
+        </div>
+        <div class="notes-grid">
+          <article class="note-card" style="--nc: var(--content-c)">
+            <div class="note-demo">
+              <div class="demo-z"><i></i><i></i></div>
+            </div>
+            <h3>z-index needs a ticket</h3>
+            <p>
+              It only works on positioned elements — or flex/grid items. On a
+              static box, <span class="mono">z-index: 9999</span> is a number
+              written on a napkin.
+            </p>
+            <p class="note-tip mono">↳ hover: the two trade places</p>
+          </article>
+          <article class="note-card" style="--nc: var(--padding-c)">
+            <div class="note-demo">
+              <div class="demo-seal">
+                <div class="p1"></div>
+                <div class="p2"></div>
+                <span class="k">z:9999</span>
+              </div>
+            </div>
+            <h3>contexts are sealed</h3>
+            <p>
+              A child's z-index only competes <i>inside</i> its stacking
+              context. Against the outside world, it rides on its parent's
+              score. 9999 loses to 2.
+            </p>
+            <p class="note-tip mono">↳ hover: the kid jumps, stays sealed</p>
+          </article>
+          <article class="note-card" style="--nc: var(--pink)">
+            <div class="note-demo">
+              <div class="demo-dom"><i></i><i></i></div>
+            </div>
+            <h3>DOM order breaks ties</h3>
+            <p>
+              No z-index anywhere? Paint order = HTML order. Later element on
+              top. Swapping markup is a legitimate (if ugly) z-fix.
+            </p>
+            <p class="note-tip mono">↳ hover: the queue reverses</p>
+          </article>
+          <article class="note-card" style="--nc: var(--border-c)">
+            <div class="note-demo">
+              <div class="demo-paint">
+                <em>1 · root background</em><em>2 · negative z-index</em
+                ><em>3 · positioned &amp; positive z</em>
+              </div>
+            </div>
+            <h3>the paint recipe</h3>
+            <p>
+              Inside a context: root bg → negative z → block backgrounds →
+              floats → inline text → positioned z:auto/0 → positive z. Memorize
+              the ends, look up the middle.
+            </p>
+            <p class="note-tip mono">↳ hover: the layers light up</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ lesson nav ============ -->
+      <div class="lesson-nav reveal">
+        <div>
+          <span class="ln-status">✓ completed</span>
+          <h3>11 — Stacking</h3>
+        </div>
+        <div class="ln-track" id="lnTrack"></div>
+        <div class="ln-next">
+          <span>up next</span>
+          <b>12 · Flexbox Basics</b>
+        </div>
+      </div>
+
+      <footer>
+        <span class="mono">drag things, break things, learn things.</span>
+        <span class="sp mono">45 lessons · lesson 11 · stacking</span>
+      </footer>
+    </div>
+    <!-- /wrap -->
+
+    <script>
+      (() => {
+        const $ = (id) => document.getElementById(id);
+        const rule = (sel, decls) =>
+          `<span class="c-sel">${sel}</span> {\n${decls
+            .map((d) => {
+              const i = d.indexOf(":");
+              return `  <span class="c-prop">${d.slice(0, i)}</span>: <span class="c-val">${d.slice(i + 1).trim()}</span>;`;
+            })
+            .join("\n")}\n}`;
+        function range(el, out, fmt, cb) {
+          const f = () => {
+            const v = +el.value;
+            out.textContent = fmt(v);
+            const min = +el.min,
+              max = +el.max;
+            el.style.setProperty(
+              "--fill",
+              ((v - min) / (max - min)) * 100 + "%",
+            );
+            cb(v);
+          };
+          el.addEventListener("input", f);
+          f();
+        }
+        function initSeg(seg, onPick) {
+          const btns = [...seg.querySelectorAll("button")],
+            thumb = seg.querySelector(".seg-thumb"),
+            n = btns.length;
+          function set(i) {
+            btns.forEach((b, j) => b.classList.toggle("active", i === j));
+            thumb.style.width = `calc((100% - 6px)/${n})`;
+            thumb.style.transform = `translateX(${i * 100}%)`;
+          }
+          btns.forEach((b, i) =>
+            b.addEventListener("click", () => {
+              set(i);
+              onPick(b.dataset.v);
+            }),
+          );
+          set(0);
+        }
+
+        /* ---------- intro cycle ---------- */
+        const ROUNDS = [
+          { z: [3, 2, 1], l: "z-index: 3 · 2 · 1 — red wins" },
+          { z: [1, 3, 2], l: "z-index: 1 · 3 · 2 — blue wins" },
+          { z: [2, 1, 3], l: "z-index: 2 · 1 · 3 — green wins" },
+        ];
+        let ri = 0;
+        function round() {
+          const r = ROUNDS[ri];
+          $("ztR").style.zIndex = r.z[0];
+          $("ztB").style.zIndex = r.z[1];
+          $("ztG").style.zIndex = r.z[2];
+          $("introFmt").textContent = r.l;
+          ri = (ri + 1) % ROUNDS.length;
+        }
+        round();
+        setInterval(round, 2000);
+
+        /* ---------- 01 z-index ---------- */
+        const Z = { r: 2, b: 1, g: 0 };
+        function renderZ() {
+          $("zcR").style.zIndex = Z.r;
+          $("zcB").style.zIndex = Z.b;
+          $("zcG").style.zIndex = Z.g;
+          $("zvR").textContent = "z:" + Z.r;
+          $("zvB").textContent = "z:" + Z.b;
+          $("zvG").textContent = "z:" + Z.g;
+          const order = [
+            ["red", Z.r],
+            ["blue", Z.b],
+            ["green", Z.g],
+          ].sort((a, b) => b[1] - a[1]);
+          $("zOrder").innerHTML =
+            "top → bottom: " +
+            order.map((o) => `<b>${o[0]} (${o[1]})</b>`).join(" · ");
+          $("codeZ").innerHTML =
+            rule(".red", [`z-index: ${Z.r}`]) +
+            "\n" +
+            rule(".blue", [`z-index: ${Z.b}`]) +
+            "\n" +
+            rule(".green", [`z-index: ${Z.g}`]);
+        }
+        range(
+          $("rZR"),
+          $("oZR"),
+          (v) => v,
+          (v) => {
+            Z.r = v;
+            renderZ();
+          },
+        );
+        range(
+          $("rZB"),
+          $("oZB"),
+          (v) => v,
+          (v) => {
+            Z.b = v;
+            renderZ();
+          },
+        );
+        range(
+          $("rZG"),
+          $("oZG"),
+          (v) => v,
+          (v) => {
+            Z.g = v;
+            renderZ();
+          },
+        );
+
+        /* ---------- 02 contexts ---------- */
+        const C = { a: 1, b: 2, k: 9999 };
+        function renderCtx() {
+          $("ctxA").style.zIndex = C.a;
+          $("ctxB").style.zIndex = C.b;
+          $("ctxKid").style.zIndex = C.k;
+          $("ctxKid").textContent = "green kid · z: " + C.k;
+          const kidWins = C.a >= C.b;
+          $("ctxRead").innerHTML = kidWins
+            ? `blue parent (${C.a}) ≥ orange (${C.b}) → the kid's room is on top; its ${C.k} finally shows`
+            : `orange parent ${C.b} beats blue parent ${C.a} → the kid's <b>${C.k}</b> is sealed inside a losing room`;
+          $("ctxNote").innerHTML = kidWins
+            ? "Raise the blue parent to match or beat orange, and the whole room — kid included — rises with it."
+            : "<b style=\"color:var(--margin-c)\">9999 lost to 2.</b> The kid only competes inside blue's room. Against orange, blue's score (1) is all that counts.";
+          $("codeCtx").innerHTML =
+            rule(".blue-parent", [`position: relative`, `z-index: ${C.a}`]) +
+            "\n" +
+            rule(".green-kid", [
+              `position: absolute`,
+              `z-index: ${C.k}  /* sealed */`,
+            ]) +
+            "\n" +
+            rule(".orange-parent", [`position: relative`, `z-index: ${C.b}`]);
+        }
+        range(
+          $("rCA"),
+          $("oCA"),
+          (v) => v,
+          (v) => {
+            C.a = v;
+            renderCtx();
+          },
+        );
+        range(
+          $("rCB"),
+          $("oCB"),
+          (v) => v,
+          (v) => {
+            C.b = v;
+            renderCtx();
+          },
+        );
+        range(
+          $("rCK"),
+          $("oCK"),
+          (v) => v,
+          (v) => {
+            C.k = v;
+            renderCtx();
+          },
+        );
+
+        /* ---------- 03 fails (Upgraded with Verdicts, Shadows, and Dimming) ---------- */
+        const F = { pos: "static", z: 50 };
+        function renderFail() {
+          const t = $("failTarget");
+          const b = $("failBase");
+
+          t.style.position = F.pos;
+          t.style.zIndex = F.z;
+
+          // Reset visual states
+          t.style.opacity = "1";
+          t.style.filter = "none";
+          t.style.boxShadow = "none";
+          b.style.filter = "none";
+          b.style.boxShadow = "none";
+
+          let readHtml = "";
+
+          if (F.pos === "static") {
+            // Blue is powerless
+            t.style.opacity = "0.5";
+            t.style.filter = "grayscale(0.7) brightness(0.8)";
+            b.style.boxShadow = "0 16px 36px rgba(0,0,0,.6)";
+            t.innerHTML = `blue · z: ${F.z}<br><span style="color:var(--margin-c);font-size:9px;letter-spacing:.1em">⚠ STATIC</span>`;
+            readHtml =
+              '🏆 <b style="color:var(--border-c)">AMBER WINS</b> — blue is static &amp; powerless';
+          } else {
+            // Relative: compare z-index
+            t.innerHTML = `blue · z: ${F.z}`;
+            if (F.z > 10) {
+              // Blue wins
+              t.style.boxShadow = "0 16px 36px rgba(0,0,0,.6)";
+              b.style.filter = "brightness(0.5)";
+              readHtml = `🏆 <b style="color:var(--content-c)">BLUE WINS</b> — z:${F.z} beats z:10`;
+            } else {
+              // Amber wins
+              b.style.boxShadow = "0 16px 36px rgba(0,0,0,.6)";
+              t.style.filter = "brightness(0.5)";
+              readHtml = `🏆 <b style="color:var(--border-c)">AMBER WINS</b> — z:10 beats z:${F.z}`;
+            }
+          }
+
+          $("failRead").innerHTML = readHtml;
+          $("codeFail").innerHTML = rule(".blue", [
+            `position: ${F.pos}`,
+            `z-index: ${F.z}`,
+          ]);
+          $("failNote").innerHTML =
+            F.pos === "static"
+              ? '<b style="color:var(--margin-c)">static ignores z-index.</b> Drag the slider to 99 — amber still wins because blue is static. Position first, then score.'
+              : "Now the number counts! Drag blue <b>below 10</b> and amber jumps on top (shadow moves). Drag <b>above 10</b> and blue wins.";
+        }
+        initSeg($("segFail"), (v) => {
+          F.pos = v;
+          renderFail();
+        });
+        range(
+          $("rFail"),
+          $("oFail"),
+          (v) => v,
+          (v) => {
+            F.z = v;
+            renderFail();
+          },
+        );
+
+        /* ---------- 04 DOM order ---------- */
+        let swapped = false;
+        function renderOrd() {
+          $("ordRead").innerHTML = swapped
+            ? "green written 2nd → <b>green on top</b>. Same CSS, new HTML order."
+            : "pink written 2nd → <b>pink on top</b>. No z-index anywhere — HTML order is the judge.";
+          $("codeOrd").innerHTML = swapped
+            ? `<span class="c-com">&lt;!-- HTML --&gt;</span>\n&lt;div class="pink"&gt;…\n&lt;div class="green"&gt;…  <span class="c-com">← later = on top</span>`
+            : `<span class="c-com">&lt;!-- HTML --&gt;</span>\n&lt;div class="green"&gt;…\n&lt;div class="pink"&gt;…  <span class="c-com">← later = on top</span>`;
+        }
+        $("swapBtn").addEventListener("click", () => {
+          swapped = !swapped;
+          const s = $("ordStage");
+          if (swapped) s.appendChild($("ord1"));
+          else s.appendChild($("ord2"));
+          $("ord1").textContent = swapped
+            ? "green · written 2nd"
+            : "green · written 1st";
+          $("ord2").textContent = swapped
+            ? "pink · written 1st"
+            : "pink · written 2nd";
+          renderOrd();
+        });
+        renderOrd();
+
+        /* ---------- lesson track ---------- */
+        const t = $("lnTrack");
+        for (let i = 0; i < 45; i++) {
+          const s = document.createElement("span");
+          s.className = "tick" + (i < 11 ? " done" : "");
+          s.title = "lesson " + (i + 1);
+          t.appendChild(s);
+        }
+
+        /* ---------- reveal ---------- */
+        const io = new IntersectionObserver(
+          (es) =>
+            es.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                io.unobserve(e.target);
+              }
+            }),
+          { threshold: 0.12 },
+        );
+        document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      })();
+    </script>
+  </body>
+</html>

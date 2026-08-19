@@ -1,0 +1,1747 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Positioning — Lesson 10</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' fill='none' stroke='%23f07f4f' stroke-width='2'/%3E%3Crect x='8' y='8' width='16' height='16' fill='none' stroke='%23f2c14e' stroke-width='2'/%3E%3Crect x='13' y='13' width='6' height='6' fill='%2358a6ff'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0e15;
+        --panel: #121826;
+        --panel2: #0d1220;
+        --ink: #10141d;
+        --line: #222c40;
+        --line2: #31405e;
+        --text: #e9eef7;
+        --muted: #8d9ab0;
+        --faint: #5b6a84;
+        --margin-c: #f07f4f;
+        --margin-bg: rgba(240, 127, 79, 0.14);
+        --border-c: #f2c14e;
+        --border-bg: rgba(242, 193, 78, 0.16);
+        --padding-c: #3ecf8e;
+        --padding-bg: rgba(62, 207, 142, 0.14);
+        --content-c: #58a6ff;
+        --content-bg: rgba(88, 166, 255, 0.17);
+        --pink: #ff4f8b;
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: dark;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 15px;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+      ::selection {
+        background: rgba(88, 166, 255, 0.35);
+      }
+      .mono {
+        font-family: var(--mono);
+      }
+      section {
+        scroll-margin-top: 76px;
+      }
+      b {
+        font-weight: 600;
+      }
+
+      .bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            700px 460px at 12% -6%,
+            rgba(242, 193, 78, 0.07),
+            transparent 60%
+          ),
+          radial-gradient(
+            760px 520px at 92% 22%,
+            rgba(88, 166, 255, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            600px 480px at 40% 105%,
+            rgba(62, 207, 142, 0.05),
+            transparent 60%
+          );
+      }
+      .bg::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(233, 238, 247, 0.035) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(233, 238, 247, 0.035) 1px,
+            transparent 1px
+          );
+        background-size: 28px 28px;
+        mask-image: radial-gradient(
+          ellipse 120% 90% at 50% 0%,
+          #000 40%,
+          transparent 100%
+        );
+      }
+      .bg .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.5;
+        animation: drift 26s ease-in-out infinite alternate;
+      }
+      .bg .g1 {
+        width: 420px;
+        height: 420px;
+        left: -120px;
+        top: 30%;
+        background: rgba(240, 127, 79, 0.1);
+      }
+      .bg .g2 {
+        width: 460px;
+        height: 460px;
+        right: -140px;
+        top: 60%;
+        background: rgba(88, 166, 255, 0.1);
+        animation-delay: -12s;
+      }
+      @keyframes drift {
+        from {
+          transform: translateY(-30px);
+        }
+        to {
+          transform: translateY(40px);
+        }
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 12px clamp(16px, 4vw, 44px);
+        background: rgba(11, 14, 21, 0.92);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar nav {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .topbar nav a {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 6px 11px;
+        border-radius: 999px;
+        transition: 0.2s;
+      }
+      .topbar nav a:hover {
+        color: var(--text);
+        background: #161d2c;
+      }
+      .lesson-tag {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--border-c);
+        border: 1px dashed rgba(242, 193, 78, 0.45);
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .wrap {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: 0 clamp(16px, 4vw, 44px);
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        padding: clamp(20px, 4vh, 48px) 0 clamp(30px, 5vh, 56px);
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--padding-c);
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(2.3rem, 5.2vw, 3.7rem);
+        line-height: 1.06;
+        letter-spacing: -0.02em;
+      }
+      .word-style {
+        display: inline-block;
+        padding: 0.02em 0.22em;
+        background: var(--margin-bg);
+        border: 0.06em solid var(--margin-c);
+        border-radius: 0.14em;
+        color: #ffc9ae;
+        transition: transform 0.3s;
+        cursor: default;
+      }
+      .word-style:hover {
+        transform: rotate(-2deg) scale(1.03);
+      }
+      .lede {
+        color: var(--muted);
+        max-width: 56ch;
+        margin-top: 18px;
+        font-size: 1.05rem;
+      }
+      .lede b {
+        color: var(--text);
+      }
+      .css-full {
+        display: inline-block;
+        margin-top: 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--faint);
+        letter-spacing: 0.08em;
+      }
+      .intro-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 26px;
+        display: grid;
+        place-items: center;
+        gap: 16px;
+        box-shadow: 0 30px 60px -40px rgba(0, 0, 0, 0.8);
+      }
+      .pos-stage {
+        width: 100%;
+        max-width: 300px;
+        height: 150px;
+        border: 1px dashed var(--line2);
+        border-radius: 10px;
+        position: relative;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .pos-sib {
+        height: 22px;
+        border-radius: 6px;
+        background: #232c40;
+        flex: none;
+      }
+      #posBox {
+        height: 34px;
+        border-radius: 8px;
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+        font-family: var(--mono);
+        font-size: 10px;
+        color: #a7cdff;
+        display: grid;
+        place-items: center;
+        transition: all 0.45s;
+      }
+      .pos-ghost {
+        position: absolute;
+        left: 12px;
+        right: 12px;
+        top: 46px;
+        height: 34px;
+        border: 1px dashed var(--faint);
+        border-radius: 8px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+      }
+      .intro-fmt {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--content-c);
+        background: var(--ink);
+        border: 1px solid var(--line2);
+        border-radius: 9px;
+        padding: 7px 16px;
+        min-height: 36px;
+      }
+      .imode {
+        font-size: 11px;
+        color: var(--faint);
+        letter-spacing: 0.1em;
+      }
+
+      .sec {
+        padding: clamp(36px, 6vh, 64px) 0;
+      }
+      .sec-head {
+        margin-bottom: 26px;
+        max-width: 72ch;
+      }
+      .sec-head h2 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+        letter-spacing: -0.015em;
+        line-height: 1.15;
+      }
+      .sec-head .lede {
+        margin-top: 10px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 18px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .panel-head h3 {
+        font-family: var(--disp);
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dots i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dots i:nth-child(1) {
+        background: #f07f4f;
+      }
+      .dots i:nth-child(2) {
+        background: #f2c14e;
+      }
+      .dots i:nth-child(3) {
+        background: #3ecf8e;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.85;
+        overflow-x: auto;
+      }
+      .c-sel {
+        color: #7fe0b0;
+      }
+      .c-prop {
+        color: #8ab4ff;
+      }
+      .c-val {
+        color: #f2c14e;
+      }
+      .c-com {
+        color: #5b6a84;
+      }
+      .grp {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+
+      .pick-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 18px;
+        align-items: stretch;
+      }
+      .stage-wrap {
+        padding: 28px;
+        display: grid;
+        place-items: center;
+        min-height: 340px;
+        gap: 14px;
+      }
+      .side {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .code-box {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .code-box pre {
+        min-height: 0;
+        font-size: 12.5px;
+      }
+      .side-note {
+        font-size: 12px;
+        color: var(--faint);
+      }
+      .ghost-btn {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--faint);
+        background: none;
+        border: 1px dashed var(--line2);
+        border-radius: 8px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .ghost-btn:hover {
+        color: var(--content-c);
+        border-color: var(--content-c);
+      }
+      .segmented {
+        position: relative;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 1fr;
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        padding: 3px;
+      }
+      .segmented button {
+        position: relative;
+        z-index: 1;
+        background: none;
+        border: 0;
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--muted);
+        padding: 8px 4px;
+        cursor: pointer;
+        transition: color 0.25s;
+        border-radius: 8px;
+      }
+      .segmented button:hover {
+        color: var(--text);
+      }
+      .segmented button.active {
+        color: #fff;
+      }
+      .seg-thumb {
+        position: absolute;
+        top: 3px;
+        bottom: 3px;
+        left: 3px;
+        width: calc((100% - 6px) / 2);
+        background: #26334c;
+        border-radius: 8px;
+        transition:
+          transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+          width 0.28s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      }
+
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        outline: none;
+        cursor: pointer;
+        background: linear-gradient(
+          90deg,
+          var(--ac) var(--fill, 50%),
+          #232c40 var(--fill, 50%)
+        );
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        transition: transform 0.15s;
+      }
+      input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.15);
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+      }
+      .ctl {
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 7px 11px;
+        transition: 0.2s;
+      }
+      .ctl:hover {
+        background: #101725;
+        border-color: var(--line);
+      }
+      .ctl-top {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+      .ctl-top label {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text);
+      }
+      .ctl-val {
+        margin-left: auto;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--ac);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 2px 9px;
+      }
+      .read {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 14px;
+      }
+      .read b {
+        color: var(--text);
+      }
+      .frame-lab {
+        position: absolute;
+        top: -9px;
+        left: 14px;
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--faint);
+        background: var(--panel);
+        padding: 0 8px;
+        z-index: 3;
+      }
+
+      /* 01 static/relative */
+      .flow-col {
+        width: 100%;
+        max-width: 420px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .pbox {
+        border-radius: 8px;
+        padding: 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        text-align: center;
+      }
+      .pbox-a {
+        background: var(--padding-bg);
+        border: 1px solid var(--padding-c);
+        color: #8fe6bd;
+      }
+      .pbox-b {
+        background: var(--border-bg);
+        border: 1px solid var(--border-c);
+        color: #ffe3a1;
+        position: relative;
+        transition:
+          top 0.2s,
+          left 0.2s;
+        z-index: 2;
+      }
+      .pbox-c {
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+        color: #a7cdff;
+      }
+      .b-slot {
+        border-radius: 8px;
+        outline: 1px dashed transparent;
+        transition: outline-color 0.2s;
+      }
+      .b-slot.ghost {
+        outline-color: var(--faint);
+      }
+
+      /* 02 absolute */
+      .abs-outer {
+        position: relative;
+        border: 1px dashed var(--line2);
+        border-radius: 12px;
+        padding: 20px;
+        width: 100%;
+        max-width: 470px;
+        min-height: 280px;
+      }
+      .abs-parent {
+        border: 1px dashed var(--margin-c);
+        border-radius: 10px;
+        padding: 16px;
+        min-height: 200px;
+        margin: 16px 56px 16px 16px;
+        transition: 0.2s;
+      }
+      .abs-parent .filler {
+        font-size: 12px;
+        color: var(--faint);
+        font-family: var(--mono);
+      }
+      .abs-box {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+        color: #a7cdff;
+        font-family: var(--mono);
+        font-size: 11px;
+        padding: 10px 14px;
+        border-radius: 8px;
+        transition:
+          top 0.2s,
+          left 0.2s;
+        z-index: 4;
+      }
+
+      /* 03 fixed */
+      #fixedCard {
+        position: fixed;
+        right: 18px;
+        bottom: 18px;
+        z-index: 80;
+        background: var(--border-c);
+        color: #4a3a00;
+        font-family: var(--mono);
+        font-size: 11px;
+        font-weight: 700;
+        border-radius: 12px;
+        padding: 14px 18px;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+        display: none;
+        max-width: 220px;
+      }
+      #fixedCard.on {
+        display: block;
+        animation: pop 0.3s;
+      }
+      @keyframes pop {
+        from {
+          transform: translateY(14px);
+          opacity: 0;
+        }
+      }
+      .fix-illus {
+        width: 100%;
+        max-width: 300px;
+        height: 200px;
+        border: 1px dashed var(--line2);
+        border-radius: 12px;
+        position: relative;
+        overflow: hidden;
+      }
+      .fix-illus .scr {
+        position: absolute;
+        inset: 0;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        animation: fakeScroll 3s ease-in-out infinite alternate;
+      }
+      .fix-illus .scr i {
+        height: 14px;
+        border-radius: 4px;
+        background: #232c40;
+        flex: none;
+      }
+      @keyframes fakeScroll {
+        to {
+          transform: translateY(-70px);
+        }
+      }
+      .fix-illus .pin {
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
+        background: var(--border-c);
+        color: #4a3a00;
+        font-family: var(--mono);
+        font-size: 9px;
+        font-weight: 700;
+        border-radius: 8px;
+        padding: 6px 10px;
+      }
+
+      /* 04 sticky */
+      .scroll-mock {
+        width: 100%;
+        max-width: 420px;
+        height: 250px;
+        overflow: auto;
+        border: 1px solid var(--line2);
+        border-radius: 12px;
+        background: var(--panel2);
+      }
+      .sticky-bar {
+        position: sticky;
+        top: 0;
+        background: var(--border-c);
+        color: #4a3a00;
+        font-family: var(--mono);
+        font-size: 11px;
+        font-weight: 700;
+        padding: 10px 14px;
+        z-index: 2;
+      }
+      .mock-lines {
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .mock-lines i {
+        height: 12px;
+        border-radius: 3px;
+        background: #232c40;
+      }
+      .mock-lines i:nth-child(3n) {
+        width: 70%;
+      }
+      .mock-lines i:nth-child(4n) {
+        width: 85%;
+      }
+
+      /* 05 offsets */
+      .off-frame {
+        position: relative;
+        width: 100%;
+        max-width: 420px;
+        height: 250px;
+        border: 1px dashed var(--line2);
+        border-radius: 12px;
+      }
+      .off-box {
+        position: absolute;
+        background: var(--padding-bg);
+        border: 1px solid var(--padding-c);
+        color: #8fe6bd;
+        font-family: var(--mono);
+        font-size: 11px;
+        padding: 10px 14px;
+        border-radius: 8px;
+        transition: all 0.2s;
+      }
+
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      @media (min-width: 1180px) {
+        .notes-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media (max-width: 640px) {
+        .notes-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .note-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.3s,
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+      .note-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--nc);
+        opacity: 0.85;
+      }
+      .note-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--nc);
+        box-shadow: 0 24px 44px -28px rgba(0, 0, 0, 0.85);
+      }
+      .note-card h3 {
+        font-family: var(--mono);
+        font-size: 15px;
+        color: var(--nc);
+        margin-bottom: 8px;
+      }
+      .note-card p {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .note-tip {
+        margin-top: 12px;
+        font-size: 11px;
+        color: var(--faint);
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+      }
+      .note-demo {
+        height: 104px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        overflow: hidden;
+      }
+      .demo-st {
+        width: 60%;
+        height: 18px;
+        border-radius: 5px;
+        background: #39415a;
+        position: relative;
+      }
+      .demo-st::after {
+        content: "→";
+        position: absolute;
+        left: -24px;
+        top: 0;
+        color: var(--margin-c);
+        transition: 0.3s;
+        opacity: 0.4;
+      }
+      .note-card:hover .demo-st::after {
+        opacity: 1;
+        left: -18px;
+      }
+      .demo-rel {
+        width: 60%;
+        position: relative;
+        height: 34px;
+      }
+      .demo-rel i {
+        position: absolute;
+        inset: 0;
+        border: 1px dashed var(--faint);
+        border-radius: 6px;
+      }
+      .demo-rel b {
+        position: absolute;
+        inset: 0;
+        background: var(--border-bg);
+        border: 1px solid var(--border-c);
+        border-radius: 6px;
+        transition: 0.35s;
+      }
+      .note-card:hover .demo-rel b {
+        transform: translate(14px, 6px);
+      }
+      .demo-abs2 {
+        width: 70%;
+        height: 64px;
+        border: 1px dashed var(--line2);
+        border-radius: 8px;
+        position: relative;
+      }
+      .demo-abs2 i {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        width: 26px;
+        height: 20px;
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+        border-radius: 5px;
+        transition: 0.35s;
+      }
+      .note-card:hover .demo-abs2 i {
+        top: 8px;
+        left: auto;
+        right: 8px;
+      }
+      .demo-stk {
+        width: 64%;
+        height: 64px;
+        border: 1px solid var(--line2);
+        border-radius: 8px;
+        overflow: hidden;
+        position: relative;
+      }
+      .demo-stk .l {
+        position: absolute;
+        inset: 0;
+        padding: 26px 8px 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .demo-stk .l i {
+        height: 8px;
+        border-radius: 2px;
+        background: #232c40;
+      }
+      .demo-stk b {
+        position: absolute;
+        top: 6px;
+        left: 8px;
+        right: 8px;
+        height: 14px;
+        border-radius: 4px;
+        background: var(--border-c);
+        transition: 0.35s;
+      }
+      .note-card:hover .demo-stk b {
+        top: 22px;
+      }
+
+      .lesson-nav {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px clamp(18px, 3vw, 28px);
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+        align-items: center;
+      }
+      .ln-status {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--padding-c);
+        border: 1px solid rgba(62, 207, 142, 0.45);
+        border-radius: 999px;
+        padding: 3px 10px;
+      }
+      .lesson-nav h3 {
+        font-family: var(--disp);
+        font-size: 17px;
+        margin-top: 8px;
+      }
+      .ln-track {
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .tick {
+        width: 7px;
+        height: 15px;
+        border-radius: 2px;
+        background: #212a3e;
+        transition: 0.2s;
+      }
+      .tick.done {
+        background: var(--padding-c);
+        box-shadow: 0 0 8px rgba(62, 207, 142, 0.55);
+      }
+      .tick:hover {
+        background: var(--line2);
+      }
+      .ln-next {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        text-align: right;
+      }
+      .ln-next span {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .ln-next b {
+        font-family: var(--disp);
+        font-size: 15px;
+        color: var(--text);
+      }
+      footer {
+        border-top: 1px solid var(--line);
+        margin-top: 40px;
+        padding: 30px 0 44px;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+        color: var(--faint);
+        font-size: 12.5px;
+      }
+      footer .mono {
+        font-size: 11.5px;
+      }
+      footer .sp {
+        margin-left: auto;
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+      @media (max-width: 1020px) {
+        .intro {
+          grid-template-columns: 1fr;
+        }
+        .pick-grid {
+          grid-template-columns: 1fr;
+        }
+        .lesson-nav {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .ln-next {
+          align-items: center;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg">
+      <span class="glow g1"></span><span class="glow g2"></span>
+    </div>
+
+    <header class="topbar">
+      <span class="lesson-tag">lesson 10 / 45</span>
+      <nav>
+        <a href="#static-relative">static · relative</a>
+        <a href="#absolute">absolute</a>
+        <a href="#fixed">fixed</a>
+        <a href="#sticky">sticky</a>
+        <a href="#offsets">top·right·bottom·left</a>
+        <a href="#notes">cheat-codes</a>
+      </nav>
+    </header>
+
+    <div class="wrap">
+      <!-- ============ intro ============ -->
+      <section class="intro">
+        <div>
+          <p class="eyebrow">lesson 10 · interactive</p>
+          <h1>
+            Position answers: <span class="word-style">where do I sit?</span>
+          </h1>
+          <p class="lede">
+            Normal flow is a queue. <b>position</b> lets an element leave it —
+            shift from its seat (relative), pin to a parent (absolute), pin to
+            the screen (fixed), or ride along until a threshold (sticky). Four
+            offsets — top, right, bottom, left — do the steering.
+          </p>
+          <span class="css-full"
+            >S · TATIC · R · ELATIVE · A · BSOLUTE · F · IXED · S · TICKY</span
+          >
+        </div>
+        <div class="intro-panel">
+          <div class="pos-stage">
+            <div class="pos-sib"></div>
+            <div class="pos-ghost" id="posGhost"></div>
+            <div id="posBox">the box</div>
+            <div class="pos-sib"></div>
+          </div>
+          <span class="intro-fmt" id="introFmt">position: static</span>
+          <p class="imode mono">one box, five seats…</p>
+        </div>
+      </section>
+
+      <!-- ============ 01 · static & relative ============ -->
+      <section id="static-relative" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">01 · static &amp; relative</p>
+          <h2>The default seat — and the nudge</h2>
+          <p class="lede">
+            <b>static</b> ignores top/left entirely — drag the sliders, nothing
+            happens. Switch to <b>relative</b> and the same sliders nudge the
+            box… while its original seat stays reserved (dashed ghost). A and C
+            never move.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>B keeps its seat</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="flow-col">
+                <div class="pbox pbox-a">A</div>
+                <div class="b-slot" id="bSlot">
+                  <div class="pbox pbox-b" id="relBox">B</div>
+                </div>
+                <div class="pbox pbox-c">C</div>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="segmented" id="segRel">
+              <span class="seg-thumb"></span>
+              <button data-v="static" class="active">static</button>
+              <button data-v="relative">relative</button>
+            </div>
+            <div class="ctl" style="--ac: var(--border-c)">
+              <div class="ctl-top">
+                <label for="rRelT">top</label
+                ><output class="ctl-val" id="oRelT">0px</output>
+              </div>
+              <input type="range" id="rRelT" min="-40" max="40" value="0" />
+            </div>
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rRelL">left</label
+                ><output class="ctl-val" id="oRelL">0px</output>
+              </div>
+              <input type="range" id="rRelL" min="-60" max="60" value="0" />
+            </div>
+            <div class="code-box"><pre id="codeRel"></pre></div>
+            <p class="side-note" id="relNote"></p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 02 · absolute ============ -->
+      <section id="absolute" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">02 · absolute</p>
+          <h2>Out of flow, pinned to a parent</h2>
+          <p class="lede">
+            An absolute box vanishes from the flow and measures its offsets from
+            the <b>nearest positioned ancestor</b>. Toggle the parent between
+            <span class="mono">static</span> and
+            <span class="mono">relative</span> — watch the box change which
+            frame it obeys.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>who is the anchor?</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="abs-outer">
+                <span class="frame-lab">grandparent · position: relative</span>
+                <div class="abs-parent" id="absParent">
+                  <span
+                    class="frame-lab"
+                    style="background: var(--panel)"
+                    id="absParentLab"
+                    >parent · position: relative</span
+                  >
+                  <p class="filler">parent content…</p>
+                  <div class="abs-box" id="absBox">absolute</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="segmented" id="segParent">
+              <span class="seg-thumb"></span>
+              <button data-v="relative" class="active">parent: relative</button>
+              <button data-v="static">parent: static</button>
+            </div>
+            <div class="ctl" style="--ac: var(--border-c)">
+              <div class="ctl-top">
+                <label for="rAbsT">top</label
+                ><output class="ctl-val" id="oAbsT">20px</output>
+              </div>
+              <input type="range" id="rAbsT" min="0" max="120" value="20" />
+            </div>
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rAbsL">left</label
+                ><output class="ctl-val" id="oAbsL">20px</output>
+              </div>
+              <input type="range" id="rAbsL" min="0" max="160" value="20" />
+            </div>
+            <div class="code-box"><pre id="codeAbs"></pre></div>
+            <p class="side-note" id="absNote"></p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 03 · fixed ============ -->
+      <section id="fixed" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">03 · fixed</p>
+          <h2>Pinned to the screen itself</h2>
+          <p class="lede">
+            Fixed elements ignore every parent and anchor to the
+            <b>viewport</b>. Spawn the card, then scroll this page up and down —
+            it stays glued to your screen corner. That's every cookie banner and
+            chat bubble ever.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>the viewport is the parent</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="fix-illus">
+                <div class="scr">
+                  <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                </div>
+                <span class="pin">fixed ✓</span>
+              </div>
+              <p class="read">content scrolls · the pin never moves</p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <button class="ghost-btn" id="fixToggle">
+              ⊕ spawn a real fixed card
+            </button>
+            <div class="code-box"><pre id="codeFix"></pre></div>
+            <p class="side-note">
+              Fixed is also why modals need a high
+              <span class="mono">z-index</span> — they live outside the flow
+              entirely. (Lesson 11 is all about that stacking.)
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 04 · sticky ============ -->
+      <section id="sticky" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">04 · sticky</p>
+          <h2>Relative until a threshold, then fixed</h2>
+          <p class="lede">
+            Scroll inside the mock. The amber header rides with the content —
+            until it hits <span class="mono">top: 0</span>, then it pins,
+            staying inside its parent. Release the scroll and it returns home.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>scroll me</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="scroll-mock">
+                <div class="sticky-bar">sticky header · top: 0</div>
+                <div class="mock-lines">
+                  <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i
+                  ><i></i><i></i><i></i>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--border-c)">
+              <div class="ctl-top">
+                <label for="rStk">top threshold</label
+                ><output class="ctl-val" id="oStk">0px</output>
+              </div>
+              <input type="range" id="rStk" min="0" max="60" value="0" />
+            </div>
+            <div class="code-box"><pre id="codeStk"></pre></div>
+            <p class="side-note">
+              Sticky needs a scroll ancestor and a threshold (usually
+              <span class="mono">top</span>). Table headers, nav bars, "back to
+              top" rails — all sticky.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 05 · top/right/bottom/left ============ -->
+      <section id="offsets" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">05 · top · right · bottom · left</p>
+          <h2>Four offsets, measured from the anchor</h2>
+          <p class="lede">
+            Offsets always ask "from which edge?". Pick a corner — the box is
+            placed with exactly two properties, measured from the parent's
+            edges. You rarely need all four.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>pick a corner, drag the distances</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="off-frame">
+                <span class="frame-lab">parent · position: relative</span>
+                <div class="off-box" id="offBox">box</div>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="segmented" id="segCorner">
+              <span
+                class="seg-thumb"
+                style="width: calc((100% - 6px) / 4)"
+              ></span>
+              <button data-v="tl" class="active">top-left</button>
+              <button data-v="tr">top-right</button>
+              <button data-v="bl">bottom-left</button>
+              <button data-v="br">bottom-right</button>
+            </div>
+            <div class="ctl" style="--ac: var(--border-c)">
+              <div class="ctl-top">
+                <label for="rOffX">vertical offset</label
+                ><output class="ctl-val" id="oOffX">20px</output>
+              </div>
+              <input type="range" id="rOffX" min="0" max="140" value="20" />
+            </div>
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rOffY">horizontal offset</label
+                ><output class="ctl-val" id="oOffY">20px</output>
+              </div>
+              <input type="range" id="rOffY" min="0" max="220" value="20" />
+            </div>
+            <div class="code-box"><pre id="codeOff"></pre></div>
+            <p class="side-note">
+              top/bottom move <i>away from</i> that edge — positive top pushes
+              down, positive bottom pushes up. Same idea, mirrored.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 06 · field notes ============ -->
+      <section id="notes" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">06 · field notes</p>
+          <h2>Cheat codes from lesson 10</h2>
+        </div>
+        <div class="notes-grid">
+          <article class="note-card" style="--nc: var(--content-c)">
+            <div class="note-demo"><div class="demo-st"></div></div>
+            <h3>static ignores offsets</h3>
+            <p>
+              The default. top/left/right/bottom do <b>nothing</b> to a static
+              box — it just stands in the queue. Every element starts here.
+            </p>
+            <p class="note-tip mono">↳ hover: the push that never works</p>
+          </article>
+          <article class="note-card" style="--nc: var(--border-c)">
+            <div class="note-demo">
+              <div class="demo-rel"><i></i><b></b></div>
+            </div>
+            <h3>relative keeps its seat</h3>
+            <p>
+              Offsets nudge the box visually, but the layout remembers where it
+              was — neighbours don't move. The dashed seat stays warm.
+            </p>
+            <p class="note-tip mono">↳ hover: nudge with a ghost</p>
+          </article>
+          <article class="note-card" style="--nc: var(--padding-c)">
+            <div class="note-demo">
+              <div class="demo-abs2"><i></i></div>
+            </div>
+            <h3>absolute needs an anchor</h3>
+            <p>
+              It pins to the nearest <i>positioned</i> ancestor — usually a
+              parent you set to <span class="mono">relative</span> on purpose.
+              No anchor? It climbs all the way to the page.
+            </p>
+            <p class="note-tip mono">↳ hover: jump to the other corner</p>
+          </article>
+          <article class="note-card" style="--nc: var(--margin-c)">
+            <div class="note-demo">
+              <div class="demo-stk">
+                <div class="l"><i></i><i></i><i></i></div>
+                <b></b>
+              </div>
+            </div>
+            <h3>sticky &amp; fixed</h3>
+            <p>
+              Fixed = pinned to the viewport forever. Sticky = relative until a
+              threshold, then fixed <i>inside its parent</i>. Both live outside
+              normal flow while pinned.
+            </p>
+            <p class="note-tip mono">↳ hover: the bar slides then pins</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ lesson nav ============ -->
+      <div class="lesson-nav reveal">
+        <div>
+          <span class="ln-status">✓ completed</span>
+          <h3>10 — Positioning</h3>
+        </div>
+        <div class="ln-track" id="lnTrack"></div>
+        <div class="ln-next">
+          <span>up next</span>
+          <b>11 · Stacking</b>
+        </div>
+      </div>
+
+      <footer>
+        <span class="mono">drag things, break things, learn things.</span>
+        <span class="sp mono">45 lessons · lesson 10 · positioning</span>
+      </footer>
+    </div>
+    <!-- /wrap -->
+
+    <div id="fixedCard">
+      position: fixed — I ignore your scrolling. dismiss ✕
+    </div>
+
+    <script>
+      (() => {
+        const $ = (id) => document.getElementById(id);
+        const rule = (sel, decls) =>
+          `<span class="c-sel">${sel}</span> {\n${decls
+            .map((d) => {
+              const i = d.indexOf(":");
+              return `  <span class="c-prop">${d.slice(0, i)}</span>: <span class="c-val">${d.slice(i + 1).trim()}</span>;`;
+            })
+            .join("\n")}\n}`;
+        function range(el, out, fmt, cb) {
+          const f = () => {
+            const v = +el.value;
+            out.textContent = fmt(v);
+            const min = +el.min,
+              max = +el.max;
+            el.style.setProperty(
+              "--fill",
+              ((v - min) / (max - min)) * 100 + "%",
+            );
+            cb(v);
+          };
+          el.addEventListener("input", f);
+          f();
+        }
+        function initSeg(seg, onPick) {
+          const btns = [...seg.querySelectorAll("button")],
+            thumb = seg.querySelector(".seg-thumb"),
+            n = btns.length;
+          function set(i) {
+            btns.forEach((b, j) => b.classList.toggle("active", i === j));
+            thumb.style.width = `calc((100% - 6px)/${n})`;
+            thumb.style.transform = `translateX(${i * 100}%)`;
+          }
+          btns.forEach((b, i) =>
+            b.addEventListener("click", () => {
+              set(i);
+              onPick(b.dataset.v);
+            }),
+          );
+          set(0);
+        }
+
+        /* ---------- intro cycle ---------- */
+        const LOOKS = [
+          {
+            l: "position: static",
+            s: {
+              position: "static",
+              transform: "none",
+              top: "auto",
+              right: "auto",
+            },
+            g: false,
+          },
+          {
+            l: "position: relative; top: 10px; left: 24px",
+            s: {
+              position: "relative",
+              top: "10px",
+              left: "24px",
+              transform: "none",
+              right: "auto",
+            },
+            g: true,
+          },
+          {
+            l: "position: absolute; top: 8px; right: 8px",
+            s: {
+              position: "absolute",
+              top: "8px",
+              right: "8px",
+              left: "auto",
+              transform: "none",
+            },
+            g: true,
+          },
+          {
+            l: "position: sticky; top: 0  (rides, then pins)",
+            s: {
+              position: "static",
+              transform: "none",
+              top: "auto",
+              right: "auto",
+            },
+            g: false,
+          },
+          {
+            l: "position: fixed  (pinned to you)",
+            s: {
+              position: "static",
+              transform: "none",
+              top: "auto",
+              right: "auto",
+            },
+            g: false,
+          },
+        ];
+        let li = 0;
+        function look() {
+          const L = LOOKS[li],
+            b = $("posBox");
+          Object.assign(b.style, L.s);
+          $("posGhost").style.opacity = L.g ? 1 : 0;
+          $("introFmt").textContent = L.l;
+          li = (li + 1) % LOOKS.length;
+        }
+        look();
+        setInterval(look, 2100);
+
+        /* ---------- 01 static / relative ---------- */
+        const R1 = { mode: "static", t: 0, l: 0 };
+        function renderRel() {
+          const b = $("relBox");
+          b.style.position = R1.mode;
+          const on = R1.mode === "relative";
+          b.style.top = on ? R1.t + "px" : "auto";
+          b.style.left = on ? R1.l + "px" : "auto";
+          $("bSlot").classList.toggle(
+            "ghost",
+            on && (R1.t !== 0 || R1.l !== 0),
+          );
+          $("codeRel").innerHTML = rule(".b", [
+            `position: ${R1.mode}`,
+            ...(on ? [`top: ${R1.t}px`, `left: ${R1.l}px`] : []),
+          ]);
+          $("relNote").innerHTML = on
+            ? "relative: the box nudges, but its <b>dashed seat</b> stays reserved — A and C never move."
+            : '<b style="color:var(--margin-c)">static ignores top & left.</b> Drag the sliders — nothing happens. That silence is the lesson.';
+        }
+        initSeg($("segRel"), (v) => {
+          R1.mode = v;
+          renderRel();
+        });
+        range(
+          $("rRelT"),
+          $("oRelT"),
+          (v) => v + "px",
+          (v) => {
+            R1.t = v;
+            renderRel();
+          },
+        );
+        range(
+          $("rRelL"),
+          $("oRelL"),
+          (v) => v + "px",
+          (v) => {
+            R1.l = v;
+            renderRel();
+          },
+        );
+
+        /* ---------- 02 absolute ---------- */
+        const A2 = { parent: "relative", t: 20, l: 20 };
+        function renderAbs() {
+          $("absParent").style.position = A2.parent;
+          const b = $("absBox");
+          b.style.top = A2.t + "px";
+          b.style.left = A2.l + "px";
+          $("absParentLab").textContent = "parent · position: " + A2.parent;
+          $("codeAbs").innerHTML =
+            rule(".parent", [`position: ${A2.parent}`]) +
+            "\n" +
+            rule(".box", [
+              `position: absolute`,
+              `top: ${A2.t}px`,
+              `left: ${A2.l}px`,
+            ]);
+          $("absNote").innerHTML =
+            A2.parent === "relative"
+              ? "The parent is positioned → the box measures from the <b>parent's</b> corner."
+              : "Parent is static → the box skips it and anchors to the <b>grandparent</b> (the outer dashed frame). Same offsets, different anchor, different spot.";
+        }
+        initSeg($("segParent"), (v) => {
+          A2.parent = v;
+          renderAbs();
+        });
+        range(
+          $("rAbsT"),
+          $("oAbsT"),
+          (v) => v + "px",
+          (v) => {
+            A2.t = v;
+            renderAbs();
+          },
+        );
+        range(
+          $("rAbsL"),
+          $("oAbsL"),
+          (v) => v + "px",
+          (v) => {
+            A2.l = v;
+            renderAbs();
+          },
+        );
+
+        /* ---------- 03 fixed ---------- */
+        $("codeFix").innerHTML = rule(".toast", [
+          `position: fixed`,
+          `right: 18px`,
+          `bottom: 18px`,
+        ]);
+        $("fixToggle").addEventListener("click", () => {
+          const c = $("fixedCard");
+          c.classList.toggle("on");
+          $("fixToggle").textContent = c.classList.contains("on")
+            ? "⊖ remove the fixed card"
+            : "⊕ spawn a real fixed card";
+        });
+        $("fixedCard").addEventListener("click", () => {
+          $("fixedCard").classList.remove("on");
+          $("fixToggle").textContent = "⊕ spawn a real fixed card";
+        });
+
+        /* ---------- 04 sticky ---------- */
+        range(
+          $("rStk"),
+          $("oStk"),
+          (v) => v + "px",
+          (v) => {
+            document.querySelector(".sticky-bar").style.top = v + "px";
+            document.querySelector(".sticky-bar").textContent =
+              "sticky header · top: " + v + "px";
+            $("codeStk").innerHTML = rule(".header", [
+              `position: sticky`,
+              `top: ${v}px`,
+            ]);
+          },
+        );
+
+        /* ---------- 05 offsets ---------- */
+        const O5 = { corner: "tl", x: 20, y: 20 };
+        function renderOff() {
+          const b = $("offBox");
+          b.style.top = b.style.right = b.style.bottom = b.style.left = "auto";
+          const v = O5.corner[0] === "t" ? "top" : "bottom";
+          const h = O5.corner[1] === "l" ? "left" : "right";
+          b.style[v] = O5.x + "px";
+          b.style[h] = O5.y + "px";
+          $("codeOff").innerHTML = rule(".box", [
+            `position: absolute`,
+            `${v}: ${O5.x}px`,
+            `${h}: ${O5.y}px`,
+          ]);
+        }
+        initSeg($("segCorner"), (v) => {
+          O5.corner = v;
+          renderOff();
+        });
+        range(
+          $("rOffX"),
+          $("oOffX"),
+          (v) => v + "px",
+          (v) => {
+            O5.x = v;
+            renderOff();
+          },
+        );
+        range(
+          $("rOffY"),
+          $("oOffY"),
+          (v) => v + "px",
+          (v) => {
+            O5.y = v;
+            renderOff();
+          },
+        );
+
+        /* ---------- lesson track ---------- */
+        const t = $("lnTrack");
+        for (let i = 0; i < 45; i++) {
+          const s = document.createElement("span");
+          s.className = "tick" + (i < 10 ? " done" : "");
+          s.title = "lesson " + (i + 1);
+          t.appendChild(s);
+        }
+
+        /* ---------- reveal ---------- */
+        const io = new IntersectionObserver(
+          (es) =>
+            es.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                io.unobserve(e.target);
+              }
+            }),
+          { threshold: 0.12 },
+        );
+        document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      })();
+    </script>
+  </body>
+</html>

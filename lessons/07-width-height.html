@@ -1,0 +1,1764 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Width & Height — Lesson 07</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' fill='none' stroke='%23f07f4f' stroke-width='2'/%3E%3Crect x='8' y='8' width='16' height='16' fill='none' stroke='%23f2c14e' stroke-width='2'/%3E%3Crect x='13' y='13' width='6' height='6' fill='%2358a6ff'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0e15;
+        --panel: #121826;
+        --panel2: #0d1220;
+        --ink: #10141d;
+        --line: #222c40;
+        --line2: #31405e;
+        --text: #e9eef7;
+        --muted: #8d9ab0;
+        --faint: #5b6a84;
+        --margin-c: #f07f4f;
+        --border-c: #f2c14e;
+        --padding-c: #3ecf8e;
+        --content-c: #58a6ff;
+        --pink: #ff4f8b;
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: dark;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 15px;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+      ::selection {
+        background: rgba(88, 166, 255, 0.35);
+      }
+      .mono {
+        font-family: var(--mono);
+      }
+      section {
+        scroll-margin-top: 76px;
+      }
+      b {
+        font-weight: 600;
+      }
+
+      .bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            700px 460px at 12% -6%,
+            rgba(242, 193, 78, 0.07),
+            transparent 60%
+          ),
+          radial-gradient(
+            760px 520px at 92% 22%,
+            rgba(88, 166, 255, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            600px 480px at 40% 105%,
+            rgba(62, 207, 142, 0.05),
+            transparent 60%
+          );
+      }
+      .bg::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(233, 238, 247, 0.035) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(233, 238, 247, 0.035) 1px,
+            transparent 1px
+          );
+        background-size: 28px 28px;
+        mask-image: radial-gradient(
+          ellipse 120% 90% at 50% 0%,
+          #000 40%,
+          transparent 100%
+        );
+      }
+      .bg .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.5;
+        animation: drift 26s ease-in-out infinite alternate;
+      }
+      .bg .g1 {
+        width: 420px;
+        height: 420px;
+        left: -120px;
+        top: 30%;
+        background: rgba(240, 127, 79, 0.1);
+      }
+      .bg .g2 {
+        width: 460px;
+        height: 460px;
+        right: -140px;
+        top: 60%;
+        background: rgba(88, 166, 255, 0.1);
+        animation-delay: -12s;
+      }
+      @keyframes drift {
+        from {
+          transform: translateY(-30px);
+        }
+        to {
+          transform: translateY(40px);
+        }
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 12px clamp(16px, 4vw, 44px);
+        background: rgba(11, 14, 21, 0.92);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar nav {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .topbar nav a {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 6px 11px;
+        border-radius: 999px;
+        transition: 0.2s;
+      }
+      .topbar nav a:hover {
+        color: var(--text);
+        background: #161d2c;
+      }
+      .lesson-tag {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--border-c);
+        border: 1px dashed rgba(242, 193, 78, 0.45);
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .wrap {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: 0 clamp(16px, 4vw, 44px);
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        padding: clamp(20px, 4vh, 48px) 0 clamp(30px, 5vh, 56px);
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--padding-c);
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(2.3rem, 5.2vw, 3.7rem);
+        line-height: 1.06;
+        letter-spacing: -0.02em;
+      }
+      .word-style {
+        display: inline-block;
+        padding: 0.02em 0.22em;
+        background: rgba(88, 166, 255, 0.17);
+        border: 0.06em solid var(--content-c);
+        border-radius: 0.14em;
+        color: #bcd8ff;
+        transition: transform 0.3s;
+        cursor: default;
+      }
+      .word-style:hover {
+        transform: rotate(-2deg) scale(1.03);
+      }
+      .lede {
+        color: var(--muted);
+        max-width: 56ch;
+        margin-top: 18px;
+        font-size: 1.05rem;
+      }
+      .lede b {
+        color: var(--text);
+      }
+      .css-full {
+        display: inline-block;
+        margin-top: 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--faint);
+        letter-spacing: 0.08em;
+      }
+      .intro-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 26px;
+        display: grid;
+        place-items: center;
+        gap: 16px;
+        box-shadow: 0 30px 60px -40px rgba(0, 0, 0, 0.8);
+      }
+      .intro-stage {
+        width: 100%;
+        max-width: 320px;
+        height: 130px;
+        border: 1px dashed var(--line2);
+        border-radius: 10px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #introBox {
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+        border-radius: 8px;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: #a7cdff;
+        display: grid;
+        place-items: center;
+        transition: all 0.4s;
+      }
+      .intro-fmt {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--content-c);
+        background: var(--ink);
+        border: 1px solid var(--line2);
+        border-radius: 9px;
+        padding: 7px 16px;
+      }
+      .imode {
+        font-size: 11px;
+        color: var(--faint);
+        letter-spacing: 0.1em;
+      }
+
+      .sec {
+        padding: clamp(36px, 6vh, 64px) 0;
+      }
+      .sec-head {
+        margin-bottom: 26px;
+        max-width: 72ch;
+      }
+      .sec-head h2 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+        letter-spacing: -0.015em;
+        line-height: 1.15;
+      }
+      .sec-head .lede {
+        margin-top: 10px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 18px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .panel-head h3 {
+        font-family: var(--disp);
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dots i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dots i:nth-child(1) {
+        background: #f07f4f;
+      }
+      .dots i:nth-child(2) {
+        background: #f2c14e;
+      }
+      .dots i:nth-child(3) {
+        background: #3ecf8e;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.85;
+        overflow-x: auto;
+      }
+      .c-sel {
+        color: #7fe0b0;
+      }
+      .c-prop {
+        color: #8ab4ff;
+      }
+      .c-val {
+        color: #f2c14e;
+      }
+      .c-com {
+        color: #5b6a84;
+      }
+      .grp {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--faint);
+        margin-bottom: 6px;
+      }
+
+      .pick-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 18px;
+        align-items: stretch;
+      }
+      .stage-wrap {
+        padding: 28px;
+        display: grid;
+        place-items: center;
+        min-height: 340px;
+      }
+      .side {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .sel-chip {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .sel-chip:hover {
+        color: var(--text);
+        border-color: var(--content-c);
+        transform: translateY(-2px);
+      }
+      .sel-chip.on {
+        color: #0e1017;
+        background: var(--content-c);
+        border-color: var(--content-c);
+        font-weight: 600;
+      }
+      .code-box {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .code-box pre {
+        min-height: 0;
+        font-size: 12.5px;
+      }
+      .side-note {
+        font-size: 12px;
+        color: var(--faint);
+      }
+      .explain {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 12px 14px;
+        font-size: 12.5px;
+        color: var(--muted);
+        line-height: 1.55;
+      }
+      .explain b {
+        color: var(--text);
+      }
+      .segmented {
+        position: relative;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 1fr;
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        padding: 3px;
+      }
+      .segmented button {
+        position: relative;
+        z-index: 1;
+        background: none;
+        border: 0;
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--muted);
+        padding: 8px 4px;
+        cursor: pointer;
+        transition: color 0.25s;
+        border-radius: 8px;
+      }
+      .segmented button:hover {
+        color: var(--text);
+      }
+      .segmented button.active {
+        color: #fff;
+      }
+      .seg-thumb {
+        position: absolute;
+        top: 3px;
+        bottom: 3px;
+        left: 3px;
+        width: calc((100% - 6px) / 2);
+        background: #26334c;
+        border-radius: 8px;
+        transition:
+          transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+          width 0.28s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      }
+
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        outline: none;
+        cursor: pointer;
+        background: linear-gradient(
+          90deg,
+          var(--ac) var(--fill, 50%),
+          #232c40 var(--fill, 50%)
+        );
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        transition: transform 0.15s;
+      }
+      input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.15);
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+      }
+      .ctl {
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 7px 11px;
+        transition: 0.2s;
+      }
+      .ctl:hover {
+        background: #101725;
+        border-color: var(--line);
+      }
+      .ctl-top {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+      .ctl-top label {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text);
+      }
+      .ctl-val {
+        margin-left: auto;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--ac);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 2px 9px;
+      }
+
+      /* stages */
+      .frame {
+        position: relative;
+        width: 100%;
+        max-width: 470px;
+        border: 1px dashed var(--line2);
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        padding: 20px;
+        min-height: 220px;
+        transition: width 0.22s;
+      }
+      .frame-lab {
+        position: absolute;
+        top: -9px;
+        left: 14px;
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--faint);
+        background: var(--panel);
+        padding: 0 8px;
+        z-index: 3;
+      }
+      .box {
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: #a7cdff;
+        transition:
+          width 0.22s,
+          height 0.22s;
+        overflow: hidden;
+        padding: 8px;
+        text-align: center;
+      }
+      .box .val {
+        font-size: 10px;
+        opacity: 0.7;
+        margin-top: 3px;
+      }
+      .guide {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        border-left: 1px dashed var(--line2);
+        pointer-events: none;
+        z-index: 2;
+        transition: left 0.22s;
+      }
+      .guide-lab {
+        position: absolute;
+        top: -2px;
+        left: 5px;
+        font-family: var(--mono);
+        font-size: 9px;
+        color: var(--faint);
+        white-space: nowrap;
+        background: var(--panel);
+        padding: 0 4px;
+      }
+      .measure-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 7px 12px;
+      }
+      .measure-row i {
+        width: 8px;
+        height: 8px;
+        border-radius: 2px;
+        background: var(--mc);
+        flex: none;
+      }
+      .measure-row b {
+        color: var(--text);
+      }
+      .status-pill {
+        display: inline-block;
+        font-family: var(--mono);
+        font-size: 10px;
+        padding: 3px 10px;
+        border-radius: 999px;
+        border: 1px solid;
+        margin-left: 6px;
+      }
+      .status-free {
+        color: var(--padding-c);
+        border-color: rgba(62, 207, 142, 0.5);
+      }
+      .status-min {
+        color: var(--border-c);
+        border-color: rgba(242, 193, 78, 0.5);
+      }
+      .status-max {
+        color: var(--margin-c);
+        border-color: rgba(240, 127, 79, 0.5);
+      }
+
+      /* intrinsic */
+      .intr-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        width: 100%;
+        max-width: 470px;
+      }
+      .intr {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        transition: border-color 0.2s;
+      }
+      .intr.on {
+        border-color: var(--content-c);
+      }
+      .intr h4 {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text);
+      }
+      .intr p {
+        font-size: 11px;
+        color: var(--faint);
+        min-height: 30px;
+      }
+      .intr-box {
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+        border-radius: 6px;
+        padding: 10px;
+        font-size: 12px;
+        color: #a7cdff;
+        transition: width 0.3s;
+      }
+      .intr-measure {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--border-c);
+      }
+
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      @media (min-width: 1180px) {
+        .notes-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media (max-width: 640px) {
+        .notes-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .note-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.3s,
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+      .note-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--nc);
+        opacity: 0.85;
+      }
+      .note-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--nc);
+        box-shadow: 0 24px 44px -28px rgba(0, 0, 0, 0.85);
+      }
+      .note-card h3 {
+        font-family: var(--mono);
+        font-size: 15px;
+        color: var(--nc);
+        margin-bottom: 8px;
+      }
+      .note-card p {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .note-tip {
+        margin-top: 12px;
+        font-size: 11px;
+        color: var(--faint);
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+      }
+      .note-demo {
+        height: 104px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        overflow: hidden;
+      }
+      .demo-wh {
+        width: 70%;
+        height: 60%;
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+        border-radius: 6px;
+        transition: 0.35s;
+        position: relative;
+      }
+      .demo-wh::before,
+      .demo-wh::after {
+        content: "";
+        position: absolute;
+        background: var(--border-c);
+        border-radius: 2px;
+      }
+      .demo-wh::before {
+        left: 4px;
+        right: 4px;
+        top: 50%;
+        height: 2px;
+      }
+      .demo-wh::after {
+        top: 4px;
+        bottom: 4px;
+        left: 50%;
+        width: 2px;
+      }
+      .note-card:hover .demo-wh {
+        width: 88%;
+        height: 76%;
+      }
+      .demo-minmax {
+        width: 70%;
+        height: 20px;
+        background: var(--padding-bg);
+        border: 1px solid var(--padding-c);
+        border-radius: 4px;
+        position: relative;
+        transition: 0.3s;
+      }
+      .note-card:hover .demo-minmax {
+        width: 90%;
+        background: var(--border-bg);
+        border-color: var(--border-c);
+      }
+      .demo-auto {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        width: 75%;
+      }
+      .demo-auto i {
+        height: 14px;
+        border-radius: 3px;
+        background: var(--content-c);
+        transition: 0.35s;
+      }
+      .demo-auto i:nth-child(1) {
+        flex: 1;
+        opacity: 0.3;
+      }
+      .demo-auto i:nth-child(2) {
+        width: 36px;
+      }
+      .note-card:hover .demo-auto i:nth-child(1) {
+        flex: 3;
+      }
+      .demo-fit {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--muted);
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+        border-radius: 6px;
+        padding: 6px 10px;
+        white-space: nowrap;
+        transition: 0.3s;
+      }
+      .note-card:hover .demo-fit {
+        color: var(--content-c);
+        border-color: var(--content-c);
+        box-shadow: 0 0 0 1px var(--content-c);
+      }
+
+      .lesson-nav {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px clamp(18px, 3vw, 28px);
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+        align-items: center;
+      }
+      .ln-status {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--padding-c);
+        border: 1px solid rgba(62, 207, 142, 0.45);
+        border-radius: 999px;
+        padding: 3px 10px;
+      }
+      .lesson-nav h3 {
+        font-family: var(--disp);
+        font-size: 17px;
+        margin-top: 8px;
+      }
+      .ln-track {
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .tick {
+        width: 7px;
+        height: 15px;
+        border-radius: 2px;
+        background: #212a3e;
+        transition: 0.2s;
+      }
+      .tick.done {
+        background: var(--padding-c);
+        box-shadow: 0 0 8px rgba(62, 207, 142, 0.55);
+      }
+      .tick:hover {
+        background: var(--line2);
+      }
+      .ln-next {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        text-align: right;
+      }
+      .ln-next span {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .ln-next b {
+        font-family: var(--disp);
+        font-size: 15px;
+        color: var(--text);
+      }
+      footer {
+        border-top: 1px solid var(--line);
+        margin-top: 40px;
+        padding: 30px 0 44px;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+        color: var(--faint);
+        font-size: 12.5px;
+      }
+      footer .mono {
+        font-size: 11.5px;
+      }
+      footer .sp {
+        margin-left: auto;
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+      @media (max-width: 1020px) {
+        .intro {
+          grid-template-columns: 1fr;
+        }
+        .pick-grid {
+          grid-template-columns: 1fr;
+        }
+        .intr-grid {
+          grid-template-columns: 1fr;
+        }
+        .lesson-nav {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .ln-next {
+          align-items: center;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg">
+      <span class="glow g1"></span><span class="glow g2"></span>
+    </div>
+
+    <header class="topbar">
+      <span class="lesson-tag">lesson 07 / 45</span>
+      <nav>
+        <a href="#wh">width · height</a>
+        <a href="#minmax">min- · max-</a>
+        <a href="#auto">auto</a>
+        <a href="#intrinsic">intrinsic</a>
+        <a href="#notes">cheat-codes</a>
+      </nav>
+    </header>
+
+    <div class="wrap">
+      <!-- ============ intro ============ -->
+      <section class="intro">
+        <div>
+          <p class="eyebrow">lesson 07 · interactive</p>
+          <h1>Size is a <span class="word-style">negotiation</span>.</h1>
+          <p class="lede">
+            You declare a width, the browser decides what actually ships.
+            <b>min</b> and <b>max</b> set guardrails. <b>auto</b> lets content
+            or layout decide. And <b>intrinsic</b> keywords let the content
+            itself set the rules.
+          </p>
+          <span class="css-full">A · SK · T · HE · B · OX</span>
+        </div>
+        <div class="intro-panel">
+          <div class="intro-stage">
+            <div id="introBox">Aurora</div>
+          </div>
+          <span class="intro-fmt" id="introFmt">width: 160px</span>
+          <p class="imode mono">one element, many ways to size it…</p>
+        </div>
+      </section>
+
+      <!-- ============ 01 · width & height ============ -->
+      <section id="wh" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">01 · width &amp; height</p>
+          <h2>The two rulers every box has</h2>
+          <p class="lede">
+            <b>width</b> and <b>height</b> are the most direct sizing tools. Set
+            them and the box obeys — but only within the guardrails of min/max.
+            With
+            <span class="mono" style="color: var(--padding-c)"
+              >box-sizing: border-box</span
+            >, they mean "the box you see", not just the content.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>live box</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="frame" id="whFrame">
+                <span class="frame-lab">parent (470px)</span>
+                <div class="box" id="whBox" style="width: 240px; height: 120px">
+                  <span>content</span>
+                  <div class="val" id="whVal">240 × 120</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rW">width</label
+                ><output class="ctl-val" id="oW">240px</output>
+              </div>
+              <input
+                type="range"
+                id="rW"
+                min="60"
+                max="440"
+                value="240"
+                step="2"
+              />
+            </div>
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rH">height</label
+                ><output class="ctl-val" id="oH">120px</output>
+              </div>
+              <input
+                type="range"
+                id="rH"
+                min="40"
+                max="220"
+                value="120"
+                step="2"
+              />
+            </div>
+            <div class="code-box"><pre id="codeWh"></pre></div>
+            <div class="explain">
+              <b>width</b> controls horizontal size. <b>height</b> controls
+              vertical. Omit width on a block element and it fills its parent
+              (auto). Omit height and the content decides.
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 02 · min- & max- ============ -->
+      <section id="minmax" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">02 · min- &amp; max-</p>
+          <h2>The guardrails</h2>
+          <p class="lede">
+            <b>min-width</b> and <b>max-width</b> are the floor and ceiling. The
+            box wants to be <span class="mono">width: 100%</span> of its parent,
+            but won't go below the min or above the max. Drag the container to
+            see it clamp.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>stretch the container</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="frame" id="mmFrame" style="width: 400px">
+                <span class="frame-lab" id="mmFrameLab">container 400px</span>
+                <div class="guide" id="mmGuideMin" style="left: 180px">
+                  <span class="guide-lab" style="color: var(--border-c)"
+                    >min 180</span
+                  >
+                </div>
+                <div class="guide" id="mmGuideMax" style="left: 360px">
+                  <span class="guide-lab" style="color: var(--margin-c)"
+                    >max 360</span
+                  >
+                </div>
+                <div class="box" id="mmBox" style="width: 100%">
+                  100% of parent
+                  <div class="val" id="mmVal"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rFrame">container width</label
+                ><output class="ctl-val" id="oFrame">400px</output>
+              </div>
+              <input
+                type="range"
+                id="rFrame"
+                min="120"
+                max="460"
+                value="400"
+                step="2"
+              />
+            </div>
+            <div class="ctl" style="--ac: var(--border-c)">
+              <div class="ctl-top">
+                <label for="rMin">min-width</label
+                ><output class="ctl-val" id="oMin">180px</output>
+              </div>
+              <input
+                type="range"
+                id="rMin"
+                min="60"
+                max="300"
+                value="180"
+                step="2"
+              />
+            </div>
+            <div class="ctl" style="--ac: var(--margin-c)">
+              <div class="ctl-top">
+                <label for="rMax">max-width</label
+                ><output class="ctl-val" id="oMax">360px</output>
+              </div>
+              <input
+                type="range"
+                id="rMax"
+                min="200"
+                max="460"
+                value="360"
+                step="2"
+              />
+            </div>
+            <p class="measure-row" id="mmStatus" style="--mc: var(--content-c)">
+              <i></i>result: <b id="mmStatusTxt"></b>
+            </p>
+            <div class="code-box"><pre id="codeMm"></pre></div>
+            <div class="explain">
+              <b>min-width</b> prevents the box from shrinking below a floor.
+              <b>max-width</b> prevents it from growing past a ceiling. The
+              dashed guides show where those limits are. When the parent is
+              smaller than min, the box clamps up. When larger than max, it
+              clamps down.
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 03 · min- & max-height (vertical pair) ============ -->
+      <section id="vertical" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">03 · min-height &amp; max-height</p>
+          <h2>Same idea, vertical axis</h2>
+          <p class="lede">
+            Add more content and the box grows — but
+            <b>never past max-height</b>. Remove content and it shrinks — but
+            <b>never below min-height</b>. The classic use: a text area that's
+            tall enough to read but doesn't explode on long posts.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>add / remove content</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="frame" style="min-height: 320px">
+                <span class="frame-lab">the box</span>
+                <div
+                  class="box"
+                  id="vhBox"
+                  style="
+                    width: 80%;
+                    min-height: 100px;
+                    max-height: 220px;
+                    align-items: flex-start;
+                    padding: 14px;
+                    text-align: left;
+                  "
+                >
+                  <div
+                    id="vhContent"
+                    style="
+                      font-family: var(--body);
+                      font-size: 13px;
+                      color: #c9d4e6;
+                    "
+                  >
+                    Aurora Coffee — small-batch beans roasted every Tuesday.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--border-c)">
+              <div class="ctl-top">
+                <label for="rVhMin">min-height</label
+                ><output class="ctl-val" id="oVhMin">100px</output>
+              </div>
+              <input
+                type="range"
+                id="rVhMin"
+                min="40"
+                max="180"
+                value="100"
+                step="2"
+              />
+            </div>
+            <div class="ctl" style="--ac: var(--margin-c)">
+              <div class="ctl-top">
+                <label for="rVhMax">max-height</label
+                ><output class="ctl-val" id="oVhMax">220px</output>
+              </div>
+              <input
+                type="range"
+                id="rVhMax"
+                min="140"
+                max="320"
+                value="220"
+                step="2"
+              />
+            </div>
+            <p class="grp">content amount</p>
+            <div class="chips">
+              <button class="sel-chip on" data-n="1">short</button>
+              <button class="sel-chip" data-n="3">medium</button>
+              <button class="sel-chip" data-n="6">long</button>
+            </div>
+            <div class="code-box"><pre id="codeVh"></pre></div>
+            <div class="explain">
+              <b>min-height</b> ensures the box is at least this tall, even with
+              little content. <b>max-height</b> caps it — overflow happens when
+              content exceeds this. Try "long" content with a low max-height to
+              see the constraint kick in.
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 04 · auto ============ -->
+      <section id="auto" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">04 · auto</p>
+          <h2>"Let the layout decide"</h2>
+          <p class="lede">
+            The default — but <i>what</i> it decides depends on context. In a
+            block,
+            <span class="mono" style="color: var(--content-c)"
+              >width: auto</span
+            >
+            fills the parent. In an inline-block, it hugs the content. In flex,
+            it shares the available space.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>same box, three contexts</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="frame" id="autoFrame" style="align-items: flex-start">
+                <span class="frame-lab" id="autoLab">display: block</span>
+                <div class="box" id="autoBox">Aurora Coffee</div>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <p class="grp">display context</p>
+            <div class="segmented" id="segAuto">
+              <span class="seg-thumb"></span>
+              <button data-v="block" class="active">block</button>
+              <button data-v="inline-block">inline-block</button>
+            </div>
+            <p class="grp">width</p>
+            <div class="segmented" id="segAutoW">
+              <span class="seg-thumb"></span>
+              <button data-v="auto" class="active">auto</button>
+              <button data-v="200px">200px</button>
+            </div>
+            <div class="code-box"><pre id="codeAuto"></pre></div>
+            <div class="explain">
+              <b>auto</b> is the most honest width: it says "I trust whoever
+              renders me". Blocks fill their parent, inline-blocks hug their
+              content, flex items share space. Almost always the right choice —
+              and almost never written.
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 05 · intrinsic sizes ============ -->
+      <section id="intrinsic" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">05 · fit-content · min-content · max-content</p>
+          <h2>Let the content set the rules</h2>
+          <p class="lede">
+            Three modern keywords that hand sizing over to the text itself.
+            Click each — the box snaps to the right answer, and the width
+            readout tells you exactly why.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>three ways to trust the text</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="intr-grid">
+                <div class="intr" id="intr-fit">
+                  <h4>fit-content</h4>
+                  <p>hug the text — but wrap when it would overflow</p>
+                  <div class="intr-box" style="width: fit-content">
+                    Aurora Coffee — small-batch beans
+                  </div>
+                  <div class="intr-measure" id="mFit"></div>
+                </div>
+                <div class="intr" id="intr-min">
+                  <h4>min-content</h4>
+                  <p>shrink until nothing can break smaller — longest word</p>
+                  <div class="intr-box" style="width: min-content">
+                    Aurora Coffee — small-batch beans
+                  </div>
+                  <div class="intr-measure" id="mMin"></div>
+                </div>
+                <div class="intr" id="intr-max">
+                  <h4>max-content</h4>
+                  <p>expand to a single unwrapped line, no matter how wide</p>
+                  <div class="intr-box" style="width: max-content">
+                    Aurora Coffee — small-batch beans
+                  </div>
+                  <div class="intr-measure" id="mMax"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <p class="grp">try a length</p>
+            <div class="chips" id="intrTextChips">
+              <button
+                class="sel-chip on"
+                data-t="Aurora Coffee — small-batch beans"
+              >
+                short phrase
+              </button>
+              <button
+                class="sel-chip"
+                data-t="Small-batch specialty beans roasted every Tuesday morning"
+              >
+                long sentence
+              </button>
+              <button class="sel-chip" data-t="Supercalifragilistic espresso">
+                one long word
+              </button>
+            </div>
+            <div class="code-box"><pre id="codeIntr"></pre></div>
+            <div class="explain">
+              <b>fit-content</b> hugs text but wraps at the container edge.
+              <b>min-content</b> shrinks to the longest word (no breaking).
+              <b>max-content</b> goes full width on one line (may overflow).
+              Reach for these in flex/grid items where you want children to
+              <i>agree</i> on their own widths.
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 06 · field notes ============ -->
+      <section id="notes" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">06 · field notes</p>
+          <h2>Cheat codes from lesson 07</h2>
+        </div>
+        <div class="notes-grid">
+          <article class="note-card" style="--nc: var(--content-c)">
+            <div class="note-demo"><div class="demo-wh"></div></div>
+            <h3>width &amp; height</h3>
+            <p>
+              Omit them on a block and it fills the parent horizontally, hugs
+              content vertically. Set them and the box obeys — until the
+              guardrails kick in.
+            </p>
+            <p class="note-tip mono">↳ hover: the box grows</p>
+          </article>
+          <article class="note-card" style="--nc: var(--border-c)">
+            <div class="note-demo"><div class="demo-minmax"></div></div>
+            <h3>min- &amp; max-</h3>
+            <p>
+              Guardrails for responsive design. Pair
+              <span class="mono">width: 100%</span> with
+              <span class="mono">max-width: 720px</span> and you have a readable
+              text column at every screen.
+            </p>
+            <p class="note-tip mono">↳ hover: the bar stretches</p>
+          </article>
+          <article class="note-card" style="--nc: var(--padding-c)">
+            <div class="note-demo">
+              <div class="demo-auto"><i></i><i></i></div>
+            </div>
+            <h3>auto is the default</h3>
+            <p>
+              Blocks fill, inline-blocks hug, flex children share.
+              <span class="mono">width: auto</span> is almost always the right
+              choice — and almost never written.
+            </p>
+            <p class="note-tip mono">↳ hover: the flexible bar grows</p>
+          </article>
+          <article class="note-card" style="--nc: var(--margin-c)">
+            <div class="note-demo">
+              <span class="demo-fit">fit-content</span>
+            </div>
+            <h3>intrinsic sizes</h3>
+            <p>
+              <span class="mono">fit-content</span> hugs text but wraps.
+              <span class="mono">min-content</span> shrinks to the longest word.
+              <span class="mono">max-content</span> goes full width on one line.
+            </p>
+            <p class="note-tip mono">↳ hover: fit-content glows</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ lesson nav ============ -->
+      <div class="lesson-nav reveal">
+        <div>
+          <span class="ln-status">✓ completed</span>
+          <h3>07 — Width &amp; Height</h3>
+        </div>
+        <div class="ln-track" id="lnTrack"></div>
+        <div class="ln-next">
+          <span>up next</span>
+          <b>08 · Borders &amp; Shadows</b>
+        </div>
+      </div>
+
+      <footer>
+        <span class="mono">drag things, break things, learn things.</span>
+        <span class="sp mono">45 lessons · lesson 07 · width &amp; height</span>
+      </footer>
+    </div>
+    <!-- /wrap -->
+
+    <script>
+      (() => {
+        const $ = (id) => document.getElementById(id);
+        const rule = (sel, decls) =>
+          `<span class="c-sel">${sel}</span> {\n${decls
+            .map((d) => {
+              const i = d.indexOf(":");
+              return `  <span class="c-prop">${d.slice(0, i)}</span>: <span class="c-val">${d.slice(i + 1).trim()}</span>;`;
+            })
+            .join("\n")}\n}`;
+        function range(el, out, fmt, cb) {
+          const f = () => {
+            const v = +el.value;
+            out.textContent = fmt(v);
+            const min = +el.min,
+              max = +el.max;
+            el.style.setProperty(
+              "--fill",
+              ((v - min) / (max - min)) * 100 + "%",
+            );
+            cb(v);
+          };
+          el.addEventListener("input", f);
+          f();
+        }
+        function initSeg(seg, onPick) {
+          const btns = [...seg.querySelectorAll("button")],
+            thumb = seg.querySelector(".seg-thumb"),
+            n = btns.length;
+          function set(i) {
+            btns.forEach((b, j) => b.classList.toggle("active", i === j));
+            thumb.style.width = `calc((100% - 6px)/${n})`;
+            thumb.style.transform = `translateX(${i * 100}%)`;
+          }
+          btns.forEach((b, i) =>
+            b.addEventListener("click", () => {
+              set(i);
+              onPick(b.dataset.v);
+            }),
+          );
+          set(0);
+        }
+
+        /* ---------- intro cycle ---------- */
+        const FORMATS = [
+          { l: "width: 160px", w: "160px", h: "80px" },
+          { l: "width: 80%", w: "80%", h: "90px" },
+          { l: "width: auto", w: "auto", h: "70px" },
+          { l: "width: fit-content", w: "fit-content", h: "70px" },
+          {
+            l: "min-width: 120px; max-width: 240px",
+            w: "100%",
+            h: "90px",
+            min: "120px",
+            max: "240px",
+          },
+        ];
+        let fi = 0;
+        function intro() {
+          const f = FORMATS[fi];
+          const b = $("introBox");
+          b.style.width = f.w;
+          b.style.height = f.h;
+          b.style.minWidth = f.min || "";
+          b.style.maxWidth = f.max || "";
+          $("introFmt").textContent = f.l;
+          fi = (fi + 1) % FORMATS.length;
+        }
+        intro();
+        setInterval(intro, 2400);
+
+        /* ---------- 01 wh ---------- */
+        range(
+          $("rW"),
+          $("oW"),
+          (v) => v + "px",
+          (v) => {
+            $("whBox").style.width = v + "px";
+            $("whVal").textContent = v + " × " + $("rH").value;
+            $("codeWh").innerHTML = rule(".box", [
+              `width: ${v}px`,
+              `height: ${$("rH").value}px`,
+            ]);
+          },
+        );
+        range(
+          $("rH"),
+          $("oH"),
+          (v) => v + "px",
+          (v) => {
+            $("whBox").style.height = v + "px";
+            $("whVal").textContent = $("rW").value + " × " + v;
+            $("codeWh").innerHTML = rule(".box", [
+              `width: ${$("rW").value}px`,
+              `height: ${v}px`,
+            ]);
+          },
+        );
+
+        /* ---------- 02 min/max width ---------- */
+        function renderMm() {
+          const frame = +$("rFrame").value,
+            min = +$("rMin").value,
+            max = +$("rMax").value;
+          const frameEl = $("mmFrame");
+          frameEl.style.width = frame + "px";
+          $("mmFrameLab").textContent = "container " + frame + "px";
+
+          // Position guides relative to content area (frame - padding)
+          const padding = 20; // frame has 20px padding
+          const contentWidth = frame - padding * 2;
+          $("mmGuideMin").style.left = padding + min + "px";
+          $("mmGuideMax").style.left = padding + max + "px";
+          $("mmGuideMin").querySelector(".guide-lab").textContent =
+            "min " + min;
+          $("mmGuideMax").querySelector(".guide-lab").textContent =
+            "max " + max;
+
+          const box = $("mmBox");
+          box.style.minWidth = min + "px";
+          box.style.maxWidth = max + "px";
+
+          // Calculate actual rendered width
+          const actual = Math.min(Math.max(contentWidth, min), max);
+          box.querySelector(".val").textContent = "renders " + actual + "px";
+
+          // Status
+          let status = "",
+            statusClass = "status-free";
+          if (contentWidth < min) {
+            status = "clamped up to min";
+            statusClass = "status-min";
+          } else if (contentWidth > max) {
+            status = "clamped down to max";
+            statusClass = "status-max";
+          } else {
+            status = "free — 100% of parent";
+            statusClass = "status-free";
+          }
+          $("mmStatusTxt").innerHTML =
+            status +
+            '<span class="status-pill ' +
+            statusClass +
+            '">' +
+            actual +
+            "px</span>";
+          $("mmStatus").querySelector("i").style.background =
+            contentWidth < min
+              ? "var(--border-c)"
+              : contentWidth > max
+                ? "var(--margin-c)"
+                : "var(--padding-c)";
+
+          $("codeMm").innerHTML = rule(".box", [
+            `width: 100%`,
+            `min-width: ${min}px`,
+            `max-width: ${max}px`,
+          ]);
+        }
+        range($("rFrame"), $("oFrame"), (v) => v + "px", renderMm);
+        range($("rMin"), $("oMin"), (v) => v + "px", renderMm);
+        range($("rMax"), $("oMax"), (v) => v + "px", renderMm);
+
+        /* ---------- 03 min/max height ---------- */
+        const LINES = [
+          "Aurora Coffee — small-batch beans roasted every Tuesday.",
+          "Aurora Coffee — small-batch beans roasted every Tuesday.<br>Shipped within 24 hours, in paper not plastic.<br>No subscriptions, no nonsense.",
+          "Aurora Coffee — small-batch beans roasted every Tuesday.<br>Shipped within 24 hours, in paper not plastic.<br>No subscriptions, no nonsense.<br>Ethically sourced from three farms in Ethiopia, Colombia and Guatemala.<br>Roast profile: medium, fruity, clean finish.<br>Grind on demand, or whole bean.",
+        ];
+        function renderVh() {
+          const min = +$("rVhMin").value,
+            max = +$("rVhMax").value;
+          const box = $("vhBox");
+          box.style.minHeight = min + "px";
+          box.style.maxHeight = max + "px";
+
+          // Show actual rendered height
+          requestAnimationFrame(() => {
+            const actual = box.offsetHeight;
+            box.querySelector(".val")?.remove();
+            const valEl = document.createElement("div");
+            valEl.className = "val";
+            valEl.textContent = "renders " + actual + "px";
+            box.appendChild(valEl);
+          });
+
+          $("codeVh").innerHTML = rule(".box", [
+            `min-height: ${min}px`,
+            `max-height: ${max}px`,
+          ]);
+        }
+        range($("rVhMin"), $("oVhMin"), (v) => v + "px", renderVh);
+        range($("rVhMax"), $("oVhMax"), (v) => v + "px", renderVh);
+        document.querySelectorAll("#vertical .sel-chip").forEach((c) =>
+          c.addEventListener("click", () => {
+            document
+              .querySelectorAll("#vertical .sel-chip")
+              .forEach((x) => x.classList.remove("on"));
+            c.classList.add("on");
+            $("vhContent").innerHTML = LINES[+c.dataset.n - 1];
+            renderVh();
+          }),
+        );
+
+        /* ---------- 04 auto ---------- */
+        const A = { disp: "block", w: "auto" };
+        function renderAuto() {
+          const b = $("autoBox");
+          b.style.display = A.disp;
+          b.style.width = A.w;
+          $("autoLab").textContent =
+            "display: " +
+            A.disp +
+            (A.disp === "inline-block" ? " · width: " + A.w : "");
+          $("codeAuto").innerHTML = rule(".box", [
+            `display: ${A.disp}`,
+            `width: ${A.w}`,
+          ]);
+        }
+        initSeg($("segAuto"), (v) => {
+          A.disp = v;
+          renderAuto();
+        });
+        initSeg($("segAutoW"), (v) => {
+          A.w = v;
+          renderAuto();
+        });
+
+        /* ---------- 05 intrinsic ---------- */
+        function renderIntr() {
+          const boxes = [...document.querySelectorAll(".intr-box")];
+          $("mFit").textContent = "width: " + boxes[0].offsetWidth + "px";
+          $("mMin").textContent = "width: " + boxes[1].offsetWidth + "px";
+          $("mMax").textContent = "width: " + boxes[2].offsetWidth + "px";
+          $("codeIntr").innerHTML =
+            rule(".a", [`width: fit-content`]) +
+            "\n" +
+            rule(".b", [`width: min-content`]) +
+            "\n" +
+            rule(".c", [`width: max-content`]);
+        }
+        document.querySelectorAll("#intrTextChips .sel-chip").forEach((c) =>
+          c.addEventListener("click", () => {
+            document
+              .querySelectorAll("#intrTextChips .sel-chip")
+              .forEach((x) => x.classList.remove("on"));
+            c.classList.add("on");
+            document
+              .querySelectorAll(".intr-box")
+              .forEach((b) => (b.textContent = c.dataset.t));
+            requestAnimationFrame(renderIntr);
+          }),
+        );
+        document.querySelectorAll(".intr").forEach((el) => {
+          el.addEventListener("mouseenter", () => {
+            document
+              .querySelectorAll(".intr")
+              .forEach((x) => x.classList.toggle("on", x === el));
+          });
+          el.addEventListener("mouseleave", () => {
+            document
+              .querySelectorAll(".intr")
+              .forEach((x) => x.classList.remove("on"));
+          });
+        });
+        requestAnimationFrame(renderIntr);
+
+        /* ---------- lesson track ---------- */
+        const t = $("lnTrack");
+        for (let i = 0; i < 45; i++) {
+          const s = document.createElement("span");
+          s.className = "tick" + (i < 7 ? " done" : "");
+          s.title = "lesson " + (i + 1);
+          t.appendChild(s);
+        }
+
+        /* ---------- reveal ---------- */
+        const io = new IntersectionObserver(
+          (es) =>
+            es.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                io.unobserve(e.target);
+              }
+            }),
+          { threshold: 0.12 },
+        );
+        document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      })();
+    </script>
+  </body>
+</html>

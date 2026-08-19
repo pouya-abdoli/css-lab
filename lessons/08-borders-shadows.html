@@ -1,0 +1,1566 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Borders &amp; Shadows — Lesson 08</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' fill='none' stroke='%23f07f4f' stroke-width='2'/%3E%3Crect x='8' y='8' width='16' height='16' fill='none' stroke='%23f2c14e' stroke-width='2'/%3E%3Crect x='13' y='13' width='6' height='6' fill='%2358a6ff'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0e15;
+        --panel: #121826;
+        --panel2: #0d1220;
+        --ink: #10141d;
+        --line: #222c40;
+        --line2: #31405e;
+        --text: #e9eef7;
+        --muted: #8d9ab0;
+        --faint: #5b6a84;
+        --margin-c: #f07f4f;
+        --border-c: #f2c14e;
+        --padding-c: #3ecf8e;
+        --content-c: #58a6ff;
+        --pink: #ff4f8b;
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: dark;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 15px;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+      ::selection {
+        background: rgba(88, 166, 255, 0.35);
+      }
+      .mono {
+        font-family: var(--mono);
+      }
+      section {
+        scroll-margin-top: 76px;
+      }
+      b {
+        font-weight: 600;
+      }
+
+      .bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            700px 460px at 12% -6%,
+            rgba(242, 193, 78, 0.07),
+            transparent 60%
+          ),
+          radial-gradient(
+            760px 520px at 92% 22%,
+            rgba(88, 166, 255, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            600px 480px at 40% 105%,
+            rgba(62, 207, 142, 0.05),
+            transparent 60%
+          );
+      }
+      .bg::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(233, 238, 247, 0.035) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(233, 238, 247, 0.035) 1px,
+            transparent 1px
+          );
+        background-size: 28px 28px;
+        mask-image: radial-gradient(
+          ellipse 120% 90% at 50% 0%,
+          #000 40%,
+          transparent 100%
+        );
+      }
+      .bg .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.5;
+        animation: drift 26s ease-in-out infinite alternate;
+      }
+      .bg .g1 {
+        width: 420px;
+        height: 420px;
+        left: -120px;
+        top: 30%;
+        background: rgba(240, 127, 79, 0.1);
+      }
+      .bg .g2 {
+        width: 460px;
+        height: 460px;
+        right: -140px;
+        top: 60%;
+        background: rgba(88, 166, 255, 0.1);
+        animation-delay: -12s;
+      }
+      @keyframes drift {
+        from {
+          transform: translateY(-30px);
+        }
+        to {
+          transform: translateY(40px);
+        }
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 12px clamp(16px, 4vw, 44px);
+        background: rgba(11, 14, 21, 0.92);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar nav {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .topbar nav a {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 6px 11px;
+        border-radius: 999px;
+        transition: 0.2s;
+      }
+      .topbar nav a:hover {
+        color: var(--text);
+        background: #161d2c;
+      }
+      .lesson-tag {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--border-c);
+        border: 1px dashed rgba(242, 193, 78, 0.45);
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .wrap {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: 0 clamp(16px, 4vw, 44px);
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        padding: clamp(20px, 4vh, 48px) 0 clamp(30px, 5vh, 56px);
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--padding-c);
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(2.3rem, 5.2vw, 3.7rem);
+        line-height: 1.06;
+        letter-spacing: -0.02em;
+      }
+      .word-style {
+        display: inline-block;
+        padding: 0.02em 0.22em;
+        background: rgba(242, 193, 78, 0.16);
+        border: 0.06em solid var(--border-c);
+        border-radius: 0.14em;
+        color: #ffe3a1;
+        transition: transform 0.3s;
+        cursor: default;
+      }
+      .word-style:hover {
+        transform: rotate(-2deg) scale(1.03);
+      }
+      .lede {
+        color: var(--muted);
+        max-width: 56ch;
+        margin-top: 18px;
+        font-size: 1.05rem;
+      }
+      .lede b {
+        color: var(--text);
+      }
+      .css-full {
+        display: inline-block;
+        margin-top: 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--faint);
+        letter-spacing: 0.08em;
+      }
+      .intro-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 26px;
+        display: grid;
+        place-items: center;
+        gap: 16px;
+        box-shadow: 0 30px 60px -40px rgba(0, 0, 0, 0.8);
+      }
+      #introBox {
+        width: 150px;
+        height: 104px;
+        background: rgba(88, 166, 255, 0.17);
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: #a7cdff;
+        transition: all 0.5s;
+      }
+      .intro-fmt {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--content-c);
+        background: var(--ink);
+        border: 1px solid var(--line2);
+        border-radius: 9px;
+        padding: 7px 16px;
+        min-height: 36px;
+      }
+      .imode {
+        font-size: 11px;
+        color: var(--faint);
+        letter-spacing: 0.1em;
+      }
+
+      .sec {
+        padding: clamp(36px, 6vh, 64px) 0;
+      }
+      .sec-head {
+        margin-bottom: 26px;
+        max-width: 72ch;
+      }
+      .sec-head h2 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+        letter-spacing: -0.015em;
+        line-height: 1.15;
+      }
+      .sec-head .lede {
+        margin-top: 10px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 18px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .panel-head h3 {
+        font-family: var(--disp);
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dots i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dots i:nth-child(1) {
+        background: #f07f4f;
+      }
+      .dots i:nth-child(2) {
+        background: #f2c14e;
+      }
+      .dots i:nth-child(3) {
+        background: #3ecf8e;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.85;
+        overflow-x: auto;
+      }
+      .c-sel {
+        color: #7fe0b0;
+      }
+      .c-prop {
+        color: #8ab4ff;
+      }
+      .c-val {
+        color: #f2c14e;
+      }
+      .c-com {
+        color: #5b6a84;
+      }
+      .grp {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+
+      .pick-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 18px;
+        align-items: stretch;
+      }
+      .stage-wrap {
+        padding: 28px;
+        display: grid;
+        place-items: center;
+        min-height: 340px;
+      }
+      .side {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .sel-chip {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .sel-chip:hover {
+        color: var(--text);
+        border-color: var(--content-c);
+        transform: translateY(-2px);
+      }
+      .sel-chip.on {
+        color: #0e1017;
+        background: var(--content-c);
+        border-color: var(--content-c);
+        font-weight: 600;
+      }
+      .code-box {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .code-box pre {
+        min-height: 0;
+        font-size: 12.5px;
+      }
+      .side-note {
+        font-size: 12px;
+        color: var(--faint);
+      }
+      .segmented {
+        position: relative;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 1fr;
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        padding: 3px;
+      }
+      .segmented button {
+        position: relative;
+        z-index: 1;
+        background: none;
+        border: 0;
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--muted);
+        padding: 8px 4px;
+        cursor: pointer;
+        transition: color 0.25s;
+        border-radius: 8px;
+      }
+      .segmented button:hover {
+        color: var(--text);
+      }
+      .segmented button.active {
+        color: #fff;
+      }
+      .seg-thumb {
+        position: absolute;
+        top: 3px;
+        bottom: 3px;
+        left: 3px;
+        width: calc((100% - 6px) / 2);
+        background: #26334c;
+        border-radius: 8px;
+        transition:
+          transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+          width 0.28s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      }
+
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        outline: none;
+        cursor: pointer;
+        background: linear-gradient(
+          90deg,
+          var(--ac) var(--fill, 50%),
+          #232c40 var(--fill, 50%)
+        );
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        transition: transform 0.15s;
+      }
+      input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.15);
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+      }
+      .ctl {
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 7px 11px;
+        transition: 0.2s;
+      }
+      .ctl:hover {
+        background: #101725;
+        border-color: var(--line);
+      }
+      .ctl-top {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+      .ctl-top label {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text);
+      }
+      .ctl-val {
+        margin-left: auto;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--ac);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 2px 9px;
+      }
+      input[type="color"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 48px;
+        height: 34px;
+        border: 1px solid var(--line2);
+        border-radius: 9px;
+        background: none;
+        padding: 2px;
+        cursor: pointer;
+      }
+      input[type="color"]::-webkit-color-swatch-wrapper {
+        padding: 2px;
+      }
+      input[type="color"]::-webkit-color-swatch {
+        border: none;
+        border-radius: 6px;
+      }
+      input[type="color"]::-moz-color-swatch {
+        border: none;
+        border-radius: 6px;
+      }
+      .picker-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .picker-row label {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        flex: 1;
+      }
+
+      /* stages */
+      .bs-box {
+        width: 200px;
+        height: 140px;
+        background: rgba(88, 166, 255, 0.17);
+        display: grid;
+        place-items: center;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: #a7cdff;
+        border: 6px solid var(--border-c);
+        transition: all 0.25s;
+      }
+      .rad-box {
+        width: 170px;
+        height: 170px;
+        background: linear-gradient(
+          135deg,
+          rgba(240, 127, 79, 0.5),
+          rgba(242, 193, 78, 0.5)
+        );
+        display: grid;
+        place-items: center;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: #fff;
+        transition: border-radius 0.3s;
+        border-radius: 0;
+      }
+      .sh-box {
+        width: 180px;
+        height: 120px;
+        background: #1a2334;
+        border: 1px solid var(--line2);
+        border-radius: 14px;
+        display: grid;
+        place-items: center;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--muted);
+        transition: box-shadow 0.3s;
+      }
+      .ob-box {
+        box-sizing: content-box;
+        width: 200px;
+        height: 120px;
+        background: rgba(88, 166, 255, 0.17);
+        display: grid;
+        place-items: center;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: #a7cdff;
+        transition: all 0.25s;
+      }
+      .read {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 14px;
+      }
+      .read b {
+        color: var(--text);
+      }
+      .focus-demo {
+        font-family: var(--body);
+        font-size: 13px;
+        font-weight: 600;
+        color: #fff;
+        background: var(--margin-c);
+        border: none;
+        border-radius: 999px;
+        padding: 10px 22px;
+        cursor: pointer;
+      }
+      .focus-demo:focus-visible {
+        outline: 3px dashed var(--content-c);
+        outline-offset: 5px;
+      }
+
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      @media (min-width: 1180px) {
+        .notes-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media (max-width: 640px) {
+        .notes-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .note-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.3s,
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+      .note-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--nc);
+        opacity: 0.85;
+      }
+      .note-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--nc);
+        box-shadow: 0 24px 44px -28px rgba(0, 0, 0, 0.85);
+      }
+      .note-card h3 {
+        font-family: var(--mono);
+        font-size: 15px;
+        color: var(--nc);
+        margin-bottom: 8px;
+      }
+      .note-card p {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .note-tip {
+        margin-top: 12px;
+        font-size: 11px;
+        color: var(--faint);
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+      }
+      .note-demo {
+        height: 104px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        overflow: hidden;
+      }
+      .demo-bo {
+        width: 60%;
+        height: 44px;
+        background: rgba(88, 166, 255, 0.15);
+        border-radius: 6px;
+        position: relative;
+        transition: 0.3s;
+      }
+      .demo-bo::before {
+        content: "";
+        position: absolute;
+        inset: -8px;
+        border: 3px solid var(--border-c);
+        border-radius: 10px;
+        transition: 0.3s;
+        opacity: 0;
+      }
+      .note-card:hover .demo-bo::before {
+        opacity: 1;
+        inset: -4px;
+      }
+      .demo-rad {
+        width: 64px;
+        height: 64px;
+        background: linear-gradient(135deg, var(--margin-c), var(--border-c));
+        border-radius: 6px;
+        transition: border-radius 0.45s;
+      }
+      .note-card:hover .demo-rad {
+        border-radius: 50%;
+      }
+      .demo-ms {
+        width: 64px;
+        height: 44px;
+        background: #1a2334;
+        border: 1px solid var(--line2);
+        border-radius: 8px;
+        transition: box-shadow 0.4s;
+      }
+      .note-card:hover .demo-ms {
+        box-shadow:
+          0 2px 4px rgba(0, 0, 0, 0.5),
+          0 10px 24px rgba(0, 0, 0, 0.45),
+          0 0 24px rgba(88, 166, 255, 0.4);
+      }
+      .demo-ol {
+        font-family: var(--body);
+        font-size: 12px;
+        font-weight: 600;
+        color: #fff;
+        background: var(--content-c);
+        border: none;
+        border-radius: 999px;
+        padding: 8px 18px;
+        transition: 0.3s;
+      }
+      .note-card:hover .demo-ol {
+        outline: 3px dashed var(--content-c);
+        outline-offset: 5px;
+      }
+
+      .lesson-nav {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px clamp(18px, 3vw, 28px);
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+        align-items: center;
+      }
+      .ln-status {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--padding-c);
+        border: 1px solid rgba(62, 207, 142, 0.45);
+        border-radius: 999px;
+        padding: 3px 10px;
+      }
+      .lesson-nav h3 {
+        font-family: var(--disp);
+        font-size: 17px;
+        margin-top: 8px;
+      }
+      .ln-track {
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .tick {
+        width: 7px;
+        height: 15px;
+        border-radius: 2px;
+        background: #212a3e;
+        transition: 0.2s;
+      }
+      .tick.done {
+        background: var(--padding-c);
+        box-shadow: 0 0 8px rgba(62, 207, 142, 0.55);
+      }
+      .tick:hover {
+        background: var(--line2);
+      }
+      .ln-next {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        text-align: right;
+      }
+      .ln-next span {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .ln-next b {
+        font-family: var(--disp);
+        font-size: 15px;
+        color: var(--text);
+      }
+      footer {
+        border-top: 1px solid var(--line);
+        margin-top: 40px;
+        padding: 30px 0 44px;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+        color: var(--faint);
+        font-size: 12.5px;
+      }
+      footer .mono {
+        font-size: 11.5px;
+      }
+      footer .sp {
+        margin-left: auto;
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+      @media (max-width: 1020px) {
+        .intro {
+          grid-template-columns: 1fr;
+        }
+        .pick-grid {
+          grid-template-columns: 1fr;
+        }
+        .lesson-nav {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .ln-next {
+          align-items: center;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg">
+      <span class="glow g1"></span><span class="glow g2"></span>
+    </div>
+
+    <header class="topbar">
+      <span class="lesson-tag">lesson 08 / 45</span>
+      <nav>
+        <a href="#styles">border-styles</a>
+        <a href="#radius">radius</a>
+        <a href="#shadow">box-shadow</a>
+        <a href="#multi">multi-shadow</a>
+        <a href="#outline">outline</a>
+        <a href="#notes">cheat-codes</a>
+      </nav>
+    </header>
+
+    <div class="wrap">
+      <!-- ============ intro ============ -->
+      <section class="intro">
+        <div>
+          <p class="eyebrow">lesson 08 · interactive</p>
+          <h1>Borders frame. Shadows <span class="word-style">lift</span>.</h1>
+          <p class="lede">
+            A border is a line with a job: separate, connect, decorate. A shadow
+            is a lie with a better job: <b>depth</b>. Learn the eight border
+            styles, the radius that turns squares into circles, shadows that
+            stack, and the outline that never takes space.
+          </p>
+          <span class="css-full">D · EPTH · W · ITHOUT · D · IMENSION</span>
+        </div>
+        <div class="intro-panel">
+          <div id="introBox">box</div>
+          <span class="intro-fmt" id="introFmt">border: 4px solid #f2c14e</span>
+          <p class="imode mono">one box, dressed five ways…</p>
+        </div>
+      </section>
+
+      <!-- ============ 01 · border styles ============ -->
+      <section id="styles" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">01 · border styles</p>
+          <h2>width · style · color</h2>
+          <p class="lede">
+            The shorthand is always the same three words in any order. The
+            <b>style</b> is the personality — try all eight.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>the frame</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="bs-box" id="b1Box">content</div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--border-c)">
+              <div class="ctl-top">
+                <label for="rB1w">border-width</label
+                ><output class="ctl-val" id="oB1w">6px</output>
+              </div>
+              <input type="range" id="rB1w" min="1" max="20" value="6" />
+            </div>
+            <p class="grp">border-style</p>
+            <div class="chips" id="b1Styles">
+              <button class="sel-chip on" data-v="solid">solid</button>
+              <button class="sel-chip" data-v="dashed">dashed</button>
+              <button class="sel-chip" data-v="dotted">dotted</button>
+              <button class="sel-chip" data-v="double">double</button>
+              <button class="sel-chip" data-v="groove">groove</button>
+              <button class="sel-chip" data-v="ridge">ridge</button>
+              <button class="sel-chip" data-v="inset">inset</button>
+              <button class="sel-chip" data-v="outset">outset</button>
+            </div>
+            <div class="picker-row">
+              <label for="colB1">border-color</label
+              ><input type="color" id="colB1" value="#f2c14e" />
+            </div>
+            <div class="code-box"><pre id="codeB1"></pre></div>
+            <p class="side-note">
+              groove / ridge / inset / outset fake 3D with two tones of your
+              color — very 1998, occasionally brilliant.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 02 · border-radius ============ -->
+      <section id="radius" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">02 · border-radius</p>
+          <h2>From square to circle to leaf</h2>
+          <p class="lede">
+            One value rounds all four corners.
+            <span class="mono" style="color: var(--border-c)">50%</span> on a
+            square makes a circle. Uneven values make… organic things.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>morph it</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="rad-box" id="b2Box">radius</div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--margin-c)">
+              <div class="ctl-top">
+                <label for="rRad">border-radius</label
+                ><output class="ctl-val" id="oRad">0px</output>
+              </div>
+              <input type="range" id="rRad" min="0" max="85" value="0" />
+            </div>
+            <p class="grp">presets</p>
+            <div class="chips" id="radChips">
+              <button class="sel-chip on" data-v="0px">square</button>
+              <button class="sel-chip" data-v="16px">soft</button>
+              <button class="sel-chip" data-v="999px">pill</button>
+              <button class="sel-chip" data-v="50%">circle</button>
+              <button
+                class="sel-chip"
+                data-v="30% 70% 70% 30% / 30% 30% 70% 70%"
+              >
+                leaf
+              </button>
+            </div>
+            <div class="code-box"><pre id="codeB2"></pre></div>
+            <p class="side-note">
+              <span class="mono">999px</span> is the pill trick: a radius bigger
+              than the box clamps to half its height — perfect for buttons &amp;
+              tags.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 03 · box-shadow ============ -->
+      <section id="shadow" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">03 · box-shadow</p>
+          <h2>x · y · blur · spread · color</h2>
+          <p class="lede">
+            Five numbers and a color, and a flat card suddenly floats. Drag each
+            — the shadow obeys. Flip <b>inset</b> to push the light
+            <i>inside</i>.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>make it float</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="sh-box" id="b3Box">card</div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rX">offset-x</label
+                ><output class="ctl-val" id="oX">0px</output>
+              </div>
+              <input type="range" id="rX" min="-40" max="40" value="0" />
+            </div>
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rY">offset-y</label
+                ><output class="ctl-val" id="oY">14px</output>
+              </div>
+              <input type="range" id="rY" min="-40" max="40" value="14" />
+            </div>
+            <div class="ctl" style="--ac: var(--border-c)">
+              <div class="ctl-top">
+                <label for="rBlur">blur</label
+                ><output class="ctl-val" id="oBlur">30px</output>
+              </div>
+              <input type="range" id="rBlur" min="0" max="60" value="30" />
+            </div>
+            <div class="ctl" style="--ac: var(--margin-c)">
+              <div class="ctl-top">
+                <label for="rSpr">spread</label
+                ><output class="ctl-val" id="oSpr">0px</output>
+              </div>
+              <input type="range" id="rSpr" min="-20" max="40" value="0" />
+            </div>
+            <div class="picker-row">
+              <label for="colB3">color</label
+              ><input type="color" id="colB3" value="#000000" />
+            </div>
+            <div class="segmented" id="segInset">
+              <span class="seg-thumb"></span>
+              <button data-v="out" class="active">outer</button>
+              <button data-v="in">inset</button>
+            </div>
+            <div class="code-box"><pre id="codeB3"></pre></div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 04 · multiple shadows ============ -->
+      <section id="multi" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">04 · multiple shadows</p>
+          <h2>Comma-separated, first on top</h2>
+          <p class="lede">
+            Shadows stack like paper: the <b>first</b> one you write sits on
+            top. Toggle the three layers and watch them combine into one
+            believable depth.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>stack the light</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="sh-box" id="b4Box">card</div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <p class="grp">toggle layers</p>
+            <div class="chips" id="layChips">
+              <button class="sel-chip on" data-i="0">① contact</button>
+              <button class="sel-chip on" data-i="1">② soft</button>
+              <button class="sel-chip" data-i="2">③ glow</button>
+            </div>
+            <div class="code-box"><pre id="codeB4"></pre></div>
+            <p class="side-note">
+              Real UI depth = a tight dark shadow (contact) + a wide soft one
+              (ambient). The glow is pure style.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 05 · outline ============ -->
+      <section id="outline" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">05 · outline</p>
+          <h2>The border that takes no space</h2>
+          <p class="lede">
+            Same box, three modes. Add a <b>border</b> and the box grows —
+            layout shifts. Add an <b>outline</b> and nothing moves: it draws
+            <i>outside</i>, over whatever is there. That's why focus rings use
+            it.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>border vs outline</h3>
+            </div>
+            <div class="stage-wrap" style="gap: 18px">
+              <div class="ob-box" id="b5Box">200px content-box</div>
+              <p class="read" id="readB5"></p>
+              <button class="focus-demo" id="focusBtn">
+                tab to me (or click)
+              </button>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="segmented" id="segMode">
+              <span
+                class="seg-thumb"
+                style="width: calc((100% - 6px) / 3)"
+              ></span>
+              <button data-v="none" class="active">none</button>
+              <button data-v="border">border</button>
+              <button data-v="outline">outline</button>
+            </div>
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rOff">outline-offset</label
+                ><output class="ctl-val" id="oOff">4px</output>
+              </div>
+              <input type="range" id="rOff" min="0" max="16" value="4" />
+            </div>
+            <p class="grp">outline-style</p>
+            <div class="chips" id="outStyles">
+              <button class="sel-chip on" data-v="solid">solid</button>
+              <button class="sel-chip" data-v="dashed">dashed</button>
+              <button class="sel-chip" data-v="dotted">dotted</button>
+              <button class="sel-chip" data-v="double">double</button>
+            </div>
+            <div class="code-box"><pre id="codeB5"></pre></div>
+            <p class="side-note">
+              Never remove focus outlines without a replacement — keyboard users
+              navigate by them. Restyle, don't erase.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 06 · field notes ============ -->
+      <section id="notes" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">06 · field notes</p>
+          <h2>Cheat codes from lesson 08</h2>
+        </div>
+        <div class="notes-grid">
+          <article class="note-card" style="--nc: var(--border-c)">
+            <div class="note-demo"><div class="demo-bo"></div></div>
+            <h3>border vs outline</h3>
+            <p>
+              Border takes space and follows the radius. Outline takes
+              <b>no</b> space, draws outside, and can offset away from the box.
+              Focus rings = outline.
+            </p>
+            <p class="note-tip mono">
+              ↳ hover: the ring appears without moving anything
+            </p>
+          </article>
+          <article class="note-card" style="--nc: var(--margin-c)">
+            <div class="note-demo"><div class="demo-rad"></div></div>
+            <h3>radius recipes</h3>
+            <p>
+              <span class="mono">50%</span> = circle on a square.
+              <span class="mono">999px</span> = pill on anything. Four values =
+              four corners, clockwise from top-left.
+            </p>
+            <p class="note-tip mono">↳ hover: square becomes circle</p>
+          </article>
+          <article class="note-card" style="--nc: var(--content-c)">
+            <div class="note-demo"><div class="demo-ms"></div></div>
+            <h3>shadows stack</h3>
+            <p>
+              Comma-separated, first written = topmost. Tight+dark for contact,
+              wide+soft for ambient. Two shadows beat one loud shadow.
+            </p>
+            <p class="note-tip mono">↳ hover: three layers combine</p>
+          </article>
+          <article class="note-card" style="--nc: var(--padding-c)">
+            <div class="note-demo"><button class="demo-ol">button</button></div>
+            <h3>keep the ring</h3>
+            <p>
+              <span class="mono">:focus-visible</span> + a custom outline =
+              accessible <i>and</i> on-brand.
+              <span class="mono">outline: none</span> with no replacement is a
+              bug, not a style choice.
+            </p>
+            <p class="note-tip mono">↳ hover: the focus ring, restyled</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ lesson nav ============ -->
+      <div class="lesson-nav reveal">
+        <div>
+          <span class="ln-status">✓ completed</span>
+          <h3>08 — Borders &amp; Shadows</h3>
+        </div>
+        <div class="ln-track" id="lnTrack"></div>
+        <div class="ln-next">
+          <span>up next</span>
+          <b>09 · Display</b>
+        </div>
+      </div>
+
+      <footer>
+        <span class="mono">drag things, break things, learn things.</span>
+        <span class="sp mono"
+          >45 lessons · lesson 08 · borders &amp; shadows</span
+        >
+      </footer>
+    </div>
+    <!-- /wrap -->
+
+    <script>
+      (() => {
+        const $ = (id) => document.getElementById(id);
+        const rule = (sel, decls) =>
+          `<span class="c-sel">${sel}</span> {\n${decls
+            .map((d) => {
+              const i = d.indexOf(":");
+              return `  <span class="c-prop">${d.slice(0, i)}</span>: <span class="c-val">${d.slice(i + 1).trim()}</span>;`;
+            })
+            .join("\n")}\n}`;
+        function range(el, out, fmt, cb) {
+          const f = () => {
+            const v = +el.value;
+            out.textContent = fmt(v);
+            const min = +el.min,
+              max = +el.max;
+            el.style.setProperty(
+              "--fill",
+              ((v - min) / (max - min)) * 100 + "%",
+            );
+            cb(v);
+          };
+          el.addEventListener("input", f);
+          f();
+        }
+        function initSeg(seg, onPick) {
+          const btns = [...seg.querySelectorAll("button")],
+            thumb = seg.querySelector(".seg-thumb"),
+            n = btns.length;
+          function set(i) {
+            btns.forEach((b, j) => b.classList.toggle("active", i === j));
+            thumb.style.width = `calc((100% - 6px)/${n})`;
+            thumb.style.transform = `translateX(${i * 100}%)`;
+          }
+          btns.forEach((b, i) =>
+            b.addEventListener("click", () => {
+              set(i);
+              onPick(b.dataset.v);
+            }),
+          );
+          set(0);
+        }
+        function chipGroup(box, cb) {
+          box.addEventListener("click", (e) => {
+            const c = e.target.closest(".sel-chip");
+            if (!c) return;
+            box
+              .querySelectorAll(".sel-chip")
+              .forEach((x) => x.classList.remove("on"));
+            c.classList.add("on");
+            cb(c.dataset.v || c.dataset.i);
+          });
+        }
+
+        /* ---------- intro cycle ---------- */
+        const LOOKS = [
+          {
+            l: "border: 4px solid #f2c14e",
+            s: {
+              border: "4px solid #f2c14e",
+              borderRadius: "8px",
+              boxShadow: "none",
+              outline: "none",
+              outlineOffset: "0",
+            },
+          },
+          {
+            l: "border-radius: 26px",
+            s: {
+              border: "4px solid #f2c14e",
+              borderRadius: "26px",
+              boxShadow: "none",
+              outline: "none",
+            },
+          },
+          {
+            l: "box-shadow: 0 18px 40px rgba(240,127,79,.45)",
+            s: {
+              border: "4px solid #f2c14e",
+              borderRadius: "26px",
+              boxShadow: "0 18px 40px rgba(240,127,79,.45)",
+              outline: "none",
+            },
+          },
+          {
+            l: "outline: 3px dashed #58a6ff; outline-offset: 6px",
+            s: {
+              border: "4px solid #f2c14e",
+              borderRadius: "26px",
+              boxShadow: "0 18px 40px rgba(240,127,79,.45)",
+              outline: "3px dashed #58a6ff",
+              outlineOffset: "6px",
+            },
+          },
+          {
+            l: "border: none — back to raw",
+            s: {
+              border: "none",
+              borderRadius: "8px",
+              boxShadow: "none",
+              outline: "none",
+              outlineOffset: "0",
+            },
+          },
+        ];
+        let li = 0;
+        function look() {
+          const L = LOOKS[li],
+            b = $("introBox");
+          Object.assign(b.style, L.s);
+          $("introFmt").textContent = L.l;
+          li = (li + 1) % LOOKS.length;
+        }
+        look();
+        setInterval(look, 2200);
+
+        /* ---------- 01 border styles ---------- */
+        const B1 = { w: 6, st: "solid", c: "#f2c14e" };
+        function renderB1() {
+          $("b1Box").style.border = `${B1.w}px ${B1.st} ${B1.c}`;
+          $("codeB1").innerHTML = rule(".card", [
+            `border: ${B1.w}px ${B1.st} ${B1.c}`,
+          ]);
+        }
+        range(
+          $("rB1w"),
+          $("oB1w"),
+          (v) => v + "px",
+          (v) => {
+            B1.w = v;
+            renderB1();
+          },
+        );
+        $("colB1").addEventListener("input", (e) => {
+          B1.c = e.target.value;
+          renderB1();
+        });
+        chipGroup($("b1Styles"), (v) => {
+          B1.st = v;
+          renderB1();
+        });
+        renderB1();
+
+        /* ---------- 02 radius ---------- */
+        function renderB2(v) {
+          $("b2Box").style.borderRadius = v;
+          $("codeB2").innerHTML = rule(".card", [`border-radius: ${v}`]);
+        }
+        range(
+          $("rRad"),
+          $("oRad"),
+          (v) => v + "px",
+          (v) => {
+            document
+              .querySelectorAll("#radChips .sel-chip")
+              .forEach((x, i) => x.classList.toggle("on", i === 0 && v === 0));
+            renderB2(v + "px");
+          },
+        );
+        chipGroup($("radChips"), (v) => {
+          renderB2(v);
+        });
+
+        /* ---------- 03 box-shadow ---------- */
+        const B3 = { x: 0, y: 14, bl: 30, sp: 0, c: "#000000", inset: false };
+        function renderB3() {
+          const sh = `${B3.inset ? "inset " : ""}${B3.x}px ${B3.y}px ${B3.bl}px ${B3.sp}px ${B3.c}cc`;
+          $("b3Box").style.boxShadow = sh;
+          $("codeB3").innerHTML = rule(".card", [`box-shadow: ${sh}`]);
+        }
+        range(
+          $("rX"),
+          $("oX"),
+          (v) => v + "px",
+          (v) => {
+            B3.x = v;
+            renderB3();
+          },
+        );
+        range(
+          $("rY"),
+          $("oY"),
+          (v) => v + "px",
+          (v) => {
+            B3.y = v;
+            renderB3();
+          },
+        );
+        range(
+          $("rBlur"),
+          $("oBlur"),
+          (v) => v + "px",
+          (v) => {
+            B3.bl = v;
+            renderB3();
+          },
+        );
+        range(
+          $("rSpr"),
+          $("oSpr"),
+          (v) => v + "px",
+          (v) => {
+            B3.sp = v;
+            renderB3();
+          },
+        );
+        $("colB3").addEventListener("input", (e) => {
+          B3.c = e.target.value;
+          renderB3();
+        });
+        initSeg($("segInset"), (v) => {
+          B3.inset = v === "in";
+          renderB3();
+        });
+        renderB3();
+
+        /* ---------- 04 multiple shadows ---------- */
+        const LAYERS = [
+          "0 1px 2px rgba(0,0,0,.5)",
+          "0 12px 28px rgba(0,0,0,.4)",
+          "0 0 32px rgba(88,166,255,.45)",
+        ];
+        const LON = [true, true, false];
+        function renderB4() {
+          const act = LAYERS.filter((_, i) => LON[i]);
+          $("b4Box").style.boxShadow = act.length ? act.join(", ") : "none";
+          $("codeB4").innerHTML = rule(".card", [
+            `box-shadow:${act.length ? "\n    " + act.join(",\n    ") : " none"}`,
+          ]);
+        }
+        $("layChips").addEventListener("click", (e) => {
+          const c = e.target.closest(".sel-chip");
+          if (!c) return;
+          const i = +c.dataset.i;
+          LON[i] = !LON[i];
+          c.classList.toggle("on", LON[i]);
+          renderB4();
+        });
+        renderB4();
+
+        /* ---------- 05 outline ---------- */
+        const B5 = { mode: "none", off: 4, st: "solid" };
+        function renderB5() {
+          const b = $("b5Box");
+          b.style.border =
+            B5.mode === "border" ? "6px solid var(--border-c)" : "none";
+          b.style.outline =
+            B5.mode === "outline" ? `6px ${B5.st} var(--border-c)` : "none";
+          b.style.outlineOffset = B5.off + "px";
+          const w = b.offsetWidth;
+          $("readB5").innerHTML =
+            B5.mode === "border"
+              ? `rendered width: <b>${w}px</b> — border added 12px, layout moved`
+              : B5.mode === "outline"
+                ? `rendered width: <b>${w}px</b> — outline added 0px, nothing moved`
+                : `rendered width: <b>${w}px</b> — the declared size`;
+          $("codeB5").innerHTML =
+            B5.mode === "border"
+              ? rule(".card", [`border: 6px solid #f2c14e`])
+              : rule(".card", [
+                  `outline: 6px ${B5.st} #f2c14e`,
+                  `outline-offset: ${B5.off}px`,
+                ]);
+        }
+        initSeg($("segMode"), (v) => {
+          B5.mode = v;
+          renderB5();
+        });
+        range(
+          $("rOff"),
+          $("oOff"),
+          (v) => v + "px",
+          (v) => {
+            B5.off = v;
+            renderB5();
+          },
+        );
+        chipGroup($("outStyles"), (v) => {
+          B5.st = v;
+          renderB5();
+        });
+        renderB5();
+
+        /* ---------- lesson track ---------- */
+        const t = $("lnTrack");
+        for (let i = 0; i < 45; i++) {
+          const s = document.createElement("span");
+          s.className = "tick" + (i < 8 ? " done" : "");
+          s.title = "lesson " + (i + 1);
+          t.appendChild(s);
+        }
+
+        /* ---------- reveal ---------- */
+        const io = new IntersectionObserver(
+          (es) =>
+            es.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                io.unobserve(e.target);
+              }
+            }),
+          { threshold: 0.12 },
+        );
+        document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      })();
+    </script>
+  </body>
+</html>
