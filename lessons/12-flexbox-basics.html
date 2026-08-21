@@ -1,0 +1,1445 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flexbox Basics — Lesson 12</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' fill='none' stroke='%23f07f4f' stroke-width='2'/%3E%3Crect x='8' y='8' width='16' height='16' fill='none' stroke='%23f2c14e' stroke-width='2'/%3E%3Crect x='13' y='13' width='6' height='6' fill='%2358a6ff'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0e15;
+        --panel: #121826;
+        --panel2: #0d1220;
+        --ink: #10141d;
+        --line: #222c40;
+        --line2: #31405e;
+        --text: #e9eef7;
+        --muted: #8d9ab0;
+        --faint: #5b6a84;
+        --margin-c: #f07f4f;
+        --margin-bg: rgba(240, 127, 79, 0.14);
+        --border-c: #f2c14e;
+        --border-bg: rgba(242, 193, 78, 0.16);
+        --padding-c: #3ecf8e;
+        --padding-bg: rgba(62, 207, 142, 0.14);
+        --content-c: #58a6ff;
+        --content-bg: rgba(88, 166, 255, 0.17);
+        --pink: #ff4f8b;
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: dark;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 15px;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+      ::selection {
+        background: rgba(88, 166, 255, 0.35);
+      }
+      .mono {
+        font-family: var(--mono);
+      }
+      section {
+        scroll-margin-top: 76px;
+      }
+      b {
+        font-weight: 600;
+      }
+
+      .bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            700px 460px at 12% -6%,
+            rgba(242, 193, 78, 0.07),
+            transparent 60%
+          ),
+          radial-gradient(
+            760px 520px at 92% 22%,
+            rgba(88, 166, 255, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            600px 480px at 40% 105%,
+            rgba(62, 207, 142, 0.05),
+            transparent 60%
+          );
+      }
+      .bg::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(233, 238, 247, 0.035) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(233, 238, 247, 0.035) 1px,
+            transparent 1px
+          );
+        background-size: 28px 28px;
+        mask-image: radial-gradient(
+          ellipse 120% 90% at 50% 0%,
+          #000 40%,
+          transparent 100%
+        );
+      }
+      .bg .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.5;
+        animation: drift 26s ease-in-out infinite alternate;
+      }
+      .bg .g1 {
+        width: 420px;
+        height: 420px;
+        left: -120px;
+        top: 30%;
+        background: rgba(240, 127, 79, 0.1);
+      }
+      .bg .g2 {
+        width: 460px;
+        height: 460px;
+        right: -140px;
+        top: 60%;
+        background: rgba(88, 166, 255, 0.1);
+        animation-delay: -12s;
+      }
+      @keyframes drift {
+        from {
+          transform: translateY(-30px);
+        }
+        to {
+          transform: translateY(40px);
+        }
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 12px clamp(16px, 4vw, 44px);
+        background: rgba(11, 14, 21, 0.92);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar nav {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .topbar nav a {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 6px 11px;
+        border-radius: 999px;
+        transition: 0.2s;
+      }
+      .topbar nav a:hover {
+        color: var(--text);
+        background: #161d2c;
+      }
+      .lesson-tag {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--border-c);
+        border: 1px dashed rgba(242, 193, 78, 0.45);
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .wrap {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: 0 clamp(16px, 4vw, 44px);
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        padding: clamp(20px, 4vh, 48px) 0 clamp(30px, 5vh, 56px);
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--padding-c);
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(2.3rem, 5.2vw, 3.7rem);
+        line-height: 1.06;
+        letter-spacing: -0.02em;
+      }
+      .word-style {
+        display: inline-block;
+        padding: 0.02em 0.22em;
+        background: var(--padding-bg);
+        border: 0.06em solid var(--padding-c);
+        border-radius: 0.14em;
+        color: #b8f2d9;
+        transition: transform 0.3s;
+        cursor: default;
+      }
+      .word-style:hover {
+        transform: rotate(-2deg) scale(1.03);
+      }
+      .lede {
+        color: var(--muted);
+        max-width: 56ch;
+        margin-top: 18px;
+        font-size: 1.05rem;
+      }
+      .lede b {
+        color: var(--text);
+      }
+      .css-full {
+        display: inline-block;
+        margin-top: 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--faint);
+        letter-spacing: 0.08em;
+      }
+      .intro-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 26px;
+        display: grid;
+        place-items: center;
+        gap: 16px;
+        box-shadow: 0 30px 60px -40px rgba(0, 0, 0, 0.8);
+      }
+      .ix-box {
+        width: 100%;
+        max-width: 280px;
+        min-height: 150px;
+        border: 1px dashed var(--line2);
+        border-radius: 10px;
+        padding: 12px;
+        transition: 0.3s;
+      }
+      .ix-item {
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+        border-radius: 6px;
+        color: #a7cdff;
+        font-family: var(--mono);
+        font-size: 10px;
+        padding: 8px 12px;
+        margin: 6px 0;
+        transition: all 0.4s;
+      }
+      .intro-fmt {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--content-c);
+        background: var(--ink);
+        border: 1px solid var(--line2);
+        border-radius: 9px;
+        padding: 7px 16px;
+        min-height: 36px;
+      }
+      .imode {
+        font-size: 11px;
+        color: var(--faint);
+        letter-spacing: 0.1em;
+      }
+
+      .sec {
+        padding: clamp(36px, 6vh, 64px) 0;
+      }
+      .sec-head {
+        margin-bottom: 26px;
+        max-width: 72ch;
+      }
+      .sec-head h2 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+        letter-spacing: -0.015em;
+        line-height: 1.15;
+      }
+      .sec-head .lede {
+        margin-top: 10px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 18px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .panel-head h3 {
+        font-family: var(--disp);
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dots i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dots i:nth-child(1) {
+        background: #f07f4f;
+      }
+      .dots i:nth-child(2) {
+        background: #f2c14e;
+      }
+      .dots i:nth-child(3) {
+        background: #3ecf8e;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.85;
+        overflow-x: auto;
+      }
+      .c-sel {
+        color: #7fe0b0;
+      }
+      .c-prop {
+        color: #8ab4ff;
+      }
+      .c-val {
+        color: #f2c14e;
+      }
+      .c-com {
+        color: #5b6a84;
+      }
+      .grp {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+
+      .pick-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 18px;
+        align-items: stretch;
+      }
+      .stage-wrap {
+        padding: 28px;
+        display: grid;
+        place-items: center;
+        min-height: 340px;
+        gap: 16px;
+      }
+      .side {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .code-box {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .code-box pre {
+        min-height: 0;
+        font-size: 12.5px;
+      }
+      .side-note {
+        font-size: 12px;
+        color: var(--faint);
+      }
+      .ghost-btn {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--faint);
+        background: none;
+        border: 1px dashed var(--line2);
+        border-radius: 8px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .ghost-btn:hover {
+        color: var(--content-c);
+        border-color: var(--content-c);
+      }
+      .segmented {
+        position: relative;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 1fr;
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        padding: 3px;
+      }
+      .segmented button {
+        position: relative;
+        z-index: 1;
+        background: none;
+        border: 0;
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--muted);
+        padding: 8px 4px;
+        cursor: pointer;
+        transition: color 0.25s;
+        border-radius: 8px;
+      }
+      .segmented button:hover {
+        color: var(--text);
+      }
+      .segmented button.active {
+        color: #fff;
+      }
+      .seg-thumb {
+        position: absolute;
+        top: 3px;
+        bottom: 3px;
+        left: 3px;
+        width: calc((100% - 6px) / 2);
+        background: #26334c;
+        border-radius: 8px;
+        transition:
+          transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+          width 0.28s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      }
+      .read {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 14px;
+      }
+      .read b {
+        color: var(--text);
+      }
+
+      /* flex stages */
+      .fx-box {
+        width: 100%;
+        max-width: 440px;
+        border: 1px dashed var(--line2);
+        border-radius: 12px;
+        padding: 16px;
+        transition: all 0.3s;
+        position: relative;
+      }
+      .fx-lab {
+        position: absolute;
+        top: -9px;
+        left: 14px;
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--faint);
+        background: var(--panel);
+        padding: 0 8px;
+      }
+      .fx-items {
+        display: block;
+        transition: all 0.3s;
+      }
+      .fx-item {
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+        color: #a7cdff;
+        border-radius: 8px;
+        font-family: var(--mono);
+        font-size: 12px;
+        padding: 14px 18px;
+        margin: 8px 0;
+        transition: all 0.3s;
+        text-align: center;
+      }
+      .fx-items.flexed {
+        display: flex;
+        gap: 10px;
+      }
+      .fx-items.flexed .fx-item {
+        margin: 0;
+      }
+      .fx-box.lit-cont {
+        border-color: var(--padding-c);
+        box-shadow:
+          0 0 0 1px var(--padding-c),
+          0 0 26px rgba(62, 207, 142, 0.25);
+      }
+      .fx-item.lit {
+        border-color: var(--border-c);
+        color: #ffe3a1;
+        background: var(--border-bg);
+        box-shadow:
+          0 0 0 1px var(--border-c),
+          0 0 22px rgba(242, 193, 78, 0.25);
+      }
+      .prop-cols {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .prop-col {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 12px;
+        transition: 0.25s;
+      }
+      .prop-col h5 {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+      .prop-col ul {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+      .prop-col li {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--muted);
+      }
+      .prop-col.cont h5 {
+        color: var(--padding-c);
+      }
+      .prop-col.items h5 {
+        color: var(--border-c);
+      }
+      .prop-col.lit {
+        border-color: currentColor;
+      }
+
+      /* axes */
+      .axis-stage {
+        position: relative;
+        width: 100%;
+        max-width: 420px;
+        padding: 44px 52px 52px 16px;
+      }
+      .axis-box {
+        border: 1px dashed var(--line2);
+        border-radius: 12px;
+        padding: 16px;
+        min-height: 170px;
+        display: flex;
+        gap: 10px;
+        transition: all 0.35s;
+      }
+      .ax-it {
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+        color: #a7cdff;
+        border-radius: 8px;
+        font-family: var(--mono);
+        font-size: 12px;
+        padding: 16px 18px;
+        transition: all 0.35s;
+      }
+      .axis-arrow {
+        position: absolute;
+        font-size: 24px;
+        line-height: 1;
+        transition: transform 0.4s;
+        pointer-events: none;
+      }
+      #mainArrow {
+        color: var(--content-c);
+        left: 50%;
+        bottom: 10px;
+        transform: translateX(-50%);
+      }
+      #crossArrow {
+        color: var(--margin-c);
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%) rotate(90deg);
+      }
+      .axis-lab {
+        position: absolute;
+        font-family: var(--mono);
+        font-size: 9.5px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        pointer-events: none;
+      }
+      #mainLab {
+        color: var(--content-c);
+        left: 50%;
+        bottom: -6px;
+        transform: translateX(-50%);
+      }
+      #crossLab {
+        color: var(--margin-c);
+        right: -8px;
+        top: 14px;
+      }
+      .axis-chips {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .axis-chip {
+        font-family: var(--mono);
+        font-size: 11px;
+        padding: 6px 14px;
+        border-radius: 999px;
+        border: 1px solid;
+        background: var(--ink);
+      }
+      .axis-chip.m {
+        color: var(--content-c);
+        border-color: rgba(88, 166, 255, 0.5);
+      }
+      .axis-chip.c {
+        color: var(--margin-c);
+        border-color: rgba(240, 127, 79, 0.5);
+      }
+
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      @media (min-width: 1180px) {
+        .notes-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media (max-width: 640px) {
+        .notes-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .note-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.3s,
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+      .note-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--nc);
+        opacity: 0.85;
+      }
+      .note-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--nc);
+        box-shadow: 0 24px 44px -28px rgba(0, 0, 0, 0.85);
+      }
+      .note-card h3 {
+        font-family: var(--mono);
+        font-size: 15px;
+        color: var(--nc);
+        margin-bottom: 8px;
+      }
+      .note-card p {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .note-tip {
+        margin-top: 12px;
+        font-size: 11px;
+        color: var(--faint);
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+      }
+      .note-demo {
+        height: 104px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        overflow: hidden;
+      }
+      .demo-fl {
+        width: 70%;
+        border: 1px dashed var(--line2);
+        border-radius: 8px;
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        transition: 0.35s;
+      }
+      .demo-fl i {
+        height: 14px;
+        border-radius: 4px;
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+      }
+      .note-card:hover .demo-fl {
+        flex-direction: row;
+      }
+      .demo-ax {
+        position: relative;
+        width: 70px;
+        height: 70px;
+      }
+      .demo-ax::before,
+      .demo-ax::after {
+        content: "➜";
+        position: absolute;
+        font-size: 20px;
+        transition: 0.4s;
+      }
+      .demo-ax::before {
+        color: var(--content-c);
+        left: 50%;
+        bottom: -4px;
+        transform: translateX(-50%);
+      }
+      .demo-ax::after {
+        color: var(--margin-c);
+        right: -6px;
+        top: 50%;
+        transform: translateY(-50%) rotate(90deg);
+      }
+      .note-card:hover .demo-ax::before {
+        transform: translateX(-50%) rotate(90deg);
+      }
+      .note-card:hover .demo-ax::after {
+        transform: translateY(-50%) rotate(0deg);
+      }
+      .demo-ct {
+        width: 72%;
+        border: 1px dashed var(--line2);
+        border-radius: 8px;
+        padding: 8px;
+        display: flex;
+        gap: 6px;
+        transition: 0.3s;
+      }
+      .demo-ct i {
+        flex: 1;
+        height: 26px;
+        border-radius: 5px;
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+      }
+      .note-card:hover .demo-ct {
+        border-color: var(--padding-c);
+        box-shadow: 0 0 0 1px var(--padding-c);
+      }
+      .demo-rv {
+        display: flex;
+        gap: 6px;
+      }
+      .demo-rv i {
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+        font: 700 10px var(--mono);
+        color: #a7cdff;
+        display: grid;
+        place-items: center;
+        transition: 0.35s;
+      }
+      .note-card:hover .demo-rv {
+        flex-direction: row-reverse;
+      }
+
+      .lesson-nav {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px clamp(18px, 3vw, 28px);
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+        align-items: center;
+      }
+      .ln-status {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--padding-c);
+        border: 1px solid rgba(62, 207, 142, 0.45);
+        border-radius: 999px;
+        padding: 3px 10px;
+      }
+      .lesson-nav h3 {
+        font-family: var(--disp);
+        font-size: 17px;
+        margin-top: 8px;
+      }
+      .ln-track {
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .tick {
+        width: 7px;
+        height: 15px;
+        border-radius: 2px;
+        background: #212a3e;
+        transition: 0.2s;
+      }
+      .tick.done {
+        background: var(--padding-c);
+        box-shadow: 0 0 8px rgba(62, 207, 142, 0.55);
+      }
+      .tick:hover {
+        background: var(--line2);
+      }
+      .ln-next {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        text-align: right;
+      }
+      .ln-next span {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .ln-next b {
+        font-family: var(--disp);
+        font-size: 15px;
+        color: var(--text);
+      }
+      footer {
+        border-top: 1px solid var(--line);
+        margin-top: 40px;
+        padding: 30px 0 44px;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+        color: var(--faint);
+        font-size: 12.5px;
+      }
+      footer .mono {
+        font-size: 11.5px;
+      }
+      footer .sp {
+        margin-left: auto;
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+      @media (max-width: 1020px) {
+        .intro {
+          grid-template-columns: 1fr;
+        }
+        .pick-grid {
+          grid-template-columns: 1fr;
+        }
+        .lesson-nav {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .ln-next {
+          align-items: center;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg">
+      <span class="glow g1"></span><span class="glow g2"></span>
+    </div>
+
+    <header class="topbar">
+      <span class="lesson-tag">lesson 12 / 45</span>
+      <nav>
+        <a href="#flex">display-flex</a>
+        <a href="#roles">container · items</a>
+        <a href="#main-axis">main-axis</a>
+        <a href="#cross-axis">cross-axis</a>
+        <a href="#notes">cheat-codes</a>
+      </nav>
+    </header>
+
+    <div class="wrap">
+      <!-- ============ intro ============ -->
+      <section class="intro">
+        <div>
+          <p class="eyebrow">lesson 12 · interactive</p>
+          <h1>
+            One line turns a pile into a <span class="word-style">team</span>.
+          </h1>
+          <p class="lede">
+            <span class="mono">display: flex</span> is the switch. The parent
+            becomes a <b>flex container</b>, its children become
+            <b>flex items</b>, and suddenly two axes exist: the
+            <b>main axis</b> (where items flow) and the
+            <b>cross axis</b> (perpendicular). That's the whole idea —
+            everything else is alignment.
+          </p>
+          <span class="css-full">F · LEX · I · BLE · L · AYOUT</span>
+        </div>
+        <div class="intro-panel">
+          <div class="ix-box" id="ixBox">
+            <div class="ix-item">item 1</div>
+            <div class="ix-item">item 2</div>
+            <div class="ix-item">item 3</div>
+          </div>
+          <span class="intro-fmt" id="introFmt">display: block</span>
+          <p class="imode mono">one property, new physics…</p>
+        </div>
+      </section>
+
+      <!-- ============ 01 · display: flex ============ -->
+      <section id="flex" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">01 · display: flex</p>
+          <h2>The switch</h2>
+          <p class="lede">
+            Flip it and watch the children stop stacking. In <b>block</b> land
+            each div demands its own line. In <b>flex</b> land they line up side
+            by side and start sharing space. Nothing else in the HTML changed.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>same HTML, one property</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="fx-box">
+                <span class="fx-lab">.container</span>
+                <div class="fx-items" id="fxItems1">
+                  <div class="fx-item">1</div>
+                  <div class="fx-item">2</div>
+                  <div class="fx-item">3</div>
+                  <div class="fx-item">4</div>
+                </div>
+              </div>
+              <p class="read" id="readFlex"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="segmented" id="segFlex">
+              <span class="seg-thumb"></span>
+              <button data-v="block" class="active">display: block</button>
+              <button data-v="flex">display: flex</button>
+            </div>
+            <div class="code-box"><pre id="codeFlex"></pre></div>
+            <p class="side-note" id="flexNote"></p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 02 · container vs items ============ -->
+      <section id="roles" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">02 · flex container vs flex items</p>
+          <h2>Two jobs, two toolboxes</h2>
+          <p class="lede">
+            The <b>container</b> owns the layout: direction, alignment, gaps.
+            The <b>items</b> own their own behaviour: grow, shrink, self-align.
+            Mixing up which property goes where is the #1 flexbox bug. Click a
+            role to see its toolbox.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>who owns what?</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="fx-box" id="roleBox">
+                <span class="fx-lab">container</span>
+                <div class="fx-items flexed">
+                  <div class="fx-item" id="ri1">item</div>
+                  <div class="fx-item" id="ri2">item</div>
+                  <div class="fx-item" id="ri3">item</div>
+                </div>
+              </div>
+              <div class="prop-cols">
+                <div class="prop-col cont" id="colCont">
+                  <h5>container props</h5>
+                  <ul>
+                    <li>flex-direction</li>
+                    <li>justify-content</li>
+                    <li>align-items</li>
+                    <li>gap</li>
+                    <li>flex-wrap</li>
+                  </ul>
+                </div>
+                <div class="prop-col items" id="colItems">
+                  <h5>item props</h5>
+                  <ul>
+                    <li>flex-grow</li>
+                    <li>flex-shrink</li>
+                    <li>flex-basis</li>
+                    <li>align-self</li>
+                    <li>order</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="segmented" id="segRole">
+              <span
+                class="seg-thumb"
+                style="width: calc((100% - 6px) / 3)"
+              ></span>
+              <button data-v="container" class="active">container</button>
+              <button data-v="items">items</button>
+              <button data-v="both">both</button>
+            </div>
+            <div class="code-box"><pre id="codeRole"></pre></div>
+            <p class="side-note" id="roleNote"></p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 03 · main axis ============ -->
+      <section id="main-axis" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">03 · the main axis</p>
+          <h2>Where the items flow</h2>
+          <p class="lede">
+            <b>flex-direction</b> points the main axis. Items always line up
+            along it, from <b>main-start</b> to <b>main-end</b>. Flip the
+            direction and the whole row reorganizes — no reordering the HTML.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>follow the blue arrow</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="axis-stage">
+                <div class="axis-box" id="axisBox1">
+                  <div class="ax-it">1</div>
+                  <div class="ax-it">2</div>
+                  <div class="ax-it">3</div>
+                </div>
+                <span class="axis-arrow" id="mainArrow">➜</span>
+                <span class="axis-lab" id="mainLab">main axis</span>
+              </div>
+              <div class="axis-chips">
+                <span class="axis-chip m" id="mainChip"
+                  >main: left → right</span
+                >
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <p class="grp">flex-direction</p>
+            <div class="segmented" id="segDir">
+              <span
+                class="seg-thumb"
+                style="width: calc((100% - 6px) / 4)"
+              ></span>
+              <button data-v="row" class="active">row</button>
+              <button data-v="row-reverse">row-rev</button>
+              <button data-v="column">column</button>
+              <button data-v="column-reverse">col-rev</button>
+            </div>
+            <div class="code-box"><pre id="codeDir"></pre></div>
+            <p class="side-note">
+              justify-content (next lesson) distributes items
+              <i>along this axis</i>. The direction you pick decides what
+              "start" even means.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 04 · cross axis ============ -->
+      <section id="cross-axis" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">04 · the cross axis</p>
+          <h2>Always perpendicular</h2>
+          <p class="lede">
+            The cross axis has no property of its own — it simply exists at 90°
+            to the main axis. Change the direction and watch the orange arrow
+            swap. Alignment along it (<span class="mono">align-items</span>) is
+            lesson 13's job.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>two arrows, one rule: 90°</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="axis-stage">
+                <div class="axis-box" id="axisBox2">
+                  <div class="ax-it">1</div>
+                  <div class="ax-it">2</div>
+                  <div class="ax-it">3</div>
+                </div>
+                <span class="axis-arrow" id="mainArrow2">➜</span>
+                <span class="axis-arrow" id="crossArrow">➜</span>
+                <span class="axis-lab" id="mainLab2">main</span>
+                <span class="axis-lab" id="crossLab">cross</span>
+              </div>
+              <div class="axis-chips">
+                <span class="axis-chip m" id="mChip2">main ➜</span>
+                <span class="axis-chip c" id="cChip2">cross ⬇</span>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="segmented" id="segCross">
+              <span class="seg-thumb"></span>
+              <button data-v="row" class="active">row</button>
+              <button data-v="column">column</button>
+            </div>
+            <div class="code-box"><pre id="codeCross"></pre></div>
+            <p class="side-note">
+              Row → cross is vertical. Column → cross is horizontal. That's it.
+              Every align-* property pushes along the orange arrow; every
+              justify-* pushes along the blue one.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 05 · field notes ============ -->
+      <section id="notes" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">05 · field notes</p>
+          <h2>Cheat codes from lesson 12</h2>
+        </div>
+        <div class="notes-grid">
+          <article class="note-card" style="--nc: var(--content-c)">
+            <div class="note-demo">
+              <div class="demo-fl"><i></i><i></i><i></i></div>
+            </div>
+            <h3>one line, new physics</h3>
+            <p>
+              <span class="mono">display: flex</span> on the parent is all it
+              takes. Children become items, stop stacking, and start sharing the
+              main axis.
+            </p>
+            <p class="note-tip mono">↳ hover: the pile becomes a row</p>
+          </article>
+          <article class="note-card" style="--nc: var(--padding-c)">
+            <div class="note-demo">
+              <div class="demo-ct"><i></i><i></i><i></i></div>
+            </div>
+            <h3>container vs items</h3>
+            <p>
+              Container props (direction, justify, align, gap) layout the group.
+              Item props (grow, shrink, basis, align-self) tune individuals.
+              Wrong toolbox = "why isn't this working?".
+            </p>
+            <p class="note-tip mono">↳ hover: the frame takes charge</p>
+          </article>
+          <article class="note-card" style="--nc: var(--border-c)">
+            <div class="note-demo">
+              <div class="demo-rv"><i>1</i><i>2</i><i>3</i></div>
+            </div>
+            <h3>main axis = flow</h3>
+            <p>
+              flex-direction points it. Items run main-start → main-end.
+              row-reverse &amp; column-reverse flip the flow without touching
+              the HTML order.
+            </p>
+            <p class="note-tip mono">↳ hover: the flow reverses</p>
+          </article>
+          <article class="note-card" style="--nc: var(--margin-c)">
+            <div class="note-demo"><div class="demo-ax"></div></div>
+            <h3>cross = 90°</h3>
+            <p>
+              No property defines it — it just exists perpendicular to main.
+              justify-* rides the main axis, align-* rides the cross. Memorize
+              that pairing and lesson 13 writes itself.
+            </p>
+            <p class="note-tip mono">↳ hover: the arrows swap</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ lesson nav ============ -->
+      <div class="lesson-nav reveal">
+        <div>
+          <span class="ln-status">✓ completed</span>
+          <h3>12 — Flexbox Basics</h3>
+        </div>
+        <div class="ln-track" id="lnTrack"></div>
+        <div class="ln-next">
+          <span>up next</span>
+          <b>13 · Flexbox Alignment</b>
+        </div>
+      </div>
+
+      <footer>
+        <span class="mono">drag things, break things, learn things.</span>
+        <span class="sp mono">45 lessons · lesson 12 · flexbox basics</span>
+      </footer>
+    </div>
+    <!-- /wrap -->
+
+    <script>
+      (() => {
+        const $ = (id) => document.getElementById(id);
+        const rule = (sel, decls) =>
+          `<span class="c-sel">${sel}</span> {\n${decls
+            .map((d) => {
+              const i = d.indexOf(":");
+              return `  <span class="c-prop">${d.slice(0, i)}</span>: <span class="c-val">${d.slice(i + 1).trim()}</span>;`;
+            })
+            .join("\n")}\n}`;
+        function initSeg(seg, onPick) {
+          const btns = [...seg.querySelectorAll("button")],
+            thumb = seg.querySelector(".seg-thumb"),
+            n = btns.length;
+          function set(i) {
+            btns.forEach((b, j) => b.classList.toggle("active", i === j));
+            thumb.style.width = `calc((100% - 6px)/${n})`;
+            thumb.style.transform = `translateX(${i * 100}%)`;
+          }
+          btns.forEach((b, i) =>
+            b.addEventListener("click", () => {
+              set(i);
+              onPick(b.dataset.v);
+            }),
+          );
+          set(0);
+        }
+
+        /* ---------- intro cycle ---------- */
+        const LOOKS = [
+          { l: "display: block", d: "block", r: "" },
+          { l: "display: flex", d: "flex", r: "row" },
+          {
+            l: "display: flex; flex-direction: column",
+            d: "flex",
+            r: "column",
+          },
+          {
+            l: "display: flex; flex-direction: row-reverse",
+            d: "flex",
+            r: "row-reverse",
+          },
+        ];
+        let li = 0;
+        function look() {
+          const L = LOOKS[li],
+            box = $("ixBox");
+          box.style.display = L.d;
+          box.style.gap = "6px";
+          box.style.flexDirection = L.r;
+          box.querySelectorAll(".ix-item").forEach((it) => {
+            it.style.margin = L.d === "flex" ? "0" : "6px 0";
+            it.style.width =
+              L.d === "flex" && L.r === "row" ? "fit-content" : "auto";
+          });
+          $("introFmt").textContent = L.l;
+          li = (li + 1) % LOOKS.length;
+        }
+        look();
+        setInterval(look, 2100);
+
+        /* ---------- 01 display flex ---------- */
+        function renderFlex(v) {
+          const items = $("fxItems1");
+          items.classList.toggle("flexed", v === "flex");
+          $("readFlex").innerHTML =
+            v === "flex"
+              ? "children are now <b>flex items</b> — one row, sharing the axis"
+              : "children are plain <b>block boxes</b> — one per line";
+          $("codeFlex").innerHTML = rule(".container", [`display: ${v}`]);
+          $("flexNote").innerHTML =
+            v === "flex"
+              ? 'The container now controls the flow. Margins between items stop collapsing, and <span class="mono">gap</span> becomes available.'
+              : "Default behaviour: every block child takes the whole line. Flexbox replaces a shelf of floats and hacks with one property.";
+        }
+        initSeg($("segFlex"), renderFlex);
+        renderFlex("block");
+
+        /* ---------- 02 roles ---------- */
+        function renderRole(v) {
+          $("roleBox").classList.toggle(
+            "lit-cont",
+            v === "container" || v === "both",
+          );
+          ["ri1", "ri2", "ri3"].forEach((id) =>
+            $(id).classList.toggle("lit", v === "items" || v === "both"),
+          );
+          $("colCont").classList.toggle(
+            "lit",
+            v === "container" || v === "both",
+          );
+          $("colItems").classList.toggle("lit", v === "items" || v === "both");
+          $("colCont").style.color =
+            v === "container" || v === "both" ? "var(--padding-c)" : "";
+          $("colItems").style.color =
+            v === "items" || v === "both" ? "var(--border-c)" : "";
+          $("codeRole").innerHTML =
+            rule(".container", [
+              `display: flex`,
+              `flex-direction: row`,
+              `gap: 12px`,
+            ]) +
+            "\n" +
+            rule(".item", [`flex-grow: 1`, `align-self: center`]);
+          $("roleNote").innerHTML =
+            v === "container"
+              ? "The green frame decides the group layout: direction, spacing, alignment. Items just show up and obey."
+              : v === "items"
+                ? "Each amber item can negotiate its own size & position: grow into free space, shrink when tight, or opt out of the group alignment."
+                : "Both toolboxes at once. Rule of thumb: layout the group on the container first, then fine-tune individuals on items.";
+        }
+        initSeg($("segRole"), renderRole);
+        renderRole("container");
+
+        /* ---------- 03 main axis ---------- */
+        const DIRS = {
+          row: { rot: 0, chip: "main: left → right" },
+          "row-reverse": { rot: 180, chip: "main: right → left" },
+          column: { rot: 90, chip: "main: top → bottom" },
+          "column-reverse": { rot: -90, chip: "main: bottom → top" },
+        };
+        function renderDir(v) {
+          $("axisBox1").style.flexDirection = v;
+          $("axisBox1").style.flexWrap = v.startsWith("column")
+            ? "nowrap"
+            : "nowrap";
+          $("mainArrow").style.transform =
+            `translateX(-50%) rotate(${DIRS[v].rot}deg)`;
+          $("mainChip").textContent = DIRS[v].chip;
+          $("codeDir").innerHTML = rule(".container", [
+            `display: flex`,
+            `flex-direction: ${v}`,
+          ]);
+        }
+        initSeg($("segDir"), renderDir);
+        renderDir("row");
+
+        /* ---------- 04 cross axis ---------- */
+        function renderCross(v) {
+          $("axisBox2").style.flexDirection = v;
+          const row = v === "row";
+          $("mainArrow2").style.transform =
+            `translateX(-50%) rotate(${row ? 0 : 90}deg)`;
+          $("crossArrow").style.transform =
+            `translateY(-50%) rotate(${row ? 90 : 0}deg)`;
+          $("mChip2").textContent = row ? "main ➜" : "main ⬇";
+          $("cChip2").textContent = row ? "cross ⬇" : "cross ➜";
+          $("codeCross").innerHTML = rule(".container", [
+            `display: flex`,
+            `flex-direction: ${v}`,
+            `/* cross axis: ${row ? "vertical" : "horizontal"} */`,
+          ]);
+        }
+        initSeg($("segCross"), renderCross);
+        renderCross("row");
+
+        /* ---------- lesson track ---------- */
+        const t = $("lnTrack");
+        for (let i = 0; i < 45; i++) {
+          const s = document.createElement("span");
+          s.className = "tick" + (i < 12 ? " done" : "");
+          s.title = "lesson " + (i + 1);
+          t.appendChild(s);
+        }
+
+        /* ---------- reveal ---------- */
+        const io = new IntersectionObserver(
+          (es) =>
+            es.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                io.unobserve(e.target);
+              }
+            }),
+          { threshold: 0.12 },
+        );
+        document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      })();
+    </script>
+  </body>
+</html>
