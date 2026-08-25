@@ -1,0 +1,1650 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flexbox Layouts — Lesson 15</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' fill='none' stroke='%23f07f4f' stroke-width='2'/%3E%3Crect x='8' y='8' width='16' height='16' fill='none' stroke='%23f2c14e' stroke-width='2'/%3E%3Crect x='13' y='13' width='6' height='6' fill='%2358a6ff'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0e15;
+        --panel: #121826;
+        --panel2: #0d1220;
+        --ink: #10141d;
+        --line: #222c40;
+        --line2: #31405e;
+        --text: #e9eef7;
+        --muted: #8d9ab0;
+        --faint: #5b6a84;
+        --margin-c: #f07f4f;
+        --margin-bg: rgba(240, 127, 79, 0.14);
+        --border-c: #f2c14e;
+        --border-bg: rgba(242, 193, 78, 0.16);
+        --padding-c: #3ecf8e;
+        --padding-bg: rgba(62, 207, 142, 0.14);
+        --content-c: #58a6ff;
+        --content-bg: rgba(88, 166, 255, 0.17);
+        --pink: #ff4f8b;
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: dark;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 15px;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+      ::selection {
+        background: rgba(88, 166, 255, 0.35);
+      }
+      .mono {
+        font-family: var(--mono);
+      }
+      section {
+        scroll-margin-top: 76px;
+      }
+      b {
+        font-weight: 600;
+      }
+
+      .bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            700px 460px at 12% -6%,
+            rgba(242, 193, 78, 0.07),
+            transparent 60%
+          ),
+          radial-gradient(
+            760px 520px at 92% 22%,
+            rgba(88, 166, 255, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            600px 480px at 40% 105%,
+            rgba(62, 207, 142, 0.05),
+            transparent 60%
+          );
+      }
+      .bg::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(233, 238, 247, 0.035) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(233, 238, 247, 0.035) 1px,
+            transparent 1px
+          );
+        background-size: 28px 28px;
+        mask-image: radial-gradient(
+          ellipse 120% 90% at 50% 0%,
+          #000 40%,
+          transparent 100%
+        );
+      }
+      .bg .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.5;
+        animation: drift 26s ease-in-out infinite alternate;
+      }
+      .bg .g1 {
+        width: 420px;
+        height: 420px;
+        left: -120px;
+        top: 30%;
+        background: rgba(240, 127, 79, 0.1);
+      }
+      .bg .g2 {
+        width: 460px;
+        height: 460px;
+        right: -140px;
+        top: 60%;
+        background: rgba(88, 166, 255, 0.1);
+        animation-delay: -12s;
+      }
+      @keyframes drift {
+        from {
+          transform: translateY(-30px);
+        }
+        to {
+          transform: translateY(40px);
+        }
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 12px clamp(16px, 4vw, 44px);
+        background: rgba(11, 14, 21, 0.92);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar nav {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .topbar nav a {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 6px 11px;
+        border-radius: 999px;
+        transition: 0.2s;
+      }
+      .topbar nav a:hover {
+        color: var(--text);
+        background: #161d2c;
+      }
+      .lesson-tag {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--border-c);
+        border: 1px dashed rgba(242, 193, 78, 0.45);
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .wrap {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: 0 clamp(16px, 4vw, 44px);
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        padding: clamp(20px, 4vh, 48px) 0 clamp(30px, 5vh, 56px);
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--padding-c);
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(2.3rem, 5.2vw, 3.7rem);
+        line-height: 1.06;
+        letter-spacing: -0.02em;
+      }
+      .word-style {
+        display: inline-block;
+        padding: 0.02em 0.22em;
+        background: var(--padding-bg);
+        border: 0.06em solid var(--padding-c);
+        border-radius: 0.14em;
+        color: #b8f2d9;
+        transition: transform 0.3s;
+        cursor: default;
+      }
+      .word-style:hover {
+        transform: rotate(-2deg) scale(1.03);
+      }
+      .lede {
+        color: var(--muted);
+        max-width: 56ch;
+        margin-top: 18px;
+        font-size: 1.05rem;
+      }
+      .lede b {
+        color: var(--text);
+      }
+      .css-full {
+        display: inline-block;
+        margin-top: 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--faint);
+        letter-spacing: 0.08em;
+      }
+      .intro-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 26px;
+        display: grid;
+        place-items: center;
+        gap: 16px;
+        box-shadow: 0 30px 60px -40px rgba(0, 0, 0, 0.8);
+      }
+      .ix-box {
+        width: 100%;
+        max-width: 280px;
+        min-height: 140px;
+        border: 1px dashed var(--line2);
+        border-radius: 10px;
+        padding: 12px;
+        display: flex;
+        gap: 8px;
+        transition: 0.4s;
+      }
+      .ix-item {
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+        border-radius: 6px;
+        color: #a7cdff;
+        font-family: var(--mono);
+        font-size: 10px;
+        padding: 10px 12px;
+        transition: all 0.4s;
+        min-width: 0;
+      }
+      .intro-fmt {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--content-c);
+        background: var(--ink);
+        border: 1px solid var(--line2);
+        border-radius: 9px;
+        padding: 7px 16px;
+        min-height: 36px;
+      }
+      .imode {
+        font-size: 11px;
+        color: var(--faint);
+        letter-spacing: 0.1em;
+      }
+
+      .sec {
+        padding: clamp(36px, 6vh, 64px) 0;
+      }
+      .sec-head {
+        margin-bottom: 26px;
+        max-width: 72ch;
+      }
+      .sec-head h2 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+        letter-spacing: -0.015em;
+        line-height: 1.15;
+      }
+      .sec-head .lede {
+        margin-top: 10px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 18px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .panel-head h3 {
+        font-family: var(--disp);
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dots i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dots i:nth-child(1) {
+        background: #f07f4f;
+      }
+      .dots i:nth-child(2) {
+        background: #f2c14e;
+      }
+      .dots i:nth-child(3) {
+        background: #3ecf8e;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.85;
+        overflow-x: auto;
+      }
+      .c-sel {
+        color: #7fe0b0;
+      }
+      .c-prop {
+        color: #8ab4ff;
+      }
+      .c-val {
+        color: #f2c14e;
+      }
+      .c-com {
+        color: #5b6a84;
+      }
+      .grp {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+
+      .pick-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 18px;
+        align-items: stretch;
+      }
+      .stage-wrap {
+        padding: 28px;
+        display: grid;
+        place-items: center;
+        min-height: 340px;
+        gap: 14px;
+      }
+      .side {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .sel-chip {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .sel-chip:hover {
+        color: var(--text);
+        border-color: var(--content-c);
+        transform: translateY(-2px);
+      }
+      .sel-chip.on {
+        color: #0e1017;
+        background: var(--content-c);
+        border-color: var(--content-c);
+        font-weight: 600;
+      }
+      .code-box {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .code-box pre {
+        min-height: 0;
+        font-size: 12.5px;
+      }
+      .side-note {
+        font-size: 12px;
+        color: var(--faint);
+      }
+      .ghost-btn {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--faint);
+        background: none;
+        border: 1px dashed var(--line2);
+        border-radius: 8px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .ghost-btn:hover {
+        color: var(--content-c);
+        border-color: var(--content-c);
+      }
+      .segmented {
+        position: relative;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 1fr;
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        padding: 3px;
+      }
+      .segmented button {
+        position: relative;
+        z-index: 1;
+        background: none;
+        border: 0;
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--muted);
+        padding: 8px 4px;
+        cursor: pointer;
+        transition: color 0.25s;
+        border-radius: 8px;
+      }
+      .segmented button:hover {
+        color: var(--text);
+      }
+      .segmented button.active {
+        color: #fff;
+      }
+      .seg-thumb {
+        position: absolute;
+        top: 3px;
+        bottom: 3px;
+        left: 3px;
+        width: calc((100% - 6px) / 3);
+        background: #26334c;
+        border-radius: 8px;
+        transition:
+          transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+          width 0.28s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      }
+      .read {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 14px;
+      }
+      .read b {
+        color: var(--text);
+      }
+
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        outline: none;
+        cursor: pointer;
+        background: linear-gradient(
+          90deg,
+          var(--ac) var(--fill, 50%),
+          #232c40 var(--fill, 50%)
+        );
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        transition: transform 0.15s;
+      }
+      input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.15);
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+      }
+      .ctl {
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 7px 11px;
+        transition: 0.2s;
+      }
+      .ctl:hover {
+        background: #101725;
+        border-color: var(--line);
+      }
+      .ctl-top {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+      .ctl-top label {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text);
+      }
+      .ctl-val {
+        margin-left: auto;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--ac);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 2px 9px;
+      }
+
+      /* layout demos */
+      .demo-frame {
+        width: 100%;
+        max-width: 440px;
+        border: 1px dashed var(--line2);
+        border-radius: 12px;
+        padding: 14px;
+        position: relative;
+        transition: 0.3s;
+      }
+      .d-lab {
+        position: absolute;
+        top: -9px;
+        left: 14px;
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--faint);
+        background: var(--panel);
+        padding: 0 8px;
+      }
+      .mini-nav {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--panel2);
+        border: 1px solid var(--line2);
+        border-radius: 10px;
+        padding: 12px 14px;
+        transition: 0.3s;
+        width: 100%;
+        max-width: 440px;
+      }
+      .mn-logo {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--border-c);
+        font-weight: 700;
+      }
+      .mn-links {
+        display: flex;
+        gap: 8px;
+        transition: 0.3s;
+      }
+      .mn-links i {
+        font-style: normal;
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 5px 10px;
+      }
+      .center-stage {
+        height: 230px;
+        display: flex;
+        border: 1px dashed var(--line2);
+        border-radius: 12px;
+        transition: 0.3s;
+        width: 100%;
+        max-width: 440px;
+      }
+      .center-box {
+        width: 130px;
+        height: 74px;
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        font-family: var(--mono);
+        font-size: 10px;
+        color: #a7cdff;
+        transition: 0.3s;
+      }
+      .cards-row {
+        display: flex;
+        gap: 12px;
+        width: 100%;
+        max-width: 440px;
+        align-items: stretch;
+      }
+      .fcard {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: var(--panel2);
+        border: 1px solid var(--line2);
+        border-radius: 12px;
+        padding: 14px;
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--muted);
+        transition: 0.3s;
+      }
+      .fcard h6 {
+        color: var(--text);
+        font-size: 11.5px;
+        margin-bottom: 8px;
+      }
+      .fcard p {
+        margin-bottom: 6px;
+      }
+      .fcard .pin {
+        margin-top: auto;
+        padding-top: 10px;
+      }
+      .fcard .pin b {
+        display: block;
+        text-align: center;
+        background: var(--content-c);
+        color: #0e1017;
+        border-radius: 7px;
+        padding: 7px 0;
+        font-size: 10px;
+      }
+      .shell {
+        display: flex;
+        flex-direction: column;
+        height: 280px;
+        width: 100%;
+        max-width: 440px;
+        border: 1px solid var(--line2);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .sh-head,
+      .sh-foot {
+        background: var(--border-bg);
+        color: #ffe3a1;
+        font-family: var(--mono);
+        font-size: 10px;
+        display: grid;
+        place-items: center;
+        padding: 10px;
+      }
+      .sh-foot {
+        background: var(--margin-bg);
+        color: #ffc9ae;
+      }
+      .sh-main {
+        flex: 1;
+        background: var(--panel2);
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        overflow: hidden;
+      }
+      .sh-main i {
+        height: 10px;
+        border-radius: 3px;
+        background: #232c40;
+        flex: none;
+      }
+      .side-demo {
+        display: flex;
+        gap: 12px;
+        height: 240px;
+        width: 100%;
+        max-width: 440px;
+      }
+      .sd-aside {
+        flex: 0 0 160px;
+        background: var(--padding-bg);
+        border: 1px solid var(--padding-c);
+        border-radius: 12px;
+        padding: 12px;
+        font-family: var(--mono);
+        font-size: 10px;
+        color: #8fe6bd;
+        transition: flex-basis 0.25s;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        overflow: hidden;
+      }
+      .sd-aside i {
+        height: 10px;
+        background: rgba(62, 207, 142, 0.25);
+        border-radius: 3px;
+        flex: none;
+      }
+      .sd-main {
+        flex: 1;
+        background: var(--panel2);
+        border: 1px solid var(--line2);
+        border-radius: 12px;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 0;
+      }
+      .sd-main i {
+        height: 10px;
+        background: #232c40;
+        border-radius: 3px;
+      }
+
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      @media (min-width: 1180px) {
+        .notes-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media (max-width: 640px) {
+        .notes-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .note-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.3s,
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+      .note-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--nc);
+        opacity: 0.85;
+      }
+      .note-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--nc);
+        box-shadow: 0 24px 44px -28px rgba(0, 0, 0, 0.85);
+      }
+      .note-card h3 {
+        font-family: var(--mono);
+        font-size: 15px;
+        color: var(--nc);
+        margin-bottom: 8px;
+      }
+      .note-card p {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .note-tip {
+        margin-top: 12px;
+        font-size: 11px;
+        color: var(--faint);
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+      }
+      .note-demo {
+        height: 104px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        overflow: hidden;
+      }
+      .demo-nb {
+        width: 78%;
+        border: 1px dashed var(--line2);
+        border-radius: 8px;
+        padding: 8px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        justify-content: flex-start;
+        transition: 0.35s;
+      }
+      .demo-nb i {
+        height: 12px;
+        border-radius: 4px;
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+      }
+      .demo-nb i:first-child {
+        width: 26px;
+        background: var(--border-bg);
+        border-color: var(--border-c);
+      }
+      .demo-nb i:not(:first-child) {
+        width: 16px;
+      }
+      .note-card:hover .demo-nb {
+        justify-content: space-between;
+      }
+      .demo-cn {
+        width: 70%;
+        height: 70%;
+        border: 1px dashed var(--line2);
+        border-radius: 8px;
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+        transition: 0.35s;
+      }
+      .demo-cn i {
+        width: 30px;
+        height: 22px;
+        border-radius: 5px;
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+      }
+      .note-card:hover .demo-cn {
+        justify-content: center;
+        align-items: center;
+      }
+      .demo-cd {
+        width: 78%;
+        display: flex;
+        gap: 6px;
+        align-items: stretch;
+      }
+      .demo-cd i {
+        flex: 1;
+        border-radius: 6px;
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+        position: relative;
+        height: 44px;
+      }
+      .demo-cd i::after {
+        content: "";
+        position: absolute;
+        left: 6px;
+        right: 6px;
+        bottom: 6px;
+        height: 8px;
+        border-radius: 3px;
+        background: var(--border-c);
+      }
+      .demo-cd i:nth-child(2) {
+        height: 64px;
+      }
+      .note-card:hover .demo-cd i {
+        height: 64px;
+      }
+      .demo-sb {
+        width: 78%;
+        height: 70%;
+        border: 1px dashed var(--line2);
+        border-radius: 8px;
+        padding: 8px;
+        display: flex;
+        gap: 6px;
+      }
+      .demo-sb i {
+        border-radius: 5px;
+      }
+      .demo-sb i:first-child {
+        width: 26px;
+        background: var(--padding-bg);
+        border: 1px solid var(--padding-c);
+        transition: 0.35s;
+      }
+      .demo-sb i:last-child {
+        flex: 1;
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+      }
+      .note-card:hover .demo-sb i:first-child {
+        width: 44px;
+      }
+
+      .lesson-nav {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px clamp(18px, 3vw, 28px);
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+        align-items: center;
+      }
+      .ln-status {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--padding-c);
+        border: 1px solid rgba(62, 207, 142, 0.45);
+        border-radius: 999px;
+        padding: 3px 10px;
+      }
+      .lesson-nav h3 {
+        font-family: var(--disp);
+        font-size: 17px;
+        margin-top: 8px;
+      }
+      .ln-track {
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .tick {
+        width: 7px;
+        height: 15px;
+        border-radius: 2px;
+        background: #212a3e;
+        transition: 0.2s;
+      }
+      .tick.done {
+        background: var(--padding-c);
+        box-shadow: 0 0 8px rgba(62, 207, 142, 0.55);
+      }
+      .tick:hover {
+        background: var(--line2);
+      }
+      .ln-next {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        text-align: right;
+      }
+      .ln-next span {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .ln-next b {
+        font-family: var(--disp);
+        font-size: 15px;
+        color: var(--text);
+      }
+      footer {
+        border-top: 1px solid var(--line);
+        margin-top: 40px;
+        padding: 30px 0 44px;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+        color: var(--faint);
+        font-size: 12.5px;
+      }
+      footer .mono {
+        font-size: 11.5px;
+      }
+      footer .sp {
+        margin-left: auto;
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+      @media (max-width: 1020px) {
+        .intro {
+          grid-template-columns: 1fr;
+        }
+        .pick-grid {
+          grid-template-columns: 1fr;
+        }
+        .lesson-nav {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .ln-next {
+          align-items: center;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg">
+      <span class="glow g1"></span><span class="glow g2"></span>
+    </div>
+
+    <header class="topbar">
+      <span class="lesson-tag">lesson 15 / 45</span>
+      <nav>
+        <a href="#navbar">navbar</a>
+        <a href="#centered">centered</a>
+        <a href="#cards">cards</a>
+        <a href="#shell">header · footer</a>
+        <a href="#sidebar">sidebar</a>
+        <a href="#notes">cheat-codes</a>
+      </nav>
+    </header>
+
+    <div class="wrap">
+      <!-- ============ intro ============ -->
+      <section class="intro">
+        <div>
+          <p class="eyebrow">lesson 15 · interactive</p>
+          <h1>
+            Flexbox isn't a trick — it's a
+            <span class="word-style">toolbelt</span>.
+          </h1>
+          <p class="lede">
+            Every layout you admire on the web is a handful of flexbox moves: a
+            navbar is <b>space-between</b>, a hero is <b>center + center</b>,
+            equal cards are <b>stretch + margin-top:auto</b>, a page shell is
+            <b>column + flex:1</b>. This lesson builds all five, live.
+          </p>
+          <span class="css-full">N · AVBAR · C · ARDS · S · IDEBAR</span>
+        </div>
+        <div class="intro-panel">
+          <div class="ix-box" id="ixBox">
+            <div class="ix-item">logo</div>
+            <div class="ix-item">links</div>
+            <div class="ix-item">cta</div>
+          </div>
+          <span class="intro-fmt" id="introFmt"
+            >navbar → justify-content: space-between</span
+          >
+          <p class="imode mono">five layouts, one property each…</p>
+        </div>
+      </section>
+
+      <!-- ============ 01 · navbar ============ -->
+      <section id="navbar" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">01 · the navbar</p>
+          <h2>Logo left, links right</h2>
+          <p class="lede">
+            The most common flexbox on earth. Three ways to place the link
+            group: <b>space-between</b> on the container,
+            <b>margin-left:auto</b> on the links (the "pusher"), or just
+            <b>center</b> everything.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>same navbar, three engines</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="mini-nav" id="navDemo">
+                <span class="mn-logo">◆ aurora</span>
+                <span class="mn-links" id="navLinks"
+                  ><i>menu</i><i>beans</i><i>visit</i></span
+                >
+              </div>
+              <p class="read" id="navRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="segmented" id="segNav">
+              <span class="seg-thumb"></span>
+              <button data-v="between" class="active">space-between</button>
+              <button data-v="push">margin-left:auto</button>
+              <button data-v="center">center</button>
+            </div>
+            <div class="code-box"><pre id="codeNav"></pre></div>
+            <p class="side-note" id="navNote"></p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 02 · centered content ============ -->
+      <section id="centered" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">02 · centered content</p>
+          <h2>The two-line centering spell</h2>
+          <p class="lede">
+            Before flexbox, vertical centering was a dark art. Now:
+            <span class="mono">justify-content: center</span> +
+            <span class="mono">align-items: center</span>. Toggle each axis and
+            watch the box find home.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>one box, two axes</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="center-stage" id="centerStage">
+                <div class="center-box">hero</div>
+              </div>
+              <p class="read" id="centerRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="segmented" id="segCenter">
+              <span class="seg-thumb"></span>
+              <button data-v="h">horizontal</button>
+              <button data-v="v">vertical</button>
+              <button data-v="both" class="active">both</button>
+            </div>
+            <div class="code-box"><pre id="codeCenter"></pre></div>
+            <p class="side-note">
+              justify-content rides the main axis, align-items the cross. "Both"
+              is the hero-section default of the modern web.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 03 · cards ============ -->
+      <section id="cards" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">03 · equal cards</p>
+          <h2>Stretch + the bottom pin</h2>
+          <p class="lede">
+            Two moves: the row's default <b>align-items: stretch</b> makes every
+            card as tall as the tallest; inside each card,
+            <b>margin-top: auto</b> pins the button to the bottom. Add lines to
+            the middle card and watch the others follow.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>buttons pinned, heights equal</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="cards-row">
+                <div class="fcard">
+                  <h6>espresso</h6>
+                  <p>short &amp; bold.</p>
+                  <div class="pin"><b>order</b></div>
+                </div>
+                <div class="fcard">
+                  <h6>filter</h6>
+                  <div id="midBody"><p>clean and bright.</p></div>
+                  <div class="pin"><b>order</b></div>
+                </div>
+                <div class="fcard">
+                  <h6>cold brew</h6>
+                  <p>slow-steeped for 16 hours, served over ice.</p>
+                  <div class="pin"><b>order</b></div>
+                </div>
+              </div>
+              <p class="read" id="cardsRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <p class="grp">change the middle card</p>
+            <div class="chips">
+              <button class="ghost-btn" id="addLine">+ add a line</button>
+              <button class="ghost-btn" id="rmLine">− remove a line</button>
+            </div>
+            <div class="code-box"><pre id="codeCards"></pre></div>
+            <p class="side-note">
+              margin-top: auto eats all free space above the button — the
+              flexbox way to pin a footer inside a card.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 04 · header & footer ============ -->
+      <section id="shell" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">04 · header &amp; footer</p>
+          <h2>The sticky-footer shell</h2>
+          <p class="lede">
+            Column flex with <b>main { flex: 1 }</b>: the main area becomes a
+            sponge that absorbs all spare height, so the footer sits at the
+            bottom even when the page is nearly empty. Add content — the footer
+            never floats.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>short page, footer still down</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="shell">
+                <div class="sh-head">header</div>
+                <div class="sh-main" id="shMain"><i></i><i></i><i></i></div>
+                <div class="sh-foot">footer</div>
+              </div>
+              <p class="read" id="shellRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <p class="grp">content amount</p>
+            <div class="chips">
+              <button class="sel-chip on" data-n="3">short page</button>
+              <button class="sel-chip" data-n="9">long page</button>
+            </div>
+            <div class="code-box"><pre id="codeShell"></pre></div>
+            <p class="side-note">
+              The shell needs a height (min-height: 100vh on a real page).
+              flex:1 on main does the rest — no calc(), no magic numbers.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 05 · sidebar ============ -->
+      <section id="sidebar" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">05 · sidebar + main</p>
+          <h2>Fixed rail, liquid content</h2>
+          <p class="lede">
+            The classic two-column: sidebar gets <b>flex: 0 0 160px</b> (never
+            grows, never shrinks), main gets <b>flex: 1</b> (takes everything
+            left). Drag the rail and watch main absorb the change instantly.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>drag the rail</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="side-demo">
+                <div class="sd-aside" id="sdAside">
+                  <i></i><i></i><i></i><i></i>
+                </div>
+                <div class="sd-main"><i></i><i></i><i></i><i></i><i></i></div>
+              </div>
+              <p class="read" id="sideRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--padding-c)">
+              <div class="ctl-top">
+                <label for="rSide">sidebar flex-basis</label
+                ><output class="ctl-val" id="oSide">160px</output>
+              </div>
+              <input type="range" id="rSide" min="90" max="240" value="160" />
+            </div>
+            <div class="code-box"><pre id="codeSide"></pre></div>
+            <p class="side-note">
+              flex: 0 0 Xpx = "I am exactly X". flex: 1 = "give me the rest".
+              Together they replace every float-based column hack ever written.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 06 · field notes ============ -->
+      <section id="notes" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">06 · field notes</p>
+          <h2>Cheat codes from lesson 15</h2>
+        </div>
+        <div class="notes-grid">
+          <article class="note-card" style="--nc: var(--content-c)">
+            <div class="note-demo">
+              <div class="demo-nb"><i></i><i></i><i></i><i></i></div>
+            </div>
+            <h3>navbar = space-between</h3>
+            <p>
+              Logo left, links right, one property. Or push the links with
+              <span class="mono">margin-left: auto</span> — same result,
+              different mental model.
+            </p>
+            <p class="note-tip mono">↳ hover: the links get pushed</p>
+          </article>
+          <article class="note-card" style="--nc: var(--margin-c)">
+            <div class="note-demo">
+              <div class="demo-cn"><i></i></div>
+            </div>
+            <h3>center = two props</h3>
+            <p>
+              justify-content: center + align-items: center. The whole
+              vertical-centering war, ended in two lines.
+            </p>
+            <p class="note-tip mono">↳ hover: the box finds home</p>
+          </article>
+          <article class="note-card" style="--nc: var(--border-c)">
+            <div class="note-demo">
+              <div class="demo-cd"><i></i><i></i><i></i></div>
+            </div>
+            <h3>cards = stretch + pin</h3>
+            <p>
+              stretch equalizes heights; margin-top: auto pins the button.
+              Uneven content, perfectly aligned feet.
+            </p>
+            <p class="note-tip mono">↳ hover: heights equalize</p>
+          </article>
+          <article class="note-card" style="--nc: var(--padding-c)">
+            <div class="note-demo">
+              <div class="demo-sb"><i></i><i></i></div>
+            </div>
+            <h3>columns = 0 0 X + 1</h3>
+            <p>
+              Sidebar flex: 0 0 Xpx, main flex: 1. The rail stays rigid, the
+              content stays liquid — resize-proof by construction.
+            </p>
+            <p class="note-tip mono">↳ hover: the rail widens</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ lesson nav ============ -->
+      <div class="lesson-nav reveal">
+        <div>
+          <span class="ln-status">✓ completed</span>
+          <h3>15 — Flexbox Layouts</h3>
+        </div>
+        <div class="ln-track" id="lnTrack"></div>
+        <div class="ln-next">
+          <span>up next</span>
+          <b>16 · Grid Basics</b>
+        </div>
+      </div>
+
+      <footer>
+        <span class="mono">drag things, break things, learn things.</span>
+        <span class="sp mono">45 lessons · lesson 15 · flexbox layouts</span>
+      </footer>
+    </div>
+    <!-- /wrap -->
+
+    <script>
+      (() => {
+        const $ = (id) => document.getElementById(id);
+        const rule = (sel, decls) =>
+          `<span class="c-sel">${sel}</span> {\n${decls
+            .map((d) => {
+              const i = d.indexOf(":");
+              return `  <span class="c-prop">${d.slice(0, i)}</span>: <span class="c-val">${d.slice(i + 1).trim()}</span>;`;
+            })
+            .join("\n")}\n}`;
+        function range(el, out, fmt, cb) {
+          const f = () => {
+            const v = +el.value;
+            out.textContent = fmt(v);
+            const min = +el.min,
+              max = +el.max;
+            el.style.setProperty(
+              "--fill",
+              ((v - min) / (max - min)) * 100 + "%",
+            );
+            cb(v);
+          };
+          el.addEventListener("input", f);
+          f();
+        }
+        function initSeg(seg, onPick) {
+          const btns = [...seg.querySelectorAll("button")],
+            thumb = seg.querySelector(".seg-thumb"),
+            n = btns.length;
+          function set(i) {
+            btns.forEach((b, j) => b.classList.toggle("active", i === j));
+            thumb.style.width = `calc((100% - 6px)/${n})`;
+            thumb.style.transform = `translateX(${i * 100}%)`;
+          }
+          btns.forEach((b, i) =>
+            b.addEventListener("click", () => {
+              set(i);
+              onPick(b.dataset.v);
+            }),
+          );
+          set(0);
+        }
+
+        /* ---------- intro cycle ---------- */
+        const LOOKS = [
+          {
+            l: "navbar → justify-content: space-between",
+            s: {
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            },
+          },
+          {
+            l: "centered → justify + align: center",
+            s: {
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+            },
+          },
+          {
+            l: "cards → align-items: stretch",
+            s: {
+              flexDirection: "row",
+              justifyContent: "flex-start",
+              alignItems: "stretch",
+            },
+          },
+          {
+            l: "shell → flex-direction: column",
+            s: {
+              flexDirection: "column",
+              justifyContent: "flex-start",
+              alignItems: "stretch",
+            },
+          },
+        ];
+        let li = 0;
+        function look() {
+          const L = LOOKS[li],
+            b = $("ixBox");
+          Object.assign(b.style, L.s);
+          [...b.children].forEach((it) => {
+            it.style.width =
+              L.s.flexDirection === "column" ? "auto" : "fit-content";
+          });
+          $("introFmt").textContent = L.l;
+          li = (li + 1) % LOOKS.length;
+        }
+        look();
+        setInterval(look, 2200);
+
+        /* ---------- 01 navbar ---------- */
+        const NAV_NOTES = {
+          between:
+            "The container distributes: first child at start, last at end. Cleanest when you have exactly two groups.",
+          push: 'margin-left: auto on the links absorbs all free space to their left — the "pusher" trick. Works with any number of groups.',
+          center: "Everything hugs the middle — the minimal landing-page nav.",
+        };
+        function renderNav(v) {
+          const nav = $("navDemo"),
+            links = $("navLinks");
+          links.style.marginLeft = v === "push" ? "auto" : "0";
+          nav.style.justifyContent =
+            v === "between"
+              ? "space-between"
+              : v === "center"
+                ? "center"
+                : "flex-start";
+          $("navRead").innerHTML =
+            v === "between"
+              ? "container does the work: <b>justify-content: space-between</b>"
+              : v === "push"
+                ? "the links push themselves: <b>margin-left: auto</b>"
+                : "nobody pushes: <b>justify-content: center</b>";
+          $("codeNav").innerHTML =
+            v === "push"
+              ? rule(".nav", [`display: flex`, `align-items: center`]) +
+                "\n" +
+                rule(".links", [`margin-left: auto`])
+              : rule(".nav", [
+                  `display: flex`,
+                  `align-items: center`,
+                  `justify-content: ${v === "between" ? "space-between" : "center"}`,
+                ]);
+          $("navNote").textContent = NAV_NOTES[v];
+        }
+        initSeg($("segNav"), renderNav);
+        renderNav("between");
+
+        /* ---------- 02 centered ---------- */
+        function renderCenter(v) {
+          const s = $("centerStage");
+          s.style.justifyContent =
+            v === "h" || v === "both" ? "center" : "flex-start";
+          s.style.alignItems =
+            v === "v" || v === "both" ? "center" : "flex-start";
+          $("centerRead").innerHTML =
+            v === "both"
+              ? "<b>centered on both axes</b> — the hero default"
+              : v === "h"
+                ? "centered on the <b>main</b> axis only — stuck to the top"
+                : "centered on the <b>cross</b> axis only — stuck to the left";
+          $("codeCenter").innerHTML = rule(".hero", [
+            `display: flex`,
+            `justify-content: ${v === "h" || v === "both" ? "center" : "flex-start"}`,
+            `align-items: ${v === "v" || v === "both" ? "center" : "flex-start"}`,
+          ]);
+        }
+        initSeg($("segCenter"), renderCenter);
+        renderCenter("both");
+
+        /* ---------- 03 cards ---------- */
+        let lines = 1;
+        function renderCards() {
+          $("cardsRead").innerHTML =
+            `middle card has <b>${lines} line${lines > 1 ? "s" : ""}</b> — all cards stay equal, buttons stay pinned`;
+        }
+        $("addLine").addEventListener("click", () => {
+          if (lines >= 5) return;
+          lines++;
+          const p = document.createElement("p");
+          p.textContent = "tasting note " + lines + ": honey, citrus.";
+          $("midBody").appendChild(p);
+          renderCards();
+        });
+        $("rmLine").addEventListener("click", () => {
+          if (lines <= 1) return;
+          lines--;
+          $("midBody").lastElementChild.remove();
+          renderCards();
+        });
+        $("codeCards").innerHTML =
+          rule(".row", [`display: flex  /* stretch by default */`]) +
+          "\n" +
+          rule(".card", [`display: flex`, `flex-direction: column`]) +
+          "\n" +
+          rule(".card button", [`margin-top: auto`]);
+        renderCards();
+
+        /* ---------- 04 shell ---------- */
+        function renderShell(n) {
+          const m = $("shMain");
+          m.innerHTML = "";
+          for (let i = 0; i < n; i++)
+            m.appendChild(document.createElement("i"));
+          $("shellRead").innerHTML =
+            n <= 3
+              ? "page is short — <b>main flex:1</b> soaks the spare height, footer stays down"
+              : "page is full — main grows with content, footer rides below it";
+          $("codeShell").innerHTML =
+            rule(".page", [
+              `display: flex`,
+              `flex-direction: column`,
+              `min-height: 100vh`,
+            ]) +
+            "\n" +
+            rule("main", [`flex: 1`]);
+        }
+        document.querySelectorAll("#shell .sel-chip").forEach((c) =>
+          c.addEventListener("click", () => {
+            document
+              .querySelectorAll("#shell .sel-chip")
+              .forEach((x) => x.classList.remove("on"));
+            c.classList.add("on");
+            renderShell(+c.dataset.n);
+          }),
+        );
+        renderShell(3);
+
+        /* ---------- 05 sidebar ---------- */
+        range(
+          $("rSide"),
+          $("oSide"),
+          (v) => v + "px",
+          (v) => {
+            $("sdAside").style.flexBasis = v + "px";
+            $("sideRead").innerHTML =
+              `rail <b>${v}px</b> rigid · main <b>flex: 1</b> takes the rest`;
+            $("codeSide").innerHTML =
+              rule(".sidebar", [`flex: 0 0 ${v}px`]) +
+              "\n" +
+              rule(".main", [`flex: 1`, `min-width: 0`]);
+          },
+        );
+
+        /* ---------- lesson track ---------- */
+        const t = $("lnTrack");
+        for (let i = 0; i < 45; i++) {
+          const s = document.createElement("span");
+          s.className = "tick" + (i < 15 ? " done" : "");
+          s.title = "lesson " + (i + 1);
+          t.appendChild(s);
+        }
+
+        /* ---------- reveal ---------- */
+        const io = new IntersectionObserver(
+          (es) =>
+            es.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                io.unobserve(e.target);
+              }
+            }),
+          { threshold: 0.12 },
+        );
+        document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      })();
+    </script>
+  </body>
+</html>

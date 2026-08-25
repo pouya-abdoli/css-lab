@@ -1,0 +1,1325 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Container Queries — Lesson 27</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' fill='none' stroke='%23f07f4f' stroke-width='2'/%3E%3Crect x='8' y='8' width='16' height='16' fill='none' stroke='%23f2c14e' stroke-width='2'/%3E%3Crect x='13' y='13' width='6' height='6' fill='%2358a6ff'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0e15;
+        --panel: #121826;
+        --panel2: #0d1220;
+        --ink: #10141d;
+        --line: #222c40;
+        --line2: #31405e;
+        --text: #e9eef7;
+        --muted: #8d9ab0;
+        --faint: #5b6a84;
+        --margin-c: #f07f4f;
+        --margin-bg: rgba(240, 127, 79, 0.14);
+        --border-c: #f2c14e;
+        --border-bg: rgba(242, 193, 78, 0.16);
+        --padding-c: #3ecf8e;
+        --padding-bg: rgba(62, 207, 142, 0.14);
+        --content-c: #58a6ff;
+        --content-bg: rgba(88, 166, 255, 0.17);
+        --pink: #ff4f8b;
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: dark;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 15px;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+      ::selection {
+        background: rgba(88, 166, 255, 0.35);
+      }
+      .mono {
+        font-family: var(--mono);
+      }
+      section {
+        scroll-margin-top: 76px;
+      }
+      b {
+        font-weight: 600;
+      }
+
+      .bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            700px 460px at 12% -6%,
+            rgba(242, 193, 78, 0.07),
+            transparent 60%
+          ),
+          radial-gradient(
+            760px 520px at 92% 22%,
+            rgba(88, 166, 255, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            600px 480px at 40% 105%,
+            rgba(62, 207, 142, 0.05),
+            transparent 60%
+          );
+      }
+      .bg::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(233, 238, 247, 0.035) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(233, 238, 247, 0.035) 1px,
+            transparent 1px
+          );
+        background-size: 28px 28px;
+        mask-image: radial-gradient(
+          ellipse 120% 90% at 50% 0%,
+          #000 40%,
+          transparent 100%
+        );
+      }
+      .bg .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.5;
+        animation: drift 26s ease-in-out infinite alternate;
+      }
+      .bg .g1 {
+        width: 420px;
+        height: 420px;
+        left: -120px;
+        top: 30%;
+        background: rgba(240, 127, 79, 0.1);
+      }
+      .bg .g2 {
+        width: 460px;
+        height: 460px;
+        right: -140px;
+        top: 60%;
+        background: rgba(88, 166, 255, 0.1);
+        animation-delay: -12s;
+      }
+      @keyframes drift {
+        from {
+          transform: translateY(-30px);
+        }
+        to {
+          transform: translateY(40px);
+        }
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 12px clamp(16px, 4vw, 44px);
+        background: rgba(11, 14, 21, 0.92);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar nav {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .topbar nav a {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 6px 11px;
+        border-radius: 999px;
+        transition: 0.2s;
+      }
+      .topbar nav a:hover {
+        color: var(--text);
+        background: #161d2c;
+      }
+      .lesson-tag {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--border-c);
+        border: 1px dashed rgba(242, 193, 78, 0.45);
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .wrap {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: 0 clamp(16px, 4vw, 44px);
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        padding: clamp(20px, 4vh, 48px) 0 clamp(30px, 5vh, 56px);
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--padding-c);
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(2.3rem, 5.2vw, 3.7rem);
+        line-height: 1.06;
+        letter-spacing: -0.02em;
+      }
+      .word-style {
+        display: inline-block;
+        padding: 0.02em 0.22em;
+        background: var(--content-bg);
+        border: 0.06em solid var(--content-c);
+        border-radius: 0.14em;
+        color: #bcd8ff;
+        transition: transform 0.3s;
+        cursor: default;
+      }
+      .word-style:hover {
+        transform: rotate(-2deg) scale(1.03);
+      }
+      .lede {
+        color: var(--muted);
+        max-width: 56ch;
+        margin-top: 18px;
+        font-size: 1.05rem;
+      }
+      .lede b {
+        color: var(--text);
+      }
+      .css-full {
+        display: inline-block;
+        margin-top: 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--faint);
+        letter-spacing: 0.08em;
+      }
+      .intro-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 26px;
+        display: grid;
+        place-items: center;
+        gap: 16px;
+        box-shadow: 0 30px 60px -40px rgba(0, 0, 0, 0.8);
+        width: 100%;
+      }
+      .intro-fmt {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--content-c);
+        background: var(--ink);
+        border: 1px solid var(--line2);
+        border-radius: 9px;
+        padding: 7px 16px;
+        min-height: 36px;
+        text-align: center;
+      }
+      .imode {
+        font-size: 11px;
+        color: var(--faint);
+        letter-spacing: 0.1em;
+      }
+
+      .sec {
+        padding: clamp(36px, 6vh, 64px) 0;
+      }
+      .sec-head {
+        margin-bottom: 26px;
+        max-width: 72ch;
+      }
+      .sec-head h2 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+        letter-spacing: -0.015em;
+        line-height: 1.15;
+      }
+      .sec-head .lede {
+        margin-top: 10px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 18px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .panel-head h3 {
+        font-family: var(--disp);
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dots i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dots i:nth-child(1) {
+        background: #f07f4f;
+      }
+      .dots i:nth-child(2) {
+        background: #f2c14e;
+      }
+      .dots i:nth-child(3) {
+        background: #3ecf8e;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.85;
+        overflow-x: auto;
+      }
+      .c-sel {
+        color: #7fe0b0;
+      }
+      .c-prop {
+        color: #8ab4ff;
+      }
+      .c-val {
+        color: #f2c14e;
+      }
+      .c-com {
+        color: #5b6a84;
+      }
+      .grp {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+
+      .pick-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 18px;
+        align-items: stretch;
+      }
+      .stage-wrap {
+        padding: 28px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 360px;
+        gap: 14px;
+        width: 100%;
+      }
+      .side {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .code-box {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .code-box pre {
+        min-height: 0;
+        font-size: 12px;
+      }
+      .side-note {
+        font-size: 12px;
+        color: var(--faint);
+      }
+      .read {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 14px;
+        text-align: center;
+        width: 100%;
+        max-width: 440px;
+      }
+      .read b {
+        color: var(--text);
+      }
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        outline: none;
+        cursor: pointer;
+        background: linear-gradient(
+          90deg,
+          var(--ac) var(--fill, 50%),
+          #232c40 var(--fill, 50%)
+        );
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        transition: transform 0.15s;
+      }
+      input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.15);
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+      }
+      .ctl {
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 7px 11px;
+        transition: 0.2s;
+      }
+      .ctl:hover {
+        background: #101725;
+        border-color: var(--line);
+      }
+      .ctl-top {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+      .ctl-top label {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text);
+      }
+      .ctl-val {
+        margin-left: auto;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--ac);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 2px 9px;
+      }
+      .mq {
+        display: block;
+        opacity: 0.35;
+        transition: 0.25s;
+        border-radius: 6px;
+        padding: 2px 4px;
+      }
+      .mq.on {
+        opacity: 1;
+        background: rgba(62, 207, 142, 0.12);
+        box-shadow: inset 0 0 0 1px rgba(62, 207, 142, 0.4);
+      }
+
+      /* ===== container query hosts ===== */
+      .cq-host {
+        container-type: inline-size;
+        width: 100%;
+        max-width: 440px;
+        margin: 0 auto;
+        transition: width 0.15s;
+        border: 1px dashed var(--line2);
+        border-radius: 14px;
+        padding: 14px;
+        background: rgba(255, 255, 255, 0.02);
+        position: relative;
+      }
+      .cq-host .h-lab {
+        position: absolute;
+        top: -9px;
+        left: 14px;
+        font-family: var(--mono);
+        font-size: 9.5px;
+        color: var(--faint);
+        background: var(--panel);
+        padding: 0 8px;
+      }
+
+      /* the component — base (narrow) */
+      .cq-card {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background: var(--panel2);
+        border: 1px solid var(--line2);
+        border-radius: 12px;
+        padding: 12px;
+        transition: 0.25s;
+      }
+      .cq-img {
+        height: 70px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, var(--content-c), var(--padding-c));
+        flex: none;
+        transition: 0.25s;
+      }
+      .cq-body {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 0;
+      }
+      .cq-title {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: 13px;
+        color: var(--text);
+      }
+      .cq-text {
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .cq-btn {
+        align-self: flex-start;
+        font: 700 9.5px var(--mono);
+        color: #0e1017;
+        background: var(--border-c);
+        border: none;
+        border-radius: 6px;
+        padding: 6px 12px;
+        cursor: pointer;
+      }
+
+      /* REAL container query: the component adapts to ITS box */
+      @container (min-width: 380px) {
+        .cq-card {
+          flex-direction: row;
+          align-items: stretch;
+        }
+        .cq-img {
+          width: 42%;
+          height: auto;
+          min-height: 90px;
+        }
+        .cq-title {
+          font-size: 16px;
+        }
+        .cq-btn {
+          background: var(--padding-c);
+        }
+      }
+
+      /* section 3: media-driven twin */
+      .mq-card {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background: var(--panel2);
+        border: 1px solid var(--margin-c);
+        border-radius: 12px;
+        padding: 12px;
+        transition: 0.25s;
+      }
+      .mq-card .cq-img {
+        background: linear-gradient(135deg, var(--margin-c), var(--border-c));
+      }
+      @media (min-width: 1100px) {
+        .mq-card {
+          flex-direction: row;
+          align-items: stretch;
+        }
+        .mq-card .cq-img {
+          width: 42%;
+          height: auto;
+          min-height: 90px;
+        }
+        .mq-card .cq-title {
+          font-size: 16px;
+        }
+      }
+      .vs-cols {
+        display: flex;
+        gap: 14px;
+        width: 100%;
+        max-width: 440px;
+        align-items: stretch;
+      }
+      .vs-col {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 0;
+      }
+      .vs-tag {
+        font-family: var(--mono);
+        font-size: 9.5px;
+        text-align: center;
+        padding: 4px 8px;
+        border-radius: 999px;
+        border: 1px solid;
+      }
+      .vs-tag.m {
+        color: var(--margin-c);
+        border-color: rgba(240, 127, 79, 0.5);
+      }
+      .vs-tag.c {
+        color: var(--content-c);
+        border-color: rgba(88, 166, 255, 0.5);
+      }
+
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      @media (min-width: 1180px) {
+        .notes-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media (max-width: 640px) {
+        .notes-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .note-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.3s,
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+      .note-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--nc);
+        opacity: 0.85;
+      }
+      .note-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--nc);
+        box-shadow: 0 24px 44px -28px rgba(0, 0, 0, 0.85);
+      }
+      .note-card h3 {
+        font-family: var(--mono);
+        font-size: 15px;
+        color: var(--nc);
+        margin-bottom: 8px;
+      }
+      .note-card p {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .note-tip {
+        margin-top: 12px;
+        font-size: 11px;
+        color: var(--faint);
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+      }
+      .note-demo {
+        height: 104px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        overflow: hidden;
+      }
+      .demo-ct {
+        width: 60%;
+        border: 1px dashed var(--line2);
+        border-radius: 8px;
+        padding: 8px;
+        transition: 0.4s;
+      }
+      .demo-ct i {
+        display: block;
+        height: 30px;
+        border-radius: 5px;
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+        transition: 0.4s;
+      }
+      .note-card:hover .demo-ct {
+        width: 88%;
+      }
+      .note-card:hover .demo-ct i {
+        height: 20px;
+        background: var(--padding-bg);
+        border-color: var(--padding-c);
+      }
+      .demo-cmp {
+        width: 78%;
+        display: flex;
+        gap: 6px;
+      }
+      .demo-cmp span {
+        flex: 1;
+        border: 1px dashed var(--line2);
+        border-radius: 6px;
+        padding: 6px;
+        display: block;
+        transition: 0.35s;
+      }
+      .demo-cmp i {
+        display: block;
+        height: 16px;
+        border-radius: 4px;
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+      }
+      .note-card:hover .demo-cmp span:first-child i {
+        height: 26px;
+        background: var(--padding-bg);
+        border-color: var(--padding-c);
+      }
+      .demo-vs {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        font: 10px var(--mono);
+        color: var(--muted);
+      }
+      .demo-vs i {
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        border: 1px solid var(--margin-c);
+        display: grid;
+        place-items: center;
+        transition: 0.3s;
+      }
+      .demo-vs em {
+        font-style: normal;
+      }
+      .note-card:hover .demo-vs i {
+        border-color: var(--content-c);
+        color: var(--content-c);
+      }
+      .demo-rw {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--muted);
+        transition: 0.3s;
+      }
+      .note-card:hover .demo-rw {
+        color: var(--padding-c);
+      }
+
+      .lesson-nav {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px clamp(18px, 3vw, 28px);
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+        align-items: center;
+        margin-top: 40px;
+      }
+      .ln-status {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--padding-c);
+        border: 1px solid rgba(62, 207, 142, 0.45);
+        border-radius: 999px;
+        padding: 3px 10px;
+      }
+      .lesson-nav h3 {
+        font-family: var(--disp);
+        font-size: 17px;
+        margin-top: 8px;
+      }
+      .ln-track {
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .tick {
+        width: 7px;
+        height: 15px;
+        border-radius: 2px;
+        background: #212a3e;
+        transition: 0.2s;
+      }
+      .tick.done {
+        background: var(--padding-c);
+        box-shadow: 0 0 8px rgba(62, 207, 142, 0.55);
+      }
+      .tick:hover {
+        background: var(--line2);
+      }
+      .ln-next {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        text-align: right;
+      }
+      .ln-next span {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .ln-next b {
+        font-family: var(--disp);
+        font-size: 15px;
+        color: var(--text);
+      }
+      footer {
+        border-top: 1px solid var(--line);
+        margin-top: 20px;
+        padding: 30px 0 44px;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+        color: var(--faint);
+        font-size: 12.5px;
+      }
+      footer .mono {
+        font-size: 11.5px;
+      }
+      footer .sp {
+        margin-left: auto;
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+      @media (max-width: 1020px) {
+        .intro {
+          grid-template-columns: 1fr;
+        }
+        .pick-grid {
+          grid-template-columns: 1fr;
+        }
+        .lesson-nav {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .ln-next {
+          align-items: center;
+        }
+        .vs-cols {
+          flex-direction: column;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg">
+      <span class="glow g1"></span><span class="glow g2"></span>
+    </div>
+
+    <header class="topbar">
+      <span class="lesson-tag">lesson 27 / 45</span>
+      <nav>
+        <a href="#container">@container</a>
+        <a href="#components">components</a>
+        <a href="#vs">vs media queries</a>
+        <a href="#notes">cheat-codes</a>
+      </nav>
+    </header>
+
+    <div class="wrap">
+      <!-- ============ intro ============ -->
+      <section class="intro">
+        <div>
+          <p class="eyebrow">lesson 27 · interactive</p>
+          <h1>
+            Components that hear <span class="word-style">their own box</span>.
+          </h1>
+          <p class="lede">
+            Media queries ask the <b>viewport</b>. Container queries ask the
+            <b>parent</b>. A card in a sidebar and the same card in a main
+            column can now style themselves differently — no classes, no
+            JavaScript, no viewport involvement.
+          </p>
+          <span class="css-full">A · SK · Y · OUR · P · ARENT</span>
+        </div>
+        <div class="intro-panel">
+          <div class="cq-host" id="ixHost" style="width: 240px">
+            <span class="h-lab">container (auto-animating)</span>
+            <div class="cq-card">
+              <div class="cq-img"></div>
+              <div class="cq-body">
+                <div class="cq-title">Aurora blend</div>
+                <div class="cq-text">small-batch, roasted tuesday</div>
+                <button class="cq-btn">add to bag</button>
+              </div>
+            </div>
+          </div>
+          <span class="intro-fmt" id="ixFmt">container: 240px — stacked</span>
+          <p class="imode mono">
+            the card listens to its box, not your screen…
+          </p>
+        </div>
+      </section>
+
+      <!-- ============ 01 · @container ============ -->
+      <section id="container" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">01 · @container</p>
+          <h2>Two lines of setup, one query</h2>
+          <p class="lede">
+            Mark the parent with
+            <span class="mono">container-type: inline-size</span>, then query it
+            with <span class="mono">@container (min-width: 380px)</span>. Drag
+            the container — the card flips layout at 380px no matter what your
+            window does.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>drag the container</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="cq-host" id="cqHost" style="width: 300px">
+                <span class="h-lab"
+                  >.card-wrap — container-type: inline-size</span
+                >
+                <div class="cq-card">
+                  <div class="cq-img"></div>
+                  <div class="cq-body">
+                    <div class="cq-title">Aurora blend</div>
+                    <div class="cq-text">
+                      small-batch beans, roasted every tuesday, shipped in 24h.
+                    </div>
+                    <button class="cq-btn">add to bag</button>
+                  </div>
+                </div>
+              </div>
+              <p class="read" id="cqRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rCq">container width</label
+                ><output class="ctl-val" id="oCq">300px</output>
+              </div>
+              <input type="range" id="rCq" min="220" max="440" value="300" />
+            </div>
+            <div class="code-box"><pre id="codeCq"></pre></div>
+            <p class="side-note">
+              Resize your browser window while dragging — the card doesn't care.
+              It only hears the 380px question.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 02 · container-based components ============ -->
+      <section id="components" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">02 · container-based components</p>
+          <h2>One component, two contexts</h2>
+          <p class="lede">
+            The <b>identical markup</b> placed in two containers. Drag each
+            independently — the card in the narrow box stays stacked, the one in
+            the wide box goes horizontal. This is the end of "sidebar variant"
+            classes.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>same HTML, different homes</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="cq-host" id="cqA" style="width: 260px">
+                <span class="h-lab">context A — sidebar</span>
+                <div class="cq-card">
+                  <div class="cq-img"></div>
+                  <div class="cq-body">
+                    <div class="cq-title">Aurora blend</div>
+                    <div class="cq-text">small-batch, roasted tuesday</div>
+                    <button class="cq-btn">add to bag</button>
+                  </div>
+                </div>
+              </div>
+              <div class="cq-host" id="cqB" style="width: 420px">
+                <span class="h-lab">context B — main column</span>
+                <div class="cq-card">
+                  <div class="cq-img"></div>
+                  <div class="cq-body">
+                    <div class="cq-title">Aurora blend</div>
+                    <div class="cq-text">
+                      small-batch beans, roasted every tuesday, shipped in 24h.
+                    </div>
+                    <button class="cq-btn">add to bag</button>
+                  </div>
+                </div>
+              </div>
+              <p class="read" id="cmpRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--padding-c)">
+              <div class="ctl-top">
+                <label for="rA">container A</label
+                ><output class="ctl-val" id="oA">260px</output>
+              </div>
+              <input type="range" id="rA" min="220" max="440" value="260" />
+            </div>
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rB">container B</label
+                ><output class="ctl-val" id="oB">420px</output>
+              </div>
+              <input type="range" id="rB" min="220" max="440" value="420" />
+            </div>
+            <div class="code-box"><pre id="codeCmp"></pre></div>
+            <p class="side-note">
+              The component ships once and adapts everywhere: sidebar, modal,
+              main, widget. Truly reusable at last.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 03 · media vs container ============ -->
+      <section id="vs" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">03 · media vs container queries</p>
+          <h2>Two different ears</h2>
+          <p class="lede">
+            Left card obeys a <b>media query</b> — it only changes when your
+            <b>window</b> crosses 1100px. Right card obeys a
+            <b>container query</b> — it only changes when its <b>box</b> crosses
+            380px. Resize the window AND drag the slider; watch each card mind
+            its own business.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>window vs box</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="vs-cols">
+                <div class="vs-col">
+                  <span class="vs-tag m">@media — hears the WINDOW</span>
+                  <div class="mq-card">
+                    <div class="cq-img"></div>
+                    <div class="cq-body">
+                      <div class="cq-title">Media card</div>
+                      <div class="cq-text">flips at window ≥ 1100px</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="vs-col">
+                  <span class="vs-tag c">@container — hears its BOX</span>
+                  <div
+                    class="cq-host"
+                    id="vsHost"
+                    style="width: 300px; border-style: solid"
+                  >
+                    <div class="cq-card">
+                      <div class="cq-img"></div>
+                      <div class="cq-body">
+                        <div class="cq-title">Container card</div>
+                        <div class="cq-text">flips at box ≥ 380px</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p class="read" id="vsRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rVs">right container width</label
+                ><output class="ctl-val" id="oVs">300px</output>
+              </div>
+              <input type="range" id="rVs" min="220" max="440" value="300" />
+            </div>
+            <div class="code-box"><pre id="codeVs"></pre></div>
+            <p class="side-note">
+              Rule of thumb: <b>media queries</b> for page-level layout (the
+              map), <b>container queries</b> for component-level layout (the
+              furniture).
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 04 · field notes ============ -->
+      <section id="notes" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">04 · field notes</p>
+          <h2>Cheat codes from lesson 27</h2>
+        </div>
+        <div class="notes-grid">
+          <article class="note-card" style="--nc: var(--content-c)">
+            <div class="note-demo">
+              <div class="demo-ct"><i></i></div>
+            </div>
+            <h3>setup = two lines</h3>
+            <p>
+              <span class="mono">container-type: inline-size</span> on the
+              parent, <span class="mono">@container (min-width: …)</span> on the
+              child. That's the whole API.
+            </p>
+            <p class="note-tip mono">↳ hover: the box widens, the card flips</p>
+          </article>
+          <article class="note-card" style="--nc: var(--padding-c)">
+            <div class="note-demo">
+              <div class="demo-cmp">
+                <span><i></i></span><span><i></i></span>
+              </div>
+            </div>
+            <h3>components self-style</h3>
+            <p>
+              Same markup, different contexts, different looks — no variant
+              classes. Sidebar card stacks, main card spreads.
+            </p>
+            <p class="note-tip mono">↳ hover: left adapts on its own</p>
+          </article>
+          <article class="note-card" style="--nc: var(--margin-c)">
+            <div class="note-demo">
+              <div class="demo-vs"><i>vw</i><em>vs</em><i>cq</i></div>
+            </div>
+            <h3>map vs furniture</h3>
+            <p>
+              Media queries arrange the page; container queries arrange the
+              pieces inside it. Both coexist happily in one codebase.
+            </p>
+            <p class="note-tip mono">↳ hover: the container side lights up</p>
+          </article>
+          <article class="note-card" style="--nc: var(--border-c)">
+            <div class="note-demo">
+              <div class="demo-rw">container-type: inline-size</div>
+            </div>
+            <h3>inline-size, not size</h3>
+            <p>
+              <span class="mono">inline-size</span> (width) avoids layout loops;
+              full <span class="mono">size</span> containment exists but rarely
+              needed. Query what you actually respond to.
+            </p>
+            <p class="note-tip mono">↳ hover: the keyword glows</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ lesson nav ============ -->
+      <div class="lesson-nav reveal">
+        <div>
+          <span class="ln-status">✓ completed</span>
+          <h3>27 — Container Queries</h3>
+        </div>
+        <div class="ln-track" id="lnTrack"></div>
+        <div class="ln-next">
+          <span>up next</span>
+          <b>28 · Transitions</b>
+        </div>
+      </div>
+
+      <footer>
+        <span class="mono">drag things, break things, learn things.</span>
+        <span class="sp mono">45 lessons · lesson 27 · container queries</span>
+      </footer>
+    </div>
+    <!-- /wrap -->
+
+    <script>
+      (() => {
+        const $ = (id) => document.getElementById(id);
+        const rule = (sel, decls) =>
+          `<span class="c-sel">${sel}</span> {\n${decls
+            .map((d) => {
+              const i = d.indexOf(":");
+              return `  <span class="c-prop">${d.slice(0, i)}</span>: <span class="c-val">${d.slice(i + 1).trim()}</span>;`;
+            })
+            .join("\n")}\n}`;
+        function range(el, out, fmt, cb) {
+          const f = () => {
+            const v = +el.value;
+            out.textContent = fmt(v);
+            const min = +el.min,
+              max = +el.max;
+            el.style.setProperty(
+              "--fill",
+              ((v - min) / (max - min)) * 100 + "%",
+            );
+            cb(v);
+          };
+          el.addEventListener("input", f);
+          f();
+        }
+
+        /* ---------- intro: auto-animating container ---------- */
+        let iw = 240,
+          idir = 1;
+        setInterval(() => {
+          iw += idir * 6;
+          if (iw > 430) {
+            iw = 430;
+            idir = -1;
+          }
+          if (iw < 230) {
+            iw = 230;
+            idir = 1;
+          }
+          $("ixHost").style.width = iw + "px";
+          $("ixFmt").textContent =
+            `container: ${iw}px — ${iw >= 380 ? "horizontal (query matched)" : "stacked"}`;
+        }, 50);
+
+        /* ---------- 01 @container ---------- */
+        function renderCq(v) {
+          $("cqHost").style.width = v + "px";
+          $("cqRead").innerHTML =
+            `container <b>${v}px</b> → ${v >= 380 ? "<b>@container matched</b> — row layout" : "base styles — stacked"}`;
+          $("codeCq").innerHTML =
+            `<span class="mq on"><span class="c-sel">.card-wrap</span> {\n  <span class="c-prop">container-type</span>: <span class="c-val">inline-size</span>;\n}</span>` +
+            `<span class="mq ${v >= 380 ? "on" : ""}"><span class="c-sel">@container (min-width: 380px)</span> {\n  <span class="c-sel">.card</span> { <span class="c-prop">flex-direction</span>: <span class="c-val">row</span>; }\n}</span>`;
+        }
+        range($("rCq"), $("oCq"), (v) => v + "px", renderCq);
+
+        /* ---------- 02 components ---------- */
+        function renderCmp() {
+          const a = +$("rA").value,
+            b = +$("rB").value;
+          $("cqA").style.width = a + "px";
+          $("cqB").style.width = b + "px";
+          $("cmpRead").innerHTML =
+            `A <b>${a}px</b> → ${a >= 380 ? "row" : "stacked"} · B <b>${b}px</b> → ${b >= 380 ? "row" : "stacked"} — one markup, two answers`;
+          $("codeCmp").innerHTML =
+            rule(".wrap-a, .wrap-b", [`container-type: inline-size`]) +
+            `\n<span class="c-com">/* one @container rule serves both */</span>`;
+        }
+        range($("rA"), $("oA"), (v) => v + "px", renderCmp);
+        range($("rB"), $("oB"), (v) => v + "px", renderCmp);
+
+        /* ---------- 03 vs ---------- */
+        function renderVs() {
+          const c = +$("rVs").value;
+          $("vsHost").style.width = c + "px";
+          const mw = innerWidth;
+          $("vsRead").innerHTML =
+            `window <b>${mw}px</b> → media card ${mw >= 1100 ? "<b>row</b>" : "stacked"} · box <b>${c}px</b> → container card ${c >= 380 ? "<b>row</b>" : "stacked"}`;
+          $("codeVs").innerHTML =
+            `<span class="mq ${mw >= 1100 ? "on" : ""}"><span class="c-sel">@media (min-width: 1100px)</span> { … }</span>` +
+            `<span class="mq ${c >= 380 ? "on" : ""}"><span class="c-sel">@container (min-width: 380px)</span> { … }</span>`;
+        }
+        range($("rVs"), $("oVs"), (v) => v + "px", renderVs);
+        addEventListener("resize", renderVs);
+        renderVs();
+
+        /* ---------- lesson track ---------- */
+        const t = $("lnTrack");
+        for (let i = 0; i < 45; i++) {
+          const s = document.createElement("span");
+          s.className = "tick" + (i < 27 ? " done" : "");
+          s.title = "lesson " + (i + 1);
+          t.appendChild(s);
+        }
+
+        /* ---------- reveal ---------- */
+        const io = new IntersectionObserver(
+          (es) =>
+            es.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                io.unobserve(e.target);
+              }
+            }),
+          { threshold: 0.12 },
+        );
+        document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      })();
+    </script>
+  </body>
+</html>

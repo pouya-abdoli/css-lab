@@ -1,0 +1,1585 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pseudo-elements — Lesson 23</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' fill='none' stroke='%23f07f4f' stroke-width='2'/%3E%3Crect x='8' y='8' width='16' height='16' fill='none' stroke='%23f2c14e' stroke-width='2'/%3E%3Crect x='13' y='13' width='6' height='6' fill='%2358a6ff'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0e15;
+        --panel: #121826;
+        --panel2: #0d1220;
+        --ink: #10141d;
+        --line: #222c40;
+        --line2: #31405e;
+        --text: #e9eef7;
+        --muted: #8d9ab0;
+        --faint: #5b6a84;
+        --margin-c: #f07f4f;
+        --margin-bg: rgba(240, 127, 79, 0.14);
+        --border-c: #f2c14e;
+        --border-bg: rgba(242, 193, 78, 0.16);
+        --padding-c: #3ecf8e;
+        --padding-bg: rgba(62, 207, 142, 0.14);
+        --content-c: #58a6ff;
+        --content-bg: rgba(88, 166, 255, 0.17);
+        --pink: #ff4f8b;
+        --page: #f7f4ee;
+        --page-ink: #1c1f26;
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: dark;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 15px;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+      ::selection {
+        background: rgba(88, 166, 255, 0.35);
+      }
+      .mono {
+        font-family: var(--mono);
+      }
+      section {
+        scroll-margin-top: 76px;
+      }
+      b {
+        font-weight: 600;
+      }
+
+      .bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            700px 460px at 12% -6%,
+            rgba(242, 193, 78, 0.07),
+            transparent 60%
+          ),
+          radial-gradient(
+            760px 520px at 92% 22%,
+            rgba(88, 166, 255, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            600px 480px at 40% 105%,
+            rgba(62, 207, 142, 0.05),
+            transparent 60%
+          );
+      }
+      .bg::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(233, 238, 247, 0.035) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(233, 238, 247, 0.035) 1px,
+            transparent 1px
+          );
+        background-size: 28px 28px;
+        mask-image: radial-gradient(
+          ellipse 120% 90% at 50% 0%,
+          #000 40%,
+          transparent 100%
+        );
+      }
+      .bg .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.5;
+        animation: drift 26s ease-in-out infinite alternate;
+      }
+      .bg .g1 {
+        width: 420px;
+        height: 420px;
+        left: -120px;
+        top: 30%;
+        background: rgba(240, 127, 79, 0.1);
+      }
+      .bg .g2 {
+        width: 460px;
+        height: 460px;
+        right: -140px;
+        top: 60%;
+        background: rgba(88, 166, 255, 0.1);
+        animation-delay: -12s;
+      }
+      @keyframes drift {
+        from {
+          transform: translateY(-30px);
+        }
+        to {
+          transform: translateY(40px);
+        }
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 12px clamp(16px, 4vw, 44px);
+        background: rgba(11, 14, 21, 0.92);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar nav {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .topbar nav a {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 6px 11px;
+        border-radius: 999px;
+        transition: 0.2s;
+      }
+      .topbar nav a:hover {
+        color: var(--text);
+        background: #161d2c;
+      }
+      .lesson-tag {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--border-c);
+        border: 1px dashed rgba(242, 193, 78, 0.45);
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .wrap {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: 0 clamp(16px, 4vw, 44px);
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        padding: clamp(20px, 4vh, 48px) 0 clamp(30px, 5vh, 56px);
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--padding-c);
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(2.3rem, 5.2vw, 3.7rem);
+        line-height: 1.06;
+        letter-spacing: -0.02em;
+      }
+      .word-style {
+        display: inline-block;
+        padding: 0.02em 0.22em;
+        background: var(--border-bg);
+        border: 0.06em solid var(--border-c);
+        border-radius: 0.14em;
+        color: #ffe3a1;
+        transition: transform 0.3s;
+        cursor: default;
+      }
+      .word-style:hover {
+        transform: rotate(-2deg) scale(1.03);
+      }
+      .lede {
+        color: var(--muted);
+        max-width: 56ch;
+        margin-top: 18px;
+        font-size: 1.05rem;
+      }
+      .lede b {
+        color: var(--text);
+      }
+      .css-full {
+        display: inline-block;
+        margin-top: 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--faint);
+        letter-spacing: 0.08em;
+      }
+      .intro-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 26px;
+        display: grid;
+        place-items: center;
+        gap: 16px;
+        box-shadow: 0 30px 60px -40px rgba(0, 0, 0, 0.8);
+      }
+      .ix-txt {
+        font-family: var(--body);
+        font-size: 15px;
+        color: var(--text);
+        max-width: 260px;
+        text-align: center;
+        transition: 0.3s;
+      }
+      .ix-txt.look-b::before {
+        content: "★ ";
+        color: var(--border-c);
+      }
+      .ix-txt.look-a::after {
+        content: " ☕";
+        color: var(--margin-c);
+      }
+      .ix-txt.look-fl::first-letter {
+        font-size: 1.9em;
+        color: var(--margin-c);
+        font-weight: 700;
+        font-family: var(--disp);
+      }
+      .ix-txt.look-sel #ixSel {
+        background: var(--border-c);
+        color: #10141d;
+        border-radius: 3px;
+        padding: 0 3px;
+      }
+      .intro-fmt {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--content-c);
+        background: var(--ink);
+        border: 1px solid var(--line2);
+        border-radius: 9px;
+        padding: 7px 16px;
+        min-height: 36px;
+      }
+      .imode {
+        font-size: 11px;
+        color: var(--faint);
+        letter-spacing: 0.1em;
+      }
+
+      .sec {
+        padding: clamp(36px, 6vh, 64px) 0;
+      }
+      .sec-head {
+        margin-bottom: 26px;
+        max-width: 72ch;
+      }
+      .sec-head h2 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+        letter-spacing: -0.015em;
+        line-height: 1.15;
+      }
+      .sec-head .lede {
+        margin-top: 10px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 18px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .panel-head h3 {
+        font-family: var(--disp);
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dots i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dots i:nth-child(1) {
+        background: #f07f4f;
+      }
+      .dots i:nth-child(2) {
+        background: #f2c14e;
+      }
+      .dots i:nth-child(3) {
+        background: #3ecf8e;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.85;
+        overflow-x: auto;
+      }
+      .c-sel {
+        color: #7fe0b0;
+      }
+      .c-prop {
+        color: #8ab4ff;
+      }
+      .c-val {
+        color: #f2c14e;
+      }
+      .c-com {
+        color: #5b6a84;
+      }
+      .grp {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+
+      .pick-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 18px;
+        align-items: stretch;
+      }
+      .stage-wrap {
+        padding: 28px;
+        display: grid;
+        place-items: center;
+        min-height: 340px;
+        gap: 14px;
+      }
+      .side {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .sel-chip {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .sel-chip:hover {
+        color: var(--text);
+        border-color: var(--content-c);
+        transform: translateY(-2px);
+      }
+      .sel-chip.on {
+        color: #0e1017;
+        background: var(--content-c);
+        border-color: var(--content-c);
+        font-weight: 600;
+      }
+      .code-box {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .code-box pre {
+        min-height: 0;
+        font-size: 12.5px;
+      }
+      .side-note {
+        font-size: 12px;
+        color: var(--faint);
+      }
+      .read {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 14px;
+      }
+      .read b {
+        color: var(--text);
+      }
+      .txt-in {
+        width: 100%;
+        font-family: var(--mono);
+        font-size: 12px;
+        padding: 9px 12px;
+        border: 1px solid var(--line2);
+        border-radius: 9px;
+        background: var(--ink);
+        color: var(--text);
+        outline: none;
+        transition: 0.2s;
+      }
+      .txt-in:focus {
+        border-color: var(--content-c);
+      }
+      input[type="color"].pick {
+        width: 48px;
+        height: 34px;
+        border: 1px solid var(--line2);
+        border-radius: 9px;
+        background: none;
+        padding: 2px;
+        cursor: pointer;
+      }
+      .picker-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .picker-row label {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        flex: 1;
+      }
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        outline: none;
+        cursor: pointer;
+        background: linear-gradient(
+          90deg,
+          var(--ac) var(--fill, 50%),
+          #232c40 var(--fill, 50%)
+        );
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        transition: transform 0.15s;
+      }
+      input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.15);
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+      }
+      .ctl {
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 7px 11px;
+        transition: 0.2s;
+      }
+      .ctl:hover {
+        background: #101725;
+        border-color: var(--line);
+      }
+      .ctl-top {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+      .ctl-top label {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text);
+      }
+      .ctl-val {
+        margin-left: auto;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--ac);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 2px 9px;
+      }
+
+      /* 01 before/after */
+      .pa-box {
+        position: relative;
+        background: var(--panel2);
+        border: 1px solid var(--line2);
+        border-radius: 12px;
+        padding: 28px 30px;
+        font-family: var(--disp);
+        font-size: 18px;
+        color: var(--text);
+        transition: 0.25s;
+        max-width: 420px;
+        width: 100%;
+        text-align: center;
+        cursor: default;
+      }
+      .pa-box::before,
+      .pa-box::after {
+        transition: all 0.25s;
+      }
+      .pa-badge::before {
+        content: var(--pac, "★");
+        position: absolute;
+        top: -12px;
+        left: -12px;
+        background: var(--margin-c);
+        color: #0e1017;
+        font: 700 11px var(--mono);
+        padding: 6px 10px;
+        border-radius: 999px;
+        transform: rotate(-8deg);
+      }
+      .pa-quote::before {
+        content: var(--pac, "“");
+        position: absolute;
+        top: 0;
+        left: 12px;
+        font: 700 46px/1 var(--disp);
+        color: var(--border-c);
+        opacity: 0.85;
+      }
+      .pa-arrow::after {
+        content: var(--pac, "→");
+        display: inline-block;
+        margin-left: 10px;
+        color: var(--content-c);
+        transition: transform 0.2s;
+      }
+      .pa-arrow:hover::after {
+        transform: translateX(7px);
+      }
+      .pa-line::after {
+        content: "";
+        display: block;
+        width: 62%;
+        height: 3px;
+        margin: 14px auto -6px;
+        border-radius: 2px;
+        background: linear-gradient(90deg, var(--content-c), var(--padding-c));
+      }
+
+      /* 02 first-letter */
+      .fl-page {
+        background: var(--page);
+        color: var(--page-ink);
+        border-radius: 12px;
+        max-width: 440px;
+        width: 100%;
+        padding: 22px;
+        font-size: 14px;
+        line-height: 1.75;
+        transition: 0.2s;
+      }
+      .fl-page.dc::first-letter {
+        font-size: var(--fls, 3em);
+        float: left;
+        line-height: 0.85;
+        padding: 4px 10px 0 0;
+        color: var(--flc, #1273c4);
+        font-weight: 700;
+        font-family: var(--disp);
+      }
+
+      /* 03 first-line */
+      .fline-frame {
+        width: 440px;
+        max-width: 100%;
+        border: 1px dashed var(--line2);
+        border-radius: 12px;
+        padding: 18px;
+        transition: width 0.2s;
+      }
+      .fline-txt {
+        font-size: 14px;
+        line-height: 1.8;
+        color: var(--muted);
+      }
+      .fline-txt::first-line {
+        color: var(--border-c);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+
+      /* 04 selection */
+      .sel-txt {
+        max-width: 440px;
+        font-size: 15px;
+        line-height: 1.8;
+        color: var(--text);
+      }
+      .sel-txt::selection {
+        background: var(--selbg, #f2c14e);
+        color: var(--selfg, #10141d);
+      }
+
+      /* 05 placeholder */
+      .ph-in {
+        width: 100%;
+        max-width: 420px;
+        font-family: var(--body);
+        font-size: 14px;
+        padding: 13px 15px;
+        border: 1px solid var(--line2);
+        border-radius: 10px;
+        background: var(--ink);
+        color: var(--text);
+        outline: none;
+        transition: 0.2s;
+      }
+      .ph-in:focus {
+        border-color: var(--content-c);
+      }
+      .ph-in::placeholder {
+        color: var(--phc, #5b6a84);
+        opacity: var(--pho, 1);
+        font-style: var(--phs, normal);
+      }
+
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      @media (min-width: 1180px) {
+        .notes-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media (max-width: 640px) {
+        .notes-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .note-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.3s,
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+      .note-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--nc);
+        opacity: 0.85;
+      }
+      .note-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--nc);
+        box-shadow: 0 24px 44px -28px rgba(0, 0, 0, 0.85);
+      }
+      .note-card h3 {
+        font-family: var(--mono);
+        font-size: 15px;
+        color: var(--nc);
+        margin-bottom: 8px;
+      }
+      .note-card p {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .note-tip {
+        margin-top: 12px;
+        font-size: 11px;
+        color: var(--faint);
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+      }
+      .note-demo {
+        height: 104px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        overflow: hidden;
+      }
+      .demo-ba {
+        position: relative;
+        width: 64%;
+        height: 38px;
+        border: 1px solid var(--line2);
+        border-radius: 8px;
+      }
+      .demo-ba::before {
+        content: "★";
+        position: absolute;
+        top: -10px;
+        left: -8px;
+        font: 700 10px var(--mono);
+        background: var(--margin-c);
+        color: #0e1017;
+        border-radius: 999px;
+        padding: 4px 7px;
+        opacity: 0;
+        transform: scale(0);
+        transition: 0.3s;
+      }
+      .demo-ba::after {
+        content: "→";
+        position: absolute;
+        right: 8px;
+        top: 9px;
+        color: var(--content-c);
+        opacity: 0;
+        transition: 0.3s;
+      }
+      .note-card:hover .demo-ba::before {
+        opacity: 1;
+        transform: scale(1);
+      }
+      .note-card:hover .demo-ba::after {
+        opacity: 1;
+      }
+      .demo-fl {
+        font: 15px var(--body);
+        color: var(--muted);
+      }
+      .demo-fl::first-letter {
+        transition: 0.3s;
+        color: var(--muted);
+        font-size: 1em;
+      }
+      .note-card:hover .demo-fl::first-letter {
+        font-size: 1.9em;
+        color: var(--border-c);
+        font-weight: 700;
+        font-family: var(--disp);
+      }
+      .demo-sel {
+        font: 12px var(--body);
+        color: var(--muted);
+      }
+      .demo-sel span {
+        transition: 0.3s;
+        border-radius: 3px;
+      }
+      .note-card:hover .demo-sel span {
+        background: var(--border-c);
+        color: #10141d;
+      }
+      .demo-ph {
+        width: 68%;
+        height: 36px;
+        border: 1px solid var(--line2);
+        border-radius: 8px;
+        position: relative;
+        overflow: hidden;
+      }
+      .demo-ph::before {
+        content: "you@aurora.coffee";
+        position: absolute;
+        left: 10px;
+        top: 9px;
+        font: 11px var(--mono);
+        color: var(--faint);
+        transition: 0.3s;
+      }
+      .demo-ph::after {
+        content: "you@au";
+        position: absolute;
+        left: 10px;
+        top: 9px;
+        font: 11px var(--mono);
+        color: var(--text);
+        opacity: 0;
+        transition: 0.3s;
+      }
+      .note-card:hover .demo-ph::before {
+        opacity: 0;
+      }
+      .note-card:hover .demo-ph::after {
+        opacity: 1;
+      }
+
+      .lesson-nav {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px clamp(18px, 3vw, 28px);
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+        align-items: center;
+      }
+      .ln-status {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--padding-c);
+        border: 1px solid rgba(62, 207, 142, 0.45);
+        border-radius: 999px;
+        padding: 3px 10px;
+      }
+      .lesson-nav h3 {
+        font-family: var(--disp);
+        font-size: 17px;
+        margin-top: 8px;
+      }
+      .ln-track {
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .tick {
+        width: 7px;
+        height: 15px;
+        border-radius: 2px;
+        background: #212a3e;
+        transition: 0.2s;
+      }
+      .tick.done {
+        background: var(--padding-c);
+        box-shadow: 0 0 8px rgba(62, 207, 142, 0.55);
+      }
+      .tick:hover {
+        background: var(--line2);
+      }
+      .ln-next {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        text-align: right;
+      }
+      .ln-next span {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .ln-next b {
+        font-family: var(--disp);
+        font-size: 15px;
+        color: var(--text);
+      }
+      footer {
+        border-top: 1px solid var(--line);
+        margin-top: 40px;
+        padding: 30px 0 44px;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+        color: var(--faint);
+        font-size: 12.5px;
+      }
+      footer .mono {
+        font-size: 11.5px;
+      }
+      footer .sp {
+        margin-left: auto;
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+      @media (max-width: 1020px) {
+        .intro {
+          grid-template-columns: 1fr;
+        }
+        .pick-grid {
+          grid-template-columns: 1fr;
+        }
+        .lesson-nav {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .ln-next {
+          align-items: center;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg">
+      <span class="glow g1"></span><span class="glow g2"></span>
+    </div>
+
+    <header class="topbar">
+      <span class="lesson-tag">lesson 23 / 45</span>
+      <nav>
+        <a href="#ba">before · after</a>
+        <a href="#fl">first-letter</a>
+        <a href="#fline">first-line</a>
+        <a href="#sel">selection</a>
+        <a href="#ph">placeholder</a>
+        <a href="#notes">cheat-codes</a>
+      </nav>
+    </header>
+
+    <div class="wrap">
+      <!-- ============ intro ============ -->
+      <section class="intro">
+        <div>
+          <p class="eyebrow">lesson 23 · interactive</p>
+          <h1>
+            Style the parts that <span class="word-style">aren't there</span>.
+          </h1>
+          <p class="lede">
+            Pseudo-elements (double colon, <span class="mono">::</span>) reach
+            <i>inside</i> or <i>outside</i> an element: generated content with
+            <b>::before / ::after</b>, editorial typography with
+            <b>::first-letter / ::first-line</b>, and the user's own marks with
+            <b>::selection / ::placeholder</b>. Six tools, zero extra HTML.
+          </p>
+          <span class="css-full">D · OUBLE · C · OLONS · N · O · HTML</span>
+        </div>
+        <div class="intro-panel">
+          <p class="ix-txt" id="ixEl">
+            Aurora roasts every <span id="ixSel">Tuesday</span> morning.
+          </p>
+          <span class="intro-fmt" id="introFmt"
+            >::before { content: "★ " }</span
+          >
+          <p class="imode mono">one sentence, four ghosts…</p>
+        </div>
+      </section>
+
+      <!-- ============ 01 · ::before & ::after ============ -->
+      <section id="ba" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">01 · ::before &amp; ::after</p>
+          <h2>The generated twins</h2>
+          <p class="lede">
+            Two invisible children, first and last, created purely by CSS.
+            They're how badges, quote marks, arrows and dividers ship without
+            touching the HTML. Pick a job, type your own content, hover the box.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>hover the arrow one</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="pa-box pa-badge" id="paBox">Aurora Coffee</div>
+              <p class="read" id="paRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <p class="grp">job</p>
+            <div class="chips" id="paChips">
+              <button class="sel-chip on" data-v="badge">badge</button>
+              <button class="sel-chip" data-v="quote">quote mark</button>
+              <button class="sel-chip" data-v="arrow">arrow link</button>
+              <button class="sel-chip" data-v="line">divider</button>
+            </div>
+            <p class="grp">content</p>
+            <input
+              class="txt-in"
+              id="paContent"
+              type="text"
+              value="★"
+              maxlength="12"
+            />
+            <div class="code-box"><pre id="codePa"></pre></div>
+            <p class="side-note">
+              Without <span class="mono">content</span> — even
+              <span class="mono">""</span> — the pseudo-element doesn't exist.
+              It's inline by default; position it like any box.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 02 · ::first-letter ============ -->
+      <section id="fl" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">02 · ::first-letter</p>
+          <h2>The drop cap</h2>
+          <p class="lede">
+            Centuries of print typography in one selector: enlarge and float the
+            first letter. Drag the size, pick the ink. Toggle it off to see the
+            paragraph forget its manners.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>straight out of a magazine</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="fl-page dc" id="flPage">
+                Tuesday is roast day at Aurora. The drum spins up at six, the
+                first crack sounds like applause, and by noon the whole street
+                smells of caramel and stone fruit. We bag it warm, date it
+                honestly, and ride it to your door before the weekend.
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="chips">
+              <button class="sel-chip on" id="flOn">drop cap on</button>
+              <button class="sel-chip" id="flOff">off</button>
+            </div>
+            <div class="ctl" style="--ac: var(--border-c)">
+              <div class="ctl-top">
+                <label for="rFl">size</label
+                ><output class="ctl-val" id="oFl">3em</output>
+              </div>
+              <input
+                type="range"
+                id="rFl"
+                min="1.5"
+                max="5"
+                step="0.1"
+                value="3"
+              />
+            </div>
+            <div class="picker-row">
+              <label for="cFl">ink</label
+              ><input type="color" class="pick" id="cFl" value="#1273c4" />
+            </div>
+            <div class="code-box"><pre id="codeFl"></pre></div>
+            <p class="side-note">
+              float: left is what lets the text wrap around it. Only works on
+              block containers — not on flex or grid items.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 03 · ::first-line ============ -->
+      <section id="fline" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">03 · ::first-line</p>
+          <h2>The line that knows your width</h2>
+          <p class="lede">
+            ::first-line styles wherever line one <i>happens to end</i> — which
+            depends on the container's width. Drag the width and watch the amber
+            uppercase portion re-wrap. No other selector is this alive.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>drag the width</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="fline-frame" id="flineFrame">
+                <p class="fline-txt">
+                  Small-batch beans, roasted every Tuesday and shipped within 24
+                  hours. No subscriptions, no nonsense — just very good coffee,
+                  delivered before the weekend, wrapped in paper not plastic.
+                </p>
+              </div>
+              <p class="read" id="flineRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rFw">container width</label
+                ><output class="ctl-val" id="oFw">440px</output>
+              </div>
+              <input type="range" id="rFw" min="220" max="440" value="440" />
+            </div>
+            <div class="code-box"><pre id="codeFline"></pre></div>
+            <p class="side-note">
+              Resize the browser and it recomputes too. That's the point: you
+              style a <i>region of text</i>, not a fixed set of words.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 04 · ::selection ============ -->
+      <section id="sel" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">04 · ::selection</p>
+          <h2>Brand the highlighter</h2>
+          <p class="lede">
+            When users drag across text, the browser paints a selection — and
+            you choose the paint. Pick colors, then <b>select the paragraph</b>.
+            Keep the contrast readable: people select to copy, not to admire.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>drag across me</h3>
+            </div>
+            <div class="stage-wrap">
+              <p class="sel-txt" id="selTxt">
+                Select this sentence with your mouse or Shift+arrows. The
+                highlight you're painting right now is ::selection — the only
+                pseudo-element the user triggers by reading.
+              </p>
+              <p class="read" id="selRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="picker-row">
+              <label for="cSelBg">highlight</label
+              ><input type="color" class="pick" id="cSelBg" value="#f2c14e" />
+            </div>
+            <div class="picker-row">
+              <label for="cSelFg">text</label
+              ><input type="color" class="pick" id="cSelFg" value="#10141d" />
+            </div>
+            <div class="code-box"><pre id="codeSel"></pre></div>
+            <p class="side-note">
+              Set it on <span class="mono">::selection</span> globally for a
+              site-wide signature. Limited properties on purpose: color,
+              background, and a few text styles.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 05 · ::placeholder ============ -->
+      <section id="ph" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">05 · ::placeholder</p>
+          <h2>The ghost in the input</h2>
+          <p class="lede">
+            The hint text is styleable too. Write the hint, tint it, fade it —
+            but never below readable, and remember lesson 20: a placeholder is a
+            hint, <b>not a label</b>. It vanishes the moment someone types.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>type in it — the ghost leaves</h3>
+            </div>
+            <div class="stage-wrap">
+              <input
+                class="ph-in"
+                id="phIn"
+                type="text"
+                placeholder="you@aurora.coffee"
+              />
+              <p class="read">
+                the placeholder styles the <b>hint</b>, not the typed value
+              </p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <p class="grp">hint text</p>
+            <input
+              class="txt-in"
+              id="phText"
+              type="text"
+              value="you@aurora.coffee"
+              maxlength="40"
+            />
+            <div class="picker-row">
+              <label for="cPh">color</label
+              ><input type="color" class="pick" id="cPh" value="#5b6a84" />
+            </div>
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rPh">opacity</label
+                ><output class="ctl-val" id="oPh">1</output>
+              </div>
+              <input
+                type="range"
+                id="rPh"
+                min="0.2"
+                max="1"
+                step="0.05"
+                value="1"
+              />
+            </div>
+            <div class="chips">
+              <button class="sel-chip on" id="phNorm">normal</button>
+              <button class="sel-chip" id="phItal">italic</button>
+            </div>
+            <div class="code-box"><pre id="codePh"></pre></div>
+            <p class="side-note">
+              Browsers default placeholders to ~0.54 opacity. Setting opacity: 1
+              with a muted color is the accessible move.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 06 · field notes ============ -->
+      <section id="notes" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">06 · field notes</p>
+          <h2>Cheat codes from lesson 23</h2>
+        </div>
+        <div class="notes-grid">
+          <article class="note-card" style="--nc: var(--content-c)">
+            <div class="note-demo"><div class="demo-ba"></div></div>
+            <h3>::before / ::after</h3>
+            <p>
+              Generated first &amp; last children. Need
+              <span class="mono">content</span> to exist. Badges, arrows,
+              quotes, overlays, dividers — all without extra HTML.
+            </p>
+            <p class="note-tip mono">↳ hover: badge &amp; arrow appear</p>
+          </article>
+          <article class="note-card" style="--nc: var(--border-c)">
+            <div class="note-demo">
+              <span class="demo-fl">Aurora roasts…</span>
+            </div>
+            <h3>editorial pair</h3>
+            <p>
+              ::first-letter = drop caps (needs a block box). ::first-line = a
+              region that re-wraps with width. Print typography, shipped in CSS.
+            </p>
+            <p class="note-tip mono">↳ hover: the drop cap arrives</p>
+          </article>
+          <article class="note-card" style="--nc: var(--margin-c)">
+            <div class="note-demo">
+              <span class="demo-sel">select <span>this part</span> of me</span>
+            </div>
+            <h3>::selection = signature</h3>
+            <p>
+              The user paints it by reading. Brand the highlighter, keep
+              contrast high. One of the few pseudo-elements triggered by the
+              audience.
+            </p>
+            <p class="note-tip mono">↳ hover: the highlight lands</p>
+          </article>
+          <article class="note-card" style="--nc: var(--padding-c)">
+            <div class="note-demo"><div class="demo-ph"></div></div>
+            <h3>::placeholder = hint</h3>
+            <p>
+              Styles the ghost text only. Muted color, full opacity, never a
+              label replacement — it disappears on input, labels must not.
+            </p>
+            <p class="note-tip mono">↳ hover: ghost out, typing in</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ lesson nav ============ -->
+      <div class="lesson-nav reveal">
+        <div>
+          <span class="ln-status">✓ completed</span>
+          <h3>23 — Pseudo-elements</h3>
+        </div>
+        <div class="ln-track" id="lnTrack"></div>
+        <div class="ln-next">
+          <span>up next</span>
+          <b>24 · Responsive Design Fundamentals</b>
+        </div>
+      </div>
+
+      <footer>
+        <span class="mono">drag things, break things, learn things.</span>
+        <span class="sp mono">45 lessons · lesson 23 · pseudo-elements</span>
+      </footer>
+    </div>
+    <!-- /wrap -->
+
+    <script>
+      (() => {
+        const $ = (id) => document.getElementById(id);
+        const rule = (sel, decls) =>
+          `<span class="c-sel">${sel}</span> {\n${decls
+            .map((d) => {
+              const i = d.indexOf(":");
+              return `  <span class="c-prop">${d.slice(0, i)}</span>: <span class="c-val">${d.slice(i + 1).trim()}</span>;`;
+            })
+            .join("\n")}\n}`;
+        function range(el, out, fmt, cb) {
+          const f = () => {
+            const v = +el.value;
+            out.textContent = fmt(v);
+            const min = +el.min,
+              max = +el.max;
+            el.style.setProperty(
+              "--fill",
+              ((v - min) / (max - min)) * 100 + "%",
+            );
+            cb(v);
+          };
+          el.addEventListener("input", f);
+          f();
+        }
+        function chipGroup(box, cb) {
+          box.addEventListener("click", (e) => {
+            const c = e.target.closest(".sel-chip");
+            if (!c) return;
+            box
+              .querySelectorAll(".sel-chip")
+              .forEach((x) => x.classList.remove("on"));
+            c.classList.add("on");
+            cb(c.dataset.v);
+          });
+        }
+
+        /* ---------- intro cycle ---------- */
+        const LOOKS = [
+          { c: "look-b", l: '::before { content: "★ " }' },
+          { c: "look-a", l: '::after { content: " ☕" }' },
+          { c: "look-fl", l: "::first-letter { font-size: 1.9em }" },
+          { c: "look-sel", l: '::selection — simulated on "Tuesday"' },
+        ];
+        let li = 0;
+        function look() {
+          const L = LOOKS[li],
+            el = $("ixEl");
+          el.className = "ix-txt " + L.c;
+          $("introFmt").textContent = L.l;
+          li = (li + 1) % LOOKS.length;
+        }
+        look();
+        setInterval(look, 2100);
+
+        /* ---------- 01 before/after ---------- */
+        const PA = { preset: "badge" };
+        const PA_DEF = { badge: "★", quote: "“", arrow: "→", line: "" };
+        const PA_NOTE = {
+          badge: "a positioned ::before — ribbon without a wrapper div",
+          quote: "a giant ::before quote mark, absolutely placed",
+          arrow: "an ::after arrow that slides on :hover — hover the box!",
+          line: "an ::after gradient rule under the content",
+        };
+        function renderPa() {
+          const box = $("paBox");
+          box.className = "pa-box pa-" + PA.preset;
+          const c = $("paContent").value;
+          box.style.setProperty("--pac", `"${c}"`);
+          $("paRead").innerHTML = PA_NOTE[PA.preset];
+          const decls = {
+            badge: [
+              `content: "${c}"`,
+              `position: absolute`,
+              `top: -12px`,
+              `left: -12px`,
+              `/* ::before */`,
+            ],
+            quote: [
+              `content: "${c}"`,
+              `position: absolute`,
+              `font: 700 46px/1 var(--disp)`,
+              `/* ::before */`,
+            ],
+            arrow: [
+              `content: "${c}"`,
+              `margin-left: 10px`,
+              `/* ::after — slides on :hover */`,
+            ],
+            line: [
+              `content: ""`,
+              `display: block`,
+              `height: 3px`,
+              `/* ::after */`,
+            ],
+          };
+          $("codePa").innerHTML = rule(
+            ".card::" +
+              (PA.preset === "arrow" || PA.preset === "line"
+                ? "after"
+                : "before"),
+            decls[PA.preset],
+          );
+        }
+        chipGroup($("paChips"), (v) => {
+          PA.preset = v;
+          $("paContent").value = PA_DEF[v];
+          renderPa();
+        });
+        $("paContent").addEventListener("input", renderPa);
+        renderPa();
+
+        /* ---------- 02 first-letter ---------- */
+        let flOn = true;
+        function renderFl() {
+          const p = $("flPage");
+          p.classList.toggle("dc", flOn);
+          p.style.setProperty("--fls", $("rFl").value + "em");
+          p.style.setProperty("--flc", $("cFl").value);
+          $("codeFl").innerHTML = flOn
+            ? rule("p::first-letter", [
+                `font-size: ${$("rFl").value}em`,
+                `float: left`,
+                `color: ${$("cFl").value}`,
+                `font-weight: 700`,
+              ])
+            : rule("p", [`/* no drop cap — plain paragraph */`]);
+        }
+        $("flOn").addEventListener("click", () => {
+          flOn = true;
+          $("flOn").classList.add("on");
+          $("flOff").classList.remove("on");
+          renderFl();
+        });
+        $("flOff").addEventListener("click", () => {
+          flOn = false;
+          $("flOff").classList.add("on");
+          $("flOn").classList.remove("on");
+          renderFl();
+        });
+        range($("rFl"), $("oFl"), (v) => v + "em", renderFl);
+        $("cFl").addEventListener("input", renderFl);
+        renderFl();
+
+        /* ---------- 03 first-line ---------- */
+        range(
+          $("rFw"),
+          $("oFw"),
+          (v) => v + "px",
+          (v) => {
+            $("flineFrame").style.width = v + "px";
+            $("flineRead").innerHTML =
+              `width <b>${v}px</b> — the amber line ends wherever it must`;
+          },
+        );
+        $("codeFline").innerHTML = rule("p::first-line", [
+          `color: #f2c14e`,
+          `font-weight: 700`,
+          `text-transform: uppercase`,
+        ]);
+
+        /* ---------- 04 selection ---------- */
+        function renderSel() {
+          const t = $("selTxt");
+          t.style.setProperty("--selbg", $("cSelBg").value);
+          t.style.setProperty("--selfg", $("cSelFg").value);
+          $("selRead").innerHTML =
+            `::selection → bg <b>${$("cSelBg").value}</b> · text <b>${$("cSelFg").value}</b>`;
+          $("codeSel").innerHTML = rule(".text::selection", [
+            `background: ${$("cSelBg").value}`,
+            `color: ${$("cSelFg").value}`,
+          ]);
+        }
+        $("cSelBg").addEventListener("input", renderSel);
+        $("cSelFg").addEventListener("input", renderSel);
+        renderSel();
+
+        /* ---------- 05 placeholder ---------- */
+        let phItal = false;
+        function renderPh() {
+          const i = $("phIn");
+          i.placeholder = $("phText").value;
+          i.style.setProperty("--phc", $("cPh").value);
+          i.style.setProperty("--pho", $("rPh").value);
+          i.style.setProperty("--phs", phItal ? "italic" : "normal");
+          $("codePh").innerHTML = rule("input::placeholder", [
+            `color: ${$("cPh").value}`,
+            `opacity: ${$("rPh").value}`,
+            `font-style: ${phItal ? "italic" : "normal"}`,
+          ]);
+        }
+        $("phText").addEventListener("input", renderPh);
+        $("cPh").addEventListener("input", renderPh);
+        range($("rPh"), $("oPh"), (v) => v, renderPh);
+        $("phNorm").addEventListener("click", () => {
+          phItal = false;
+          $("phNorm").classList.add("on");
+          $("phItal").classList.remove("on");
+          renderPh();
+        });
+        $("phItal").addEventListener("click", () => {
+          phItal = true;
+          $("phItal").classList.add("on");
+          $("phNorm").classList.remove("on");
+          renderPh();
+        });
+        renderPh();
+
+        /* ---------- lesson track ---------- */
+        const t = $("lnTrack");
+        for (let i = 0; i < 45; i++) {
+          const s = document.createElement("span");
+          s.className = "tick" + (i < 23 ? " done" : "");
+          s.title = "lesson " + (i + 1);
+          t.appendChild(s);
+        }
+
+        /* ---------- reveal ---------- */
+        const io = new IntersectionObserver(
+          (es) =>
+            es.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                io.unobserve(e.target);
+              }
+            }),
+          { threshold: 0.12 },
+        );
+        document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1550 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Animations — Lesson 30</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' fill='none' stroke='%23f07f4f' stroke-width='2'/%3E%3Crect x='8' y='8' width='16' height='16' fill='none' stroke='%23f2c14e' stroke-width='2'/%3E%3Crect x='13' y='13' width='6' height='6' fill='%2358a6ff'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0e15;
+        --panel: #121826;
+        --panel2: #0d1220;
+        --ink: #10141d;
+        --line: #222c40;
+        --line2: #31405e;
+        --text: #e9eef7;
+        --muted: #8d9ab0;
+        --faint: #5b6a84;
+        --margin-c: #f07f4f;
+        --margin-bg: rgba(240, 127, 79, 0.14);
+        --border-c: #f2c14e;
+        --border-bg: rgba(242, 193, 78, 0.16);
+        --padding-c: #3ecf8e;
+        --padding-bg: rgba(62, 207, 142, 0.14);
+        --content-c: #58a6ff;
+        --content-bg: rgba(88, 166, 255, 0.17);
+        --pink: #ff4f8b;
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: dark;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 15px;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+      ::selection {
+        background: rgba(88, 166, 255, 0.35);
+      }
+      .mono {
+        font-family: var(--mono);
+      }
+      section {
+        scroll-margin-top: 76px;
+      }
+      b {
+        font-weight: 600;
+      }
+
+      .bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            700px 460px at 12% -6%,
+            rgba(242, 193, 78, 0.07),
+            transparent 60%
+          ),
+          radial-gradient(
+            760px 520px at 92% 22%,
+            rgba(88, 166, 255, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            600px 480px at 40% 105%,
+            rgba(62, 207, 142, 0.05),
+            transparent 60%
+          );
+      }
+      .bg::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(233, 238, 247, 0.035) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(233, 238, 247, 0.035) 1px,
+            transparent 1px
+          );
+        background-size: 28px 28px;
+        mask-image: radial-gradient(
+          ellipse 120% 90% at 50% 0%,
+          #000 40%,
+          transparent 100%
+        );
+      }
+      .bg .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.5;
+        animation: drift 26s ease-in-out infinite alternate;
+      }
+      .bg .g1 {
+        width: 420px;
+        height: 420px;
+        left: -120px;
+        top: 30%;
+        background: rgba(240, 127, 79, 0.1);
+      }
+      .bg .g2 {
+        width: 460px;
+        height: 460px;
+        right: -140px;
+        top: 60%;
+        background: rgba(88, 166, 255, 0.1);
+        animation-delay: -12s;
+      }
+      @keyframes drift {
+        from {
+          transform: translateY(-30px);
+        }
+        to {
+          transform: translateY(40px);
+        }
+      }
+
+      @keyframes kfSlide {
+        from {
+          transform: translateX(-70px);
+        }
+        to {
+          transform: translateX(70px);
+        }
+      }
+      @keyframes kfBounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        45% {
+          transform: translateY(-56px);
+        }
+      }
+      @keyframes kfRun {
+        to {
+          transform: translateX(var(--dist, 340px));
+        }
+      }
+      @keyframes kfOrbit {
+        from {
+          transform: rotate(0) translateX(44px) rotate(0);
+        }
+        to {
+          transform: rotate(360deg) translateX(44px) rotate(-360deg);
+        }
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 12px clamp(16px, 4vw, 44px);
+        background: rgba(11, 14, 21, 0.92);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar nav {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .topbar nav a {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 6px 11px;
+        border-radius: 999px;
+        transition: 0.2s;
+      }
+      .topbar nav a:hover {
+        color: var(--text);
+        background: #161d2c;
+      }
+      .lesson-tag {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--border-c);
+        border: 1px dashed rgba(242, 193, 78, 0.45);
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .wrap {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: 0 clamp(16px, 4vw, 44px);
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        padding: clamp(20px, 4vh, 48px) 0 clamp(30px, 5vh, 56px);
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--padding-c);
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(2.3rem, 5.2vw, 3.7rem);
+        line-height: 1.06;
+        letter-spacing: -0.02em;
+      }
+      .word-style {
+        display: inline-block;
+        padding: 0.02em 0.22em;
+        background: var(--border-bg);
+        border: 0.06em solid var(--border-c);
+        border-radius: 0.14em;
+        color: #ffe3a1;
+        transition: transform 0.3s;
+        cursor: default;
+      }
+      .word-style:hover {
+        transform: rotate(-2deg) scale(1.03);
+      }
+      .lede {
+        color: var(--muted);
+        max-width: 56ch;
+        margin-top: 18px;
+        font-size: 1.05rem;
+      }
+      .lede b {
+        color: var(--text);
+      }
+      .css-full {
+        display: inline-block;
+        margin-top: 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--faint);
+        letter-spacing: 0.08em;
+      }
+      .intro-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 26px;
+        display: grid;
+        place-items: center;
+        gap: 16px;
+        box-shadow: 0 30px 60px -40px rgba(0, 0, 0, 0.8);
+        width: 100%;
+      }
+      .ix-stage {
+        width: 150px;
+        height: 150px;
+        display: grid;
+        place-items: center;
+      }
+      .ix-dot {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: var(--border-c);
+        animation: kfOrbit 2.4s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+      }
+      .intro-fmt {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--content-c);
+        background: var(--ink);
+        border: 1px solid var(--line2);
+        border-radius: 9px;
+        padding: 7px 16px;
+        min-height: 36px;
+        text-align: center;
+      }
+      .imode {
+        font-size: 11px;
+        color: var(--faint);
+        letter-spacing: 0.1em;
+      }
+
+      .sec {
+        padding: clamp(36px, 6vh, 64px) 0;
+      }
+      .sec-head {
+        margin-bottom: 26px;
+        max-width: 72ch;
+      }
+      .sec-head h2 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+        letter-spacing: -0.015em;
+        line-height: 1.15;
+      }
+      .sec-head .lede {
+        margin-top: 10px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 18px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .panel-head h3 {
+        font-family: var(--disp);
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dots i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dots i:nth-child(1) {
+        background: #f07f4f;
+      }
+      .dots i:nth-child(2) {
+        background: #f2c14e;
+      }
+      .dots i:nth-child(3) {
+        background: #3ecf8e;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.85;
+        overflow-x: auto;
+      }
+      .c-sel {
+        color: #7fe0b0;
+      }
+      .c-prop {
+        color: #8ab4ff;
+      }
+      .c-val {
+        color: #f2c14e;
+      }
+      .c-com {
+        color: #5b6a84;
+      }
+      .grp {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+
+      .pick-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 18px;
+        align-items: stretch;
+      }
+      .stage-wrap {
+        padding: 28px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 360px;
+        gap: 16px;
+        width: 100%;
+      }
+      .side {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .sel-chip {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .sel-chip:hover {
+        color: var(--text);
+        border-color: var(--content-c);
+        transform: translateY(-2px);
+      }
+      .sel-chip.on {
+        color: #0e1017;
+        background: var(--content-c);
+        border-color: var(--content-c);
+        font-weight: 600;
+      }
+      .ghost-btn {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--faint);
+        background: none;
+        border: 1px dashed var(--line2);
+        border-radius: 8px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .ghost-btn:hover {
+        color: var(--content-c);
+        border-color: var(--content-c);
+      }
+      .code-box {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .code-box pre {
+        min-height: 0;
+        font-size: 12px;
+      }
+      .side-note {
+        font-size: 12px;
+        color: var(--faint);
+      }
+      .read {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 14px;
+        text-align: center;
+        width: 100%;
+        max-width: 440px;
+      }
+      .read b {
+        color: var(--text);
+      }
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        outline: none;
+        cursor: pointer;
+        background: linear-gradient(
+          90deg,
+          var(--ac) var(--fill, 50%),
+          #232c40 var(--fill, 50%)
+        );
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        transition: transform 0.15s;
+      }
+      input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.15);
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+      }
+      .ctl {
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 7px 11px;
+        transition: 0.2s;
+      }
+      .ctl:hover {
+        background: #101725;
+        border-color: var(--line);
+      }
+      .ctl-top {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+      .ctl-top label {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text);
+      }
+      .ctl-val {
+        margin-left: auto;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--ac);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 2px 9px;
+      }
+      .segmented {
+        position: relative;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 1fr;
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        padding: 3px;
+      }
+      .segmented button {
+        position: relative;
+        z-index: 1;
+        background: none;
+        border: 0;
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--muted);
+        padding: 8px 4px;
+        cursor: pointer;
+        transition: color 0.25s;
+        border-radius: 8px;
+      }
+      .segmented button:hover {
+        color: var(--text);
+      }
+      .segmented button.active {
+        color: #fff;
+      }
+      .seg-thumb {
+        position: absolute;
+        top: 3px;
+        bottom: 3px;
+        left: 3px;
+        width: calc((100% - 6px) / 3);
+        background: #26334c;
+        border-radius: 8px;
+        transition:
+          transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+          width 0.28s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      }
+
+      .an-stage {
+        position: relative;
+        width: 100%;
+        max-width: 440px;
+        height: 170px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+      }
+      .an-box {
+        width: 70px;
+        height: 70px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, var(--content-c), var(--padding-c));
+        display: grid;
+        place-items: center;
+        font: 700 9px var(--mono);
+        color: #0e1017;
+      }
+      .lane {
+        position: relative;
+        width: 100%;
+        max-width: 440px;
+        height: 34px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--line);
+        border-radius: 9px;
+      }
+      .lane .ll {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        font: 9px var(--mono);
+        color: var(--faint);
+      }
+      .runner {
+        position: absolute;
+        left: 6px;
+        top: 6px;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+      }
+      .r1 {
+        background: var(--content-c);
+      }
+      .r2 {
+        background: var(--padding-c);
+      }
+      .r3 {
+        background: var(--border-c);
+      }
+      .r4 {
+        background: var(--margin-c);
+      }
+      .race {
+        width: 100%;
+        max-width: 440px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .tl {
+        width: 100%;
+        max-width: 440px;
+        height: 30px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        display: flex;
+        overflow: hidden;
+      }
+      .tl-delay {
+        background: repeating-linear-gradient(
+          45deg,
+          rgba(242, 193, 78, 0.35) 0 6px,
+          transparent 6px 12px
+        );
+        transition: width 0.15s;
+        display: grid;
+        place-items: center;
+        font: 8.5px var(--mono);
+        color: var(--border-c);
+        white-space: nowrap;
+      }
+      .tl-dur {
+        background: var(--padding-bg);
+        border-left: 1px solid var(--padding-c);
+        border-right: 1px solid var(--padding-c);
+        transition: width 0.15s;
+        display: grid;
+        place-items: center;
+        font: 8.5px var(--mono);
+        color: var(--padding-c);
+        white-space: nowrap;
+      }
+
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      @media (min-width: 1180px) {
+        .notes-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media (max-width: 640px) {
+        .notes-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .note-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.3s,
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+      .note-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--nc);
+        opacity: 0.85;
+      }
+      .note-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--nc);
+        box-shadow: 0 24px 44px -28px rgba(0, 0, 0, 0.85);
+      }
+      .note-card h3 {
+        font-family: var(--mono);
+        font-size: 15px;
+        color: var(--nc);
+        margin-bottom: 8px;
+      }
+      .note-card p {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .note-tip {
+        margin-top: 12px;
+        font-size: 11px;
+        color: var(--faint);
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+      }
+      .note-demo {
+        height: 104px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        overflow: hidden;
+      }
+      .demo-kf {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: var(--content-c);
+      }
+      .note-card:hover .demo-kf {
+        animation: kfBounce 1s ease infinite;
+      }
+      .demo-dur {
+        width: 70%;
+        height: 8px;
+        border-radius: 4px;
+        background: var(--line);
+        position: relative;
+        overflow: hidden;
+      }
+      .demo-dur i {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 20%;
+        background: var(--border-c);
+      }
+      .note-card:hover .demo-dur i {
+        animation: kfFill 1.4s linear infinite;
+      }
+      @keyframes kfFill {
+        from {
+          width: 0;
+        }
+        to {
+          width: 100%;
+        }
+      }
+      .demo-it {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--padding-c);
+      }
+      .note-card:hover .demo-it {
+        animation: kfSlide 1.2s ease-in-out infinite alternate;
+      }
+      .demo-fm {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: var(--margin-c);
+      }
+      .note-card:hover .demo-fm {
+        animation: kfSlide 1s ease 0.4s 1 both;
+      }
+
+      .lesson-nav {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px clamp(18px, 3vw, 28px);
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+        align-items: center;
+        margin-top: 40px;
+      }
+      .ln-status {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--padding-c);
+        border: 1px solid rgba(62, 207, 142, 0.45);
+        border-radius: 999px;
+        padding: 3px 10px;
+      }
+      .lesson-nav h3 {
+        font-family: var(--disp);
+        font-size: 17px;
+        margin-top: 8px;
+      }
+      .ln-track {
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .tick {
+        width: 7px;
+        height: 15px;
+        border-radius: 2px;
+        background: #212a3e;
+        transition: 0.2s;
+      }
+      .tick.done {
+        background: var(--padding-c);
+        box-shadow: 0 0 8px rgba(62, 207, 142, 0.55);
+      }
+      .tick:hover {
+        background: var(--line2);
+      }
+      .ln-next {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        text-align: right;
+      }
+      .ln-next span {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .ln-next b {
+        font-family: var(--disp);
+        font-size: 15px;
+        color: var(--text);
+      }
+      footer {
+        border-top: 1px solid var(--line);
+        margin-top: 20px;
+        padding: 30px 0 44px;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+        color: var(--faint);
+        font-size: 12.5px;
+      }
+      footer .mono {
+        font-size: 11.5px;
+      }
+      footer .sp {
+        margin-left: auto;
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+      @media (max-width: 1020px) {
+        .intro {
+          grid-template-columns: 1fr;
+        }
+        .pick-grid {
+          grid-template-columns: 1fr;
+        }
+        .lesson-nav {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .ln-next {
+          align-items: center;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg">
+      <span class="glow g1"></span><span class="glow g2"></span>
+    </div>
+
+    <header class="topbar">
+      <span class="lesson-tag">lesson 30 / 45</span>
+      <nav>
+        <a href="#keyframes">@keyframes</a>
+        <a href="#shorthand">animation</a>
+        <a href="#iteration">iteration</a>
+        <a href="#timing">timing</a>
+        <a href="#fill">fill-modes</a>
+        <a href="#notes">cheat-codes</a>
+      </nav>
+    </header>
+
+    <div class="wrap">
+      <section class="intro">
+        <div>
+          <p class="eyebrow">lesson 30 · interactive</p>
+          <h1>
+            Transitions react. Animations
+            <span class="word-style">perform</span>.
+          </h1>
+          <p class="lede">
+            A transition needs a state change to fire. An <b>animation</b> runs
+            on its own: a script of frames (<span class="mono">@keyframes</span
+            >) plus a director's note (<span class="mono">animation</span>)
+            controlling duration, delay, repeats, easing and what happens before
+            &amp; after.
+          </p>
+          <span class="css-full">K · EYFRAMES · R · UN · F · OREVER</span>
+        </div>
+        <div class="intro-panel">
+          <div class="ix-stage"><div class="ix-dot"></div></div>
+          <span class="intro-fmt" id="ixFmt"
+            >animation: orbit 2.4s cubic-bezier(.5,0,.5,1) infinite</span
+          >
+          <p class="imode mono">no hover, no click — it just runs…</p>
+        </div>
+      </section>
+
+      <section id="keyframes" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">01 · @keyframes</p>
+          <h2>The script of frames</h2>
+          <p class="lede">
+            A keyframe rule is a timeline written in CSS: percentages → styles.
+            Swap the script and the same box performs a different move. The
+            browser interpolates everything in between.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>same box, two scripts</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="an-stage">
+                <div class="an-box" id="kfBox">me</div>
+              </div>
+              <p class="read" id="kfRead">performing: <b>slide</b></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="chips" id="kfChips">
+              <button class="sel-chip on" data-v="slide">
+                @keyframes slide
+              </button>
+              <button class="sel-chip" data-v="bounce">
+                @keyframes bounce
+              </button>
+            </div>
+            <div class="code-box"><pre id="codeKf"></pre></div>
+            <p class="side-note">
+              0% = from, 100% = to. Middle stops (45% here) create the
+              personality. Keyframes can animate any animatable property —
+              transform, opacity, color, even grid tracks.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <section id="shorthand" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">02 · animation · duration · delay</p>
+          <h2>The director's note</h2>
+          <p class="lede">
+            <span class="mono">animation: name duration timing delay …</span> —
+            the first time value is duration, the second is delay. The timeline
+            bar shows exactly how your two sliders map to the run. Press play.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>watch the timeline</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="lane" style="max-width: 440px; width: 100%">
+                <div class="runner r1" id="shRunner"></div>
+                <span class="ll">run</span>
+              </div>
+              <div class="tl">
+                <div class="tl-delay" id="tlDelay">delay</div>
+                <div class="tl-dur" id="tlDur">duration</div>
+              </div>
+              <div class="chips">
+                <button class="ghost-btn" id="shPlay">▶ play</button>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--padding-c)">
+              <div class="ctl-top">
+                <label for="rDur">duration</label
+                ><output class="ctl-val" id="oDur">1.2s</output>
+              </div>
+              <input
+                type="range"
+                id="rDur"
+                min="0.3"
+                max="3"
+                step="0.1"
+                value="1.2"
+              />
+            </div>
+            <div class="ctl" style="--ac: var(--border-c)">
+              <div class="ctl-top">
+                <label for="rDly">delay</label
+                ><output class="ctl-val" id="oDly">0.4s</output>
+              </div>
+              <input
+                type="range"
+                id="rDly"
+                min="0"
+                max="2"
+                step="0.1"
+                value="0.4"
+              />
+            </div>
+            <div class="code-box"><pre id="codeSh"></pre></div>
+            <p class="side-note">
+              Shorthand order is free-form except the two times:
+              <b>first = duration, second = delay</b>. That's the one rule
+              people trip on.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <section id="iteration" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">03 · iteration-count · direction</p>
+          <h2>How many times, which way</h2>
+          <p class="lede">
+            <span class="mono">iteration-count</span> repeats the script (<span
+              class="mono"
+              >infinite</span
+            >
+            never stops); <span class="mono">direction</span> decides whether
+            repeats rewind or ping-pong. The counter listens to real
+            <span class="mono">animationiteration</span> events.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>the looping runner</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="lane" style="max-width: 440px; width: 100%">
+                <div class="runner r3" id="itRunner"></div>
+                <span class="ll">loop</span>
+              </div>
+              <p class="read" id="itRead">iterations completed: <b>0</b></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rIt">iteration-count</label
+                ><output class="ctl-val" id="oIt">3</output>
+              </div>
+              <input type="range" id="rIt" min="1" max="8" value="3" />
+            </div>
+            <div class="chips">
+              <button class="sel-chip" id="itInf">infinite</button>
+            </div>
+            <div class="segmented" id="segDir">
+              <span class="seg-thumb"></span>
+              <button data-v="normal" class="active">normal</button>
+              <button data-v="reverse">reverse</button>
+              <button data-v="alternate">alternate</button>
+            </div>
+            <div class="code-box"><pre id="codeIt"></pre></div>
+            <p class="side-note">
+              <span class="mono">alternate</span> + ease-in-out is the recipe
+              for every smooth back-and-forth pulse, shimmer and breathing
+              effect.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <section id="timing" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">04 · timing functions in animation</p>
+          <h2>Easing per loop</h2>
+          <p class="lede">
+            Same as transitions, but applied to <b>each iteration</b>. Four
+            runners loop forever with different curves — the personality
+            difference is all timing-function.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>endless race</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="race">
+                <div class="lane">
+                  <div class="runner r1" data-fn="ease"></div>
+                  <span class="ll">ease</span>
+                </div>
+                <div class="lane">
+                  <div class="runner r2" data-fn="linear"></div>
+                  <span class="ll">linear</span>
+                </div>
+                <div class="lane">
+                  <div class="runner r3" data-fn="ease-in"></div>
+                  <span class="ll">ease-in</span>
+                </div>
+                <div class="lane">
+                  <div
+                    class="runner r4"
+                    data-fn="cubic-bezier(.6,-.4,.3,1.4)"
+                  ></div>
+                  <span class="ll">springy bezier</span>
+                </div>
+              </div>
+              <div class="chips">
+                <button class="ghost-btn" id="tfToggle">
+                  ⏸ pause / ▶ resume
+                </button>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="code-box"><pre id="codeTf"></pre></div>
+            <p class="side-note">
+              The negative-first / over-one bezier gives anticipation +
+              overshoot per loop — the "alive" feeling loaders use.
+              <span class="mono">animation-play-state: paused</span> freezes
+              without resetting.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <section id="fill" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">05 · fill modes</p>
+          <h2>Before the start, after the end</h2>
+          <p class="lede">
+            With a 1s delay: what does the box show <b>before</b> it starts?
+            After it finishes, where does it rest?
+            <span class="mono">fill-mode</span> answers both. Press play and
+            stare at the edges.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>the 1s delay test</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="an-stage">
+                <div class="an-box" id="fmBox">me</div>
+              </div>
+              <p class="read" id="fmRead"></p>
+              <div class="chips">
+                <button class="ghost-btn" id="fmPlay">▶ play</button>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="segmented" id="segFill">
+              <span
+                class="seg-thumb"
+                style="width: calc((100% - 6px) / 4)"
+              ></span>
+              <button data-v="none" class="active">none</button>
+              <button data-v="forwards">forwards</button>
+              <button data-v="backwards">backwards</button>
+              <button data-v="both">both</button>
+            </div>
+            <div class="code-box"><pre id="codeFm"></pre></div>
+            <p class="side-note" id="fmNote"></p>
+          </aside>
+        </div>
+      </section>
+
+      <section id="notes" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">06 · field notes</p>
+          <h2>Cheat codes from lesson 30</h2>
+        </div>
+        <div class="notes-grid">
+          <article class="note-card" style="--nc: var(--content-c)">
+            <div class="note-demo"><div class="demo-kf"></div></div>
+            <h3>keyframes = script</h3>
+            <p>
+              Percentages → styles; the browser plays the in-betweens. Name it,
+              then cast it with <span class="mono">animation-name</span>.
+            </p>
+            <p class="note-tip mono">↳ hover: the bounce loops</p>
+          </article>
+          <article class="note-card" style="--nc: var(--border-c)">
+            <div class="note-demo">
+              <div class="demo-dur"><i></i></div>
+            </div>
+            <h3>first time = duration</h3>
+            <p>
+              In the shorthand, the first time value is duration, the second
+              delay. Everything else can be in any order.
+            </p>
+            <p class="note-tip mono">↳ hover: the fill sweeps</p>
+          </article>
+          <article class="note-card" style="--nc: var(--padding-c)">
+            <div class="note-demo"><div class="demo-it"></div></div>
+            <h3>alternate + ease-in-out</h3>
+            <p>
+              The universal smooth-loop recipe: ping-pong direction with
+              symmetric easing. Shimmers, breaths, pulses.
+            </p>
+            <p class="note-tip mono">↳ hover: it ping-pongs</p>
+          </article>
+          <article class="note-card" style="--nc: var(--margin-c)">
+            <div class="note-demo"><div class="demo-fm"></div></div>
+            <h3>fill = the edges</h3>
+            <p>
+              <span class="mono">backwards</span> applies frame 0 during the
+              delay; <span class="mono">forwards</span> keeps the last frame
+              after the end; <span class="mono">both</span> = the sane default.
+            </p>
+            <p class="note-tip mono">↳ hover: delayed, then held</p>
+          </article>
+        </div>
+      </section>
+
+      <div class="lesson-nav reveal">
+        <div>
+          <span class="ln-status">✓ completed</span>
+          <h3>30 — Animations</h3>
+        </div>
+        <div class="ln-track" id="lnTrack"></div>
+        <div class="ln-next">
+          <span>up next</span>
+          <b>31 · Modern UI Effects</b>
+        </div>
+      </div>
+
+      <footer>
+        <span class="mono">drag things, break things, learn things.</span>
+        <span class="sp mono">45 lessons · lesson 30 · animations</span>
+      </footer>
+    </div>
+
+    <script>
+      (() => {
+        const $ = (id) => document.getElementById(id);
+        const rule = (sel, decls) =>
+          `<span class="c-sel">${sel}</span> {\n${decls
+            .map((d) => {
+              const i = d.indexOf(":");
+              return `  <span class="c-prop">${d.slice(0, i)}</span>: <span class="c-val">${d.slice(i + 1).trim()}</span>;`;
+            })
+            .join("\n")}\n}`;
+        function range(el, out, fmt, cb) {
+          const f = () => {
+            const v = +el.value;
+            out.textContent = fmt(v);
+            const min = +el.min,
+              max = +el.max;
+            el.style.setProperty(
+              "--fill",
+              ((v - min) / (max - min)) * 100 + "%",
+            );
+            cb(v);
+          };
+          el.addEventListener("input", f);
+          f();
+        }
+        function initSeg(seg, onPick) {
+          const btns = [...seg.querySelectorAll("button")],
+            thumb = seg.querySelector(".seg-thumb"),
+            n = btns.length;
+          function set(i) {
+            btns.forEach((b, j) => b.classList.toggle("active", i === j));
+            thumb.style.width = `calc((100% - 6px)/${n})`;
+            thumb.style.transform = `translateX(${i * 100}%)`;
+          }
+          btns.forEach((b, i) =>
+            b.addEventListener("click", () => {
+              set(i);
+              onPick(b.dataset.v);
+            }),
+          );
+          set(0);
+        }
+        function chipGroup(box, cb) {
+          box.addEventListener("click", (e) => {
+            const c = e.target.closest(".sel-chip");
+            if (!c) return;
+            box
+              .querySelectorAll(".sel-chip")
+              .forEach((x) => x.classList.remove("on"));
+            c.classList.add("on");
+            cb(c.dataset.v);
+          });
+        }
+        function setDist(el) {
+          const lane = el.parentElement;
+          el.style.setProperty("--dist", lane.clientWidth - 34 + "px");
+        }
+
+        // FIXED replay function - saves and restores animation value
+        function replay(el) {
+          const anim = el.style.animation;
+          if (!anim) return;
+          el.style.animation = "none";
+          void el.offsetWidth;
+          el.style.animation = anim;
+        }
+
+        const KF = {
+          slide: {
+            anim: "kfSlide 1.6s ease-in-out infinite alternate",
+            code: () =>
+              rule("@keyframes slide", [
+                `from { transform: translateX(-70px) }`,
+                `to   { transform: translateX(70px) }`,
+              ]) +
+              "\n" +
+              rule(".box", [
+                `animation: slide 1.6s ease-in-out infinite alternate`,
+              ]),
+          },
+          bounce: {
+            anim: "kfBounce 1.1s ease-in-out infinite",
+            code: () =>
+              rule("@keyframes bounce", [
+                `0%,100% { transform: translateY(0) }`,
+                `45%     { transform: translateY(-56px) }`,
+              ]) +
+              "\n" +
+              rule(".box", [`animation: bounce 1.1s ease-in-out infinite`]),
+          },
+        };
+        chipGroup($("kfChips"), (v) => {
+          $("kfBox").style.animation = KF[v].anim;
+          $("kfRead").innerHTML = `performing: <b>${v}</b>`;
+          $("codeKf").innerHTML = KF[v].code();
+        });
+        $("kfBox").style.animation = KF.slide.anim;
+        $("codeKf").innerHTML = KF.slide.code();
+
+        let shDur = 1.2,
+          shDly = 0.4;
+        function renderSh() {
+          const r = $("shRunner");
+          setDist(r);
+          r.style.animation = `kfRun ${shDur}s ease ${shDly}s 1 normal none`;
+          const total = 5;
+          $("tlDelay").style.width = (shDly / total) * 100 + "%";
+          $("tlDur").style.width = (shDur / total) * 100 + "%";
+          $("tlDelay").textContent = shDly > 0.3 ? `delay ${shDly}s` : "";
+          $("tlDur").textContent = `duration ${shDur}s`;
+          $("codeSh").innerHTML = rule(".run", [
+            `animation: run ${shDur}s ease ${shDly}s`,
+          ]);
+        }
+        $("shPlay").addEventListener("click", () => replay($("shRunner")));
+        range(
+          $("rDur"),
+          $("oDur"),
+          (v) => v + "s",
+          (v) => {
+            shDur = v;
+            renderSh();
+          },
+        );
+        range(
+          $("rDly"),
+          $("oDly"),
+          (v) => v + "s",
+          (v) => {
+            shDly = v;
+            renderSh();
+          },
+        );
+
+        let itCount = 3,
+          itDir = "normal",
+          itInf = false,
+          itDone = 0;
+        function renderIt() {
+          const r = $("itRunner");
+          setDist(r);
+          itDone = 0;
+          $("itRead").innerHTML =
+            `iterations completed: <b>0</b>${itInf ? " · ∞ mode" : ""}`;
+          r.style.animation = `kfRun 1.1s ease 0s ${itInf ? "infinite" : itCount} ${itDir} none`;
+        }
+        $("itRunner").addEventListener("animationiteration", () => {
+          itDone++;
+          $("itRead").innerHTML =
+            `iterations completed: <b>${itDone}</b>${itInf ? " · ∞ mode" : ""}`;
+        });
+        range(
+          $("rIt"),
+          $("oIt"),
+          (v) => v,
+          (v) => {
+            itCount = v;
+            itInf = false;
+            $("itInf").classList.remove("on");
+            renderIt();
+          },
+        );
+        $("itInf").addEventListener("click", () => {
+          itInf = !itInf;
+          $("itInf").classList.toggle("on", itInf);
+          renderIt();
+        });
+        initSeg($("segDir"), (v) => {
+          itDir = v;
+          renderIt();
+        });
+        renderIt();
+
+        let tfPaused = false;
+        function startRace() {
+          document.querySelectorAll("#timing .runner").forEach((r) => {
+            setDist(r);
+            r.style.animation = `kfRun 1.6s ${r.dataset.fn} infinite`;
+            r.style.animationPlayState = tfPaused ? "paused" : "running";
+          });
+        }
+        $("tfToggle").addEventListener("click", () => {
+          tfPaused = !tfPaused;
+          startRace();
+        });
+        startRace();
+        $("codeTf").innerHTML =
+          rule(".runner", [`animation: lap 1.6s <fn> infinite`]) +
+          `\n<span class="c-com">/* ease · linear · ease-in · springy */</span>`;
+
+        let fmMode = "none";
+        const FM_NOTES = {
+          none: "During the 1s delay: box sits at its <b>normal</b> spot. After the end: snaps back to normal. The animation leaves no trace.",
+          forwards:
+            "During delay: normal spot. After the end: <b>holds the last frame</b> (right side). The ending sticks.",
+          backwards:
+            "During delay: <b>shows the first frame</b> (left side) immediately. After the end: snaps back to normal.",
+          both: "First frame during the delay AND last frame after the end. Both edges covered — usually what you want.",
+        };
+        function renderFm() {
+          const b = $("fmBox");
+          b.style.animation = `kfSlide 1.2s ease 1s 1 normal ${fmMode}`;
+          $("fmRead").innerHTML =
+            `fill-mode: <b>${fmMode}</b> · delay 1s · duration 1.2s`;
+          $("fmNote").innerHTML = FM_NOTES[fmMode];
+          $("codeFm").innerHTML = rule(".box", [
+            `animation: slide 1.2s ease 1s both`.replace("both", fmMode),
+          ]);
+        }
+        $("fmPlay").addEventListener("click", () => replay($("fmBox")));
+        initSeg($("segFill"), (v) => {
+          fmMode = v;
+          renderFm();
+        });
+        renderFm();
+
+        const t = $("lnTrack");
+        for (let i = 0; i < 45; i++) {
+          const s = document.createElement("span");
+          s.className = "tick" + (i < 30 ? " done" : "");
+          s.title = "lesson " + (i + 1);
+          t.appendChild(s);
+        }
+
+        const io = new IntersectionObserver(
+          (es) =>
+            es.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                io.unobserve(e.target);
+              }
+            }),
+          { threshold: 0.12 },
+        );
+        document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      })();
+    </script>
+  </body>
+</html>

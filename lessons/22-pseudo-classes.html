@@ -1,0 +1,1520 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pseudo-classes — Lesson 22</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' fill='none' stroke='%23f07f4f' stroke-width='2'/%3E%3Crect x='8' y='8' width='16' height='16' fill='none' stroke='%23f2c14e' stroke-width='2'/%3E%3Crect x='13' y='13' width='6' height='6' fill='%2358a6ff'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0e15;
+        --panel: #121826;
+        --panel2: #0d1220;
+        --ink: #10141d;
+        --line: #222c40;
+        --line2: #31405e;
+        --text: #e9eef7;
+        --muted: #8d9ab0;
+        --faint: #5b6a84;
+        --margin-c: #f07f4f;
+        --margin-bg: rgba(240, 127, 79, 0.14);
+        --border-c: #f2c14e;
+        --border-bg: rgba(242, 193, 78, 0.16);
+        --padding-c: #3ecf8e;
+        --padding-bg: rgba(62, 207, 142, 0.14);
+        --content-c: #58a6ff;
+        --content-bg: rgba(88, 166, 255, 0.17);
+        --pink: #ff4f8b;
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: dark;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 15px;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+      ::selection {
+        background: rgba(88, 166, 255, 0.35);
+      }
+      .mono {
+        font-family: var(--mono);
+      }
+      section {
+        scroll-margin-top: 76px;
+      }
+      b {
+        font-weight: 600;
+      }
+
+      .bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            700px 460px at 12% -6%,
+            rgba(242, 193, 78, 0.07),
+            transparent 60%
+          ),
+          radial-gradient(
+            760px 520px at 92% 22%,
+            rgba(88, 166, 255, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            600px 480px at 40% 105%,
+            rgba(62, 207, 142, 0.05),
+            transparent 60%
+          );
+      }
+      .bg::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(233, 238, 247, 0.035) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(233, 238, 247, 0.035) 1px,
+            transparent 1px
+          );
+        background-size: 28px 28px;
+        mask-image: radial-gradient(
+          ellipse 120% 90% at 50% 0%,
+          #000 40%,
+          transparent 100%
+        );
+      }
+      .bg .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.5;
+        animation: drift 26s ease-in-out infinite alternate;
+      }
+      .bg .g1 {
+        width: 420px;
+        height: 420px;
+        left: -120px;
+        top: 30%;
+        background: rgba(240, 127, 79, 0.1);
+      }
+      .bg .g2 {
+        width: 460px;
+        height: 460px;
+        right: -140px;
+        top: 60%;
+        background: rgba(88, 166, 255, 0.1);
+        animation-delay: -12s;
+      }
+      @keyframes drift {
+        from {
+          transform: translateY(-30px);
+        }
+        to {
+          transform: translateY(40px);
+        }
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 12px clamp(16px, 4vw, 44px);
+        background: rgba(11, 14, 21, 0.92);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar nav {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .topbar nav a {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 6px 11px;
+        border-radius: 999px;
+        transition: 0.2s;
+      }
+      .topbar nav a:hover {
+        color: var(--text);
+        background: #161d2c;
+      }
+      .lesson-tag {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--border-c);
+        border: 1px dashed rgba(242, 193, 78, 0.45);
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .wrap {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: 0 clamp(16px, 4vw, 44px);
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        padding: clamp(20px, 4vh, 48px) 0 clamp(30px, 5vh, 56px);
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--padding-c);
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(2.3rem, 5.2vw, 3.7rem);
+        line-height: 1.06;
+        letter-spacing: -0.02em;
+      }
+      .word-style {
+        display: inline-block;
+        padding: 0.02em 0.22em;
+        background: var(--pink);
+        border: 0.06em solid var(--pink);
+        border-radius: 0.14em;
+        color: #fff;
+        transition: transform 0.3s;
+        cursor: default;
+      }
+      .word-style:hover {
+        transform: rotate(-2deg) scale(1.03);
+      }
+      .lede {
+        color: var(--muted);
+        max-width: 56ch;
+        margin-top: 18px;
+        font-size: 1.05rem;
+      }
+      .lede b {
+        color: var(--text);
+      }
+      .css-full {
+        display: inline-block;
+        margin-top: 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--faint);
+        letter-spacing: 0.08em;
+      }
+      .intro-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 26px;
+        display: grid;
+        place-items: center;
+        gap: 16px;
+        box-shadow: 0 30px 60px -40px rgba(0, 0, 0, 0.8);
+      }
+      .ix-btn {
+        font: 600 13px var(--body);
+        padding: 14px 28px;
+        border-radius: 10px;
+        background: var(--content-c);
+        color: #0e1017;
+        border: none;
+        transition: all 0.3s;
+        cursor: pointer;
+      }
+      .intro-fmt {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--content-c);
+        background: var(--ink);
+        border: 1px solid var(--line2);
+        border-radius: 9px;
+        padding: 7px 16px;
+        min-height: 36px;
+      }
+      .imode {
+        font-size: 11px;
+        color: var(--faint);
+        letter-spacing: 0.1em;
+      }
+
+      .sec {
+        padding: clamp(36px, 6vh, 64px) 0;
+      }
+      .sec-head {
+        margin-bottom: 26px;
+        max-width: 72ch;
+      }
+      .sec-head h2 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+        letter-spacing: -0.015em;
+        line-height: 1.15;
+      }
+      .sec-head .lede {
+        margin-top: 10px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 18px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .panel-head h3 {
+        font-family: var(--disp);
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dots i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dots i:nth-child(1) {
+        background: #f07f4f;
+      }
+      .dots i:nth-child(2) {
+        background: #f2c14e;
+      }
+      .dots i:nth-child(3) {
+        background: #3ecf8e;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.85;
+        overflow-x: auto;
+      }
+      .c-sel {
+        color: #7fe0b0;
+      }
+      .c-prop {
+        color: #8ab4ff;
+      }
+      .c-val {
+        color: #f2c14e;
+      }
+      .c-com {
+        color: #5b6a84;
+      }
+      .grp {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+
+      .pick-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 18px;
+        align-items: stretch;
+      }
+      .stage-wrap {
+        padding: 28px;
+        display: grid;
+        place-items: center;
+        min-height: 340px;
+        gap: 14px;
+      }
+      .side {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .sel-chip {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .sel-chip:hover {
+        color: var(--text);
+        border-color: var(--content-c);
+        transform: translateY(-2px);
+      }
+      .sel-chip.on {
+        color: #0e1017;
+        background: var(--content-c);
+        border-color: var(--content-c);
+        font-weight: 600;
+      }
+      .ghost-btn {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--faint);
+        background: none;
+        border: 1px dashed var(--line2);
+        border-radius: 8px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .ghost-btn:hover {
+        color: var(--content-c);
+        border-color: var(--content-c);
+      }
+      .code-box {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .code-box pre {
+        min-height: 0;
+        font-size: 12.5px;
+      }
+      .side-note {
+        font-size: 12px;
+        color: var(--faint);
+      }
+      .read {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 14px;
+      }
+      .read b {
+        color: var(--text);
+      }
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        outline: none;
+        cursor: pointer;
+        background: linear-gradient(
+          90deg,
+          var(--ac) var(--fill, 50%),
+          #232c40 var(--fill, 50%)
+        );
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        transition: transform 0.15s;
+      }
+      input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.15);
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+      }
+      .ctl {
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 7px 11px;
+        transition: 0.2s;
+      }
+      .ctl:hover {
+        background: #101725;
+        border-color: var(--line);
+      }
+      .ctl-top {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+      .ctl-top label {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text);
+      }
+      .ctl-val {
+        margin-left: auto;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--ac);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 2px 9px;
+      }
+
+      /* 01 interaction states */
+      .state-btn {
+        font: 600 15px var(--body);
+        padding: 18px 34px;
+        border-radius: 12px;
+        background: var(--content-c);
+        color: #0e1017;
+        border: none;
+        cursor: pointer;
+        transition: 0.15s;
+      }
+      .state-btn:hover {
+        box-shadow: 0 10px 26px rgba(88, 166, 255, 0.45);
+        transform: translateY(-2px);
+      }
+      .state-btn:active {
+        transform: translateY(2px) scale(0.97);
+        box-shadow: none;
+      }
+      .state-btn:focus-visible {
+        outline: 3px dashed var(--padding-c);
+        outline-offset: 4px;
+      }
+
+      /* 02 link & form */
+      .lf-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        width: 100%;
+        max-width: 420px;
+      }
+      .lf-link {
+        color: var(--content-c);
+        font-size: 13px;
+      }
+      .lf-link:visited {
+        color: var(--padding-c);
+      }
+      .lf-check {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 13px;
+        cursor: pointer;
+        accent-color: var(--padding-c);
+      }
+      .lf-card {
+        border: 1px solid var(--line2);
+        border-radius: 10px;
+        padding: 12px 14px;
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--muted);
+        transition: 0.25s;
+      }
+      .lf-check input:checked ~ .lf-card {
+        border-color: var(--padding-c);
+        background: var(--padding-bg);
+        color: #8fe6bd;
+      }
+      .lf-in {
+        font-family: var(--body);
+        font-size: 13px;
+        padding: 10px 12px;
+        border: 1px solid var(--line2);
+        border-radius: 8px;
+        background: var(--ink);
+        color: var(--text);
+        outline: none;
+        transition: 0.2s;
+      }
+      .lf-in:focus {
+        border-color: var(--content-c);
+      }
+      .lf-in:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        background: var(--panel2);
+      }
+
+      /* 03 structural */
+      .st-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+        max-width: 420px;
+      }
+      .st-item {
+        background: var(--panel2);
+        border: 1px solid var(--line2);
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        transition: 0.2s;
+        display: flex;
+        gap: 12px;
+      }
+      .st-item .idx {
+        color: var(--faint);
+        width: 14px;
+      }
+      .st-item.hit {
+        border-color: var(--border-c);
+        background: var(--border-bg);
+        color: #ffe3a1;
+        box-shadow: 0 0 0 1px var(--border-c);
+      }
+
+      /* 04 logic */
+      .pc-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        width: 100%;
+        max-width: 420px;
+      }
+      .pc-item {
+        background: var(--panel2);
+        border: 1px solid var(--line2);
+        border-radius: 10px;
+        padding: 14px 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        align-items: center;
+        font-size: 22px;
+        transition: 0.2s;
+      }
+      .pc-item small {
+        font-family: var(--mono);
+        font-size: 8.5px;
+        color: var(--faint);
+        text-align: center;
+      }
+      .pc-item.hit {
+        border-color: var(--content-c);
+        background: var(--content-bg);
+        box-shadow: 0 0 0 1px var(--content-c);
+      }
+
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      @media (min-width: 1180px) {
+        .notes-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media (max-width: 640px) {
+        .notes-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .note-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.3s,
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+      .note-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--nc);
+        opacity: 0.85;
+      }
+      .note-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--nc);
+        box-shadow: 0 24px 44px -28px rgba(0, 0, 0, 0.85);
+      }
+      .note-card h3 {
+        font-family: var(--mono);
+        font-size: 15px;
+        color: var(--nc);
+        margin-bottom: 8px;
+      }
+      .note-card p {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .note-tip {
+        margin-top: 12px;
+        font-size: 11px;
+        color: var(--faint);
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+      }
+      .note-demo {
+        height: 104px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        overflow: hidden;
+      }
+      .demo-hv {
+        font: 600 12px var(--body);
+        padding: 10px 20px;
+        border-radius: 9px;
+        background: var(--panel2);
+        border: 1px solid var(--line2);
+        color: var(--text);
+        transition: 0.3s;
+      }
+      .note-card:hover .demo-hv {
+        background: var(--content-c);
+        color: #0e1017;
+        transform: translateY(-2px);
+      }
+      .demo-ck {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .demo-ck i {
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--line2);
+        border-radius: 5px;
+        transition: 0.3s;
+        position: relative;
+      }
+      .demo-ck em {
+        font: 11px var(--mono);
+        color: var(--muted);
+        font-style: normal;
+        transition: 0.3s;
+      }
+      .note-card:hover .demo-ck i {
+        background: var(--padding-c);
+        border-color: var(--padding-c);
+      }
+      .note-card:hover .demo-ck i::after {
+        content: "✓";
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        color: #0e1017;
+        font: 700 11px var(--mono);
+      }
+      .note-card:hover .demo-ck em {
+        color: var(--padding-c);
+      }
+      .demo-nth {
+        display: flex;
+        gap: 5px;
+      }
+      .demo-nth i {
+        width: 16px;
+        height: 26px;
+        border-radius: 4px;
+        border: 1px solid var(--line2);
+        transition: 0.3s;
+      }
+      .note-card:hover .demo-nth i:nth-child(odd) {
+        background: var(--border-bg);
+        border-color: var(--border-c);
+      }
+      .demo-wh {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--muted);
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        width: 78%;
+      }
+      .demo-wh em {
+        font-style: normal;
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        padding: 3px 8px;
+        transition: 0.3s;
+        opacity: 0.55;
+      }
+      .note-card:hover .demo-wh em:last-child {
+        opacity: 1;
+        color: var(--padding-c);
+        border-color: var(--padding-c);
+      }
+
+      .lesson-nav {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px clamp(18px, 3vw, 28px);
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+        align-items: center;
+      }
+      .ln-status {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--padding-c);
+        border: 1px solid rgba(62, 207, 142, 0.45);
+        border-radius: 999px;
+        padding: 3px 10px;
+      }
+      .lesson-nav h3 {
+        font-family: var(--disp);
+        font-size: 17px;
+        margin-top: 8px;
+      }
+      .ln-track {
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .tick {
+        width: 7px;
+        height: 15px;
+        border-radius: 2px;
+        background: #212a3e;
+        transition: 0.2s;
+      }
+      .tick.done {
+        background: var(--padding-c);
+        box-shadow: 0 0 8px rgba(62, 207, 142, 0.55);
+      }
+      .tick:hover {
+        background: var(--line2);
+      }
+      .ln-next {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        text-align: right;
+      }
+      .ln-next span {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .ln-next b {
+        font-family: var(--disp);
+        font-size: 15px;
+        color: var(--text);
+      }
+      footer {
+        border-top: 1px solid var(--line);
+        margin-top: 40px;
+        padding: 30px 0 44px;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+        color: var(--faint);
+        font-size: 12.5px;
+      }
+      footer .mono {
+        font-size: 11.5px;
+      }
+      footer .sp {
+        margin-left: auto;
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+      @media (max-width: 1020px) {
+        .intro {
+          grid-template-columns: 1fr;
+        }
+        .pick-grid {
+          grid-template-columns: 1fr;
+        }
+        .lesson-nav {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .ln-next {
+          align-items: center;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg">
+      <span class="glow g1"></span><span class="glow g2"></span>
+    </div>
+
+    <header class="topbar">
+      <span class="lesson-tag">lesson 22 / 45</span>
+      <nav>
+        <a href="#interaction">hover · active</a>
+        <a href="#linkform">visited · checked · disabled</a>
+        <a href="#structural">nth-child</a>
+        <a href="#logic">not · is · where</a>
+        <a href="#notes">cheat-codes</a>
+      </nav>
+    </header>
+
+    <div class="wrap">
+      <!-- ============ intro ============ -->
+      <section class="intro">
+        <div>
+          <p class="eyebrow">lesson 22 · interactive</p>
+          <h1>Selectors with a <span class="word-style">mood</span>.</h1>
+          <p class="lede">
+            A pseudo-class selects an element <b>by its state</b>, not its name:
+            being hovered, focused, checked, disabled, or being the third child
+            of twelve. Twelve of them cover 95% of real work — this lesson makes
+            each one visible.
+          </p>
+          <span class="css-full">H · OVER · F · OCUS · A · CTIVE</span>
+        </div>
+        <div class="intro-panel">
+          <button class="ix-btn" id="ixBtn">one button, four moods</button>
+          <span class="intro-fmt" id="introFmt"
+            >idle — no pseudo-class matches</span
+          >
+          <p class="imode mono">hover it, press it, tab to it…</p>
+        </div>
+      </section>
+
+      <!-- ============ 01 · interaction states ============ -->
+      <section id="interaction" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">01 · :hover · :focus · :active</p>
+          <h2>The interaction trio</h2>
+          <p class="lede">
+            Three moments every clickable thing has: cursor over it
+            (<b>:hover</b>), keyboard on it (<b>:focus</b>), finger pressing it
+            (<b>:active</b>). The readout shows which ones match
+            <i>right now</i> — stack them by doing two at once.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>hover · press · Tab</h3>
+            </div>
+            <div class="stage-wrap">
+              <button class="state-btn" id="stateBtn">interact with me</button>
+              <p class="read" id="stateRead">state: <b>idle</b></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="code-box"><pre id="codeState"></pre></div>
+            <p class="side-note">
+              Order matters in the stylesheet:
+              <span class="mono">:hover</span> before
+              <span class="mono">:focus</span> before
+              <span class="mono">:active</span> — otherwise the press state gets
+              overwritten. Old mnemonic: LoVe / HAte.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 02 · visited · checked · disabled ============ -->
+      <section id="linkform" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">02 · :visited · :checked · :disabled</p>
+          <h2>States with memory</h2>
+          <p class="lede">
+            <b>:visited</b> remembers where you've been (browsers limit it to
+            color, for privacy). <b>:checked</b> powers CSS-only toggles — the
+            card below obeys the checkbox with zero JavaScript.
+            <b>:disabled</b> greys out what can't be used.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>toggle everything</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="lf-wrap">
+                <a class="lf-link" href="#linkform"
+                  >a link — turns green once :visited</a
+                >
+                <label class="lf-check"
+                  ><input type="checkbox" id="ckDemo" /> subscribe to the roast
+                  letter
+                  <div class="lf-card" id="lfCard">
+                    this card is styled by input:checked ~ .card — pure CSS
+                  </div>
+                </label>
+                <input
+                  class="lf-in"
+                  id="lfIn"
+                  type="text"
+                  placeholder="a normal input"
+                />
+                <button class="ghost-btn" id="disToggle">
+                  ⊘ disable the input
+                </button>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="code-box"><pre id="codeLf"></pre></div>
+            <p class="side-note">
+              :checked + sibling selectors = accordions, tabs and theme switches
+              without a line of JS. :disabled needs no JS either — style the
+              state the HTML declares.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 03 · structural ============ -->
+      <section id="structural" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">03 · :first-child · :last-child · :nth-child()</p>
+          <h2>Counting siblings</h2>
+          <p class="lede">
+            Position-based selection: the ends, the odds, the evens, every
+            third. Pick a pattern — or build your own
+            <span class="mono">an+b</span> — and watch the matching rows light
+            up.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>eight siblings, one pattern</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="st-list" id="stList"></div>
+              <p class="read" id="stRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <p class="grp">presets</p>
+            <div class="chips" id="stChips">
+              <button class="sel-chip" data-a="0" data-b="1">
+                :first-child
+              </button>
+              <button class="sel-chip" data-a="0" data-b="8" data-last="1">
+                :last-child
+              </button>
+              <button class="sel-chip" data-a="2" data-b="1">
+                :nth-child(odd)
+              </button>
+              <button class="sel-chip" data-a="2" data-b="0">
+                :nth-child(even)
+              </button>
+              <button class="sel-chip" data-a="3" data-b="0">
+                :nth-child(3n)
+              </button>
+            </div>
+            <div class="ctl" style="--ac: var(--border-c)">
+              <div class="ctl-top">
+                <label for="rA">a (step)</label
+                ><output class="ctl-val" id="oA">2</output>
+              </div>
+              <input type="range" id="rA" min="0" max="5" value="2" />
+            </div>
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rB">b (offset)</label
+                ><output class="ctl-val" id="oB">1</output>
+              </div>
+              <input type="range" id="rB" min="0" max="8" value="1" />
+            </div>
+            <div class="code-box"><pre id="codeSt"></pre></div>
+            <p class="side-note">
+              an+b: start at b, step by a. <span class="mono">3n+1</span> = 1,
+              4, 7… Negative steps don't exist — swap the math instead.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 04 · :not :is :where ============ -->
+      <section id="logic" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">04 · :not() · :is() · :where()</p>
+          <h2>The logic operators</h2>
+          <p class="lede">
+            <b>:not()</b> excludes. <b>:is()</b> groups with an OR — and keeps
+            the specificity of its strongest argument. <b>:where()</b> does the
+            same grouping but contributes <b>zero</b> specificity. Same matches,
+            different weight.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>same matches, different weight</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="pc-grid" id="pcGrid"></div>
+              <p class="read" id="pcRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="chips" id="pcChips">
+              <button class="sel-chip" data-v="not">:not(.spicy)</button>
+              <button class="sel-chip" data-v="is">:is(.fruit, .veg)</button>
+              <button class="sel-chip" data-v="where">
+                :where(.fruit, .veg)
+              </button>
+            </div>
+            <div class="code-box"><pre id="codePc"></pre></div>
+            <p class="side-note">
+              Use :where() when you want the grouping to be easy to override
+              later — it adds nothing to the specificity fight.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 05 · field notes ============ -->
+      <section id="notes" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">05 · field notes</p>
+          <h2>Cheat codes from lesson 22</h2>
+        </div>
+        <div class="notes-grid">
+          <article class="note-card" style="--nc: var(--content-c)">
+            <div class="note-demo"><button class="demo-hv">button</button></div>
+            <h3>states are moments</h3>
+            <p>
+              :hover, :focus, :active — the same element, different instants.
+              Design all three or the UI feels dead under the finger.
+            </p>
+            <p class="note-tip mono">↳ hover: the mood flips</p>
+          </article>
+          <article class="note-card" style="--nc: var(--padding-c)">
+            <div class="note-demo">
+              <div class="demo-ck"><i></i><em>the card obeys</em></div>
+            </div>
+            <h3>:checked = CSS logic</h3>
+            <p>
+              Checkbox + sibling selector = toggles, accordions, tabs — no
+              JavaScript. The state lives in the DOM; CSS just reacts.
+            </p>
+            <p class="note-tip mono">↳ hover: it checks itself</p>
+          </article>
+          <article class="note-card" style="--nc: var(--border-c)">
+            <div class="note-demo">
+              <div class="demo-nth">
+                <i></i><i></i><i></i><i></i><i></i><i></i>
+              </div>
+            </div>
+            <h3>nth-child counts</h3>
+            <p>
+              an+b from 1, not 0. odd/even are shortcuts for 2n+1 / 2n. Zebra
+              stripes in one selector, forever.
+            </p>
+            <p class="note-tip mono">↳ hover: the odds light up</p>
+          </article>
+          <article class="note-card" style="--nc: var(--margin-c)">
+            <div class="note-demo">
+              <div class="demo-wh">
+                <em>:is(.a, .b) → weight of the strongest</em
+                ><em>:where(.a, .b) → weight 0-0-0</em>
+              </div>
+            </div>
+            <h3>:is vs :where</h3>
+            <p>
+              Identical matching, different specificity. :is for "these count",
+              :where for "group but stay overridable".
+            </p>
+            <p class="note-tip mono">↳ hover: zero-weight glows</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ lesson nav ============ -->
+      <div class="lesson-nav reveal">
+        <div>
+          <span class="ln-status">✓ completed</span>
+          <h3>22 — Pseudo-classes</h3>
+        </div>
+        <div class="ln-track" id="lnTrack"></div>
+        <div class="ln-next">
+          <span>up next</span>
+          <b>23 · Pseudo-elements</b>
+        </div>
+      </div>
+
+      <footer>
+        <span class="mono">drag things, break things, learn things.</span>
+        <span class="sp mono">45 lessons · lesson 22 · pseudo-classes</span>
+      </footer>
+    </div>
+    <!-- /wrap -->
+
+    <script>
+      (() => {
+        const $ = (id) => document.getElementById(id);
+        const rule = (sel, decls) =>
+          `<span class="c-sel">${sel}</span> {\n${decls
+            .map((d) => {
+              const i = d.indexOf(":");
+              return `  <span class="c-prop">${d.slice(0, i)}</span>: <span class="c-val">${d.slice(i + 1).trim()}</span>;`;
+            })
+            .join("\n")}\n}`;
+        function range(el, out, fmt, cb) {
+          const f = () => {
+            const v = +el.value;
+            out.textContent = fmt(v);
+            const min = +el.min,
+              max = +el.max;
+            el.style.setProperty(
+              "--fill",
+              ((v - min) / (max - min)) * 100 + "%",
+            );
+            cb(v);
+          };
+          el.addEventListener("input", f);
+          f();
+        }
+        function chipGroup(box, cb) {
+          box.addEventListener("click", (e) => {
+            const c = e.target.closest(".sel-chip");
+            if (!c) return;
+            box
+              .querySelectorAll(".sel-chip")
+              .forEach((x) => x.classList.remove("on"));
+            c.classList.add("on");
+            cb(c);
+          });
+        }
+
+        /* ---------- intro cycle ---------- */
+        const LOOKS = [
+          {
+            l: "idle — no pseudo-class matches",
+            s: {
+              background: "var(--content-c)",
+              transform: "none",
+              boxShadow: "none",
+              opacity: 1,
+            },
+          },
+          {
+            l: ":hover — the cursor arrives",
+            s: {
+              background: "var(--content-c)",
+              transform: "translateY(-3px)",
+              boxShadow: "0 10px 26px rgba(88,166,255,.45)",
+              opacity: 1,
+            },
+          },
+          {
+            l: ":active — the press",
+            s: {
+              background: "var(--border-c)",
+              transform: "translateY(2px) scale(.97)",
+              boxShadow: "none",
+              opacity: 1,
+            },
+          },
+          {
+            l: ":disabled — out of service",
+            s: {
+              background: "var(--line2)",
+              transform: "none",
+              boxShadow: "none",
+              opacity: 0.5,
+            },
+          },
+        ];
+        let li = 0;
+        function look() {
+          const L = LOOKS[li];
+          Object.assign($("ixBtn").style, L.s);
+          $("introFmt").textContent = L.l;
+          li = (li + 1) % LOOKS.length;
+        }
+        look();
+        setInterval(look, 2100);
+
+        /* ---------- 01 interaction ---------- */
+        const S = { h: false, f: false, a: false };
+        function renderState() {
+          const parts = [];
+          if (S.h) parts.push(":hover");
+          if (S.f) parts.push(":focus");
+          if (S.a) parts.push(":active");
+          $("stateRead").innerHTML =
+            "state: <b>" + (parts.length ? parts.join(" + ") : "idle") + "</b>";
+        }
+        const sb = $("stateBtn");
+        sb.addEventListener("mouseenter", () => {
+          S.h = true;
+          renderState();
+        });
+        sb.addEventListener("mouseleave", () => {
+          S.h = false;
+          S.a = false;
+          renderState();
+        });
+        sb.addEventListener("focus", () => {
+          S.f = true;
+          renderState();
+        });
+        sb.addEventListener("blur", () => {
+          S.f = false;
+          renderState();
+        });
+        sb.addEventListener("mousedown", () => {
+          S.a = true;
+          renderState();
+        });
+        sb.addEventListener("mouseup", () => {
+          S.a = false;
+          renderState();
+        });
+        $("codeState").innerHTML =
+          rule(".btn:hover", [`transform: translateY(-2px)`]) +
+          "\n" +
+          rule(".btn:focus", [`outline: 3px dashed #3ecf8e`]) +
+          "\n" +
+          rule(".btn:active", [`transform: translateY(2px)`]);
+
+        /* ---------- 02 link/form ---------- */
+        $("disToggle").addEventListener("click", () => {
+          const inp = $("lfIn");
+          inp.disabled = !inp.disabled;
+          $("disToggle").textContent = inp.disabled
+            ? "✓ enable the input"
+            : "⊘ disable the input";
+        });
+        $("codeLf").innerHTML =
+          rule("a:visited", [`color: #3ecf8e  /* privacy: color only */`]) +
+          "\n" +
+          rule("input:checked ~ .card", [
+            `border-color: #3ecf8e`,
+            `background: rgba(62,207,142,.14)`,
+          ]) +
+          "\n" +
+          rule("input:disabled", [`opacity: .4`, `cursor: not-allowed`]);
+
+        /* ---------- 03 structural ---------- */
+        const stList = $("stList");
+        for (let i = 1; i <= 8; i++) {
+          const d = document.createElement("div");
+          d.className = "st-item";
+          d.innerHTML = `<span class="idx">${i}</span> sibling ${i}`;
+          stList.appendChild(d);
+        }
+        let lastMode = false;
+        function renderSt(a, b) {
+          const items = [...stList.children];
+          const hits = [];
+          items.forEach((it, idx) => {
+            const n = idx + 1;
+            let m;
+            if (lastMode) m = n === 8;
+            else if (a === 0) m = n === b;
+            else m = (n - b) % a === 0 && (n - b) / a >= 0;
+            it.classList.toggle("hit", m);
+            if (m) hits.push(n);
+          });
+          const label = lastMode
+            ? ":last-child"
+            : a === 0
+              ? `:nth-child(${b})  /* first = ${b} */`
+              : `:nth-child(${a}n${b ? "+" + b : ""})`;
+          $("stRead").innerHTML =
+            `matches: <b>${hits.join(", ") || "none"}</b>`;
+          $("codeSt").innerHTML = rule(".list li" + label, [
+            `/* highlighted */`,
+          ]);
+        }
+        chipGroup($("stChips"), (c) => {
+          lastMode = !!c.dataset.last;
+          const a = +c.dataset.a,
+            b = +c.dataset.b;
+          $("rA").value = a;
+          $("oA").textContent = a;
+          $("rB").value = b;
+          $("oB").textContent = b;
+          renderSt(a, b);
+        });
+        range(
+          $("rA"),
+          $("oA"),
+          (v) => v,
+          (v) => {
+            lastMode = false;
+            renderSt(v, +$("rB").value);
+          },
+        );
+        range(
+          $("rB"),
+          $("oB"),
+          (v) => v,
+          (v) => {
+            lastMode = false;
+            renderSt(+$("rA").value, v);
+          },
+        );
+        renderSt(2, 1);
+
+        /* ---------- 04 logic ---------- */
+        const FOODS = [
+          { e: "🍅", c: ["fruit"] },
+          { e: "🌶️", c: ["veg", "spicy"] },
+          { e: "🥩", c: ["meat"] },
+          { e: "🍎", c: ["fruit"] },
+          { e: "🥦", c: ["veg"] },
+          { e: "🍰", c: ["sweet"] },
+        ];
+        const pcGrid = $("pcGrid");
+        FOODS.forEach((f) => {
+          const d = document.createElement("div");
+          d.className = "pc-item";
+          d.dataset.cls = f.c.join(" ");
+          d.innerHTML = `${f.e}<small>.${f.c.join(" .")}</small>`;
+          pcGrid.appendChild(d);
+        });
+        const PC = {
+          not: {
+            sel: ":not(.spicy)",
+            spec: "0-1-0 (negated arg counts)",
+            match: (el) => !el.dataset.cls.includes("spicy"),
+          },
+          is: {
+            sel: ":is(.fruit, .veg)",
+            spec: "0-1-0 — strongest argument",
+            match: (el) => /fruit|veg/.test(el.dataset.cls),
+          },
+          where: {
+            sel: ":where(.fruit, .veg)",
+            spec: "0-0-0 — always zero",
+            match: (el) => /fruit|veg/.test(el.dataset.cls),
+          },
+        };
+        chipGroup($("pcChips"), (c) => {
+          const P = PC[c.dataset.v];
+          let n = 0;
+          [...pcGrid.children].forEach((el) => {
+            const m = P.match(el);
+            el.classList.toggle("hit", m);
+            if (m) n++;
+          });
+          $("pcRead").innerHTML =
+            `<b>${P.sel}</b> → ${n} matches · specificity <b>${P.spec}</b>`;
+          $("codePc").innerHTML =
+            rule(".item" + P.sel, [`/* ${n} of 6 match */`]) +
+            `\n<span class="c-com">/* specificity added: ${P.spec} */</span>`;
+        });
+        $("codePc").innerHTML =
+          rule(".item:not(.spicy)", [``]) +
+          `\n<span class="c-com">/* pick a selector ↑ */</span>`;
+
+        /* ---------- lesson track ---------- */
+        const t = $("lnTrack");
+        for (let i = 0; i < 45; i++) {
+          const s = document.createElement("span");
+          s.className = "tick" + (i < 22 ? " done" : "");
+          s.title = "lesson " + (i + 1);
+          t.appendChild(s);
+        }
+
+        /* ---------- reveal ---------- */
+        const io = new IntersectionObserver(
+          (es) =>
+            es.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                io.unobserve(e.target);
+              }
+            }),
+          { threshold: 0.12 },
+        );
+        document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      })();
+    </script>
+  </body>
+</html>

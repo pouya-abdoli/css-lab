@@ -1,0 +1,1710 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grid Layout Projects — Lesson 19</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' fill='none' stroke='%23f07f4f' stroke-width='2'/%3E%3Crect x='8' y='8' width='16' height='16' fill='none' stroke='%23f2c14e' stroke-width='2'/%3E%3Crect x='13' y='13' width='6' height='6' fill='%2358a6ff'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0e15;
+        --panel: #121826;
+        --panel2: #0d1220;
+        --ink: #10141d;
+        --line: #222c40;
+        --line2: #31405e;
+        --text: #e9eef7;
+        --muted: #8d9ab0;
+        --faint: #5b6a84;
+        --margin-c: #f07f4f;
+        --margin-bg: rgba(240, 127, 79, 0.14);
+        --border-c: #f2c14e;
+        --border-bg: rgba(242, 193, 78, 0.16);
+        --padding-c: #3ecf8e;
+        --padding-bg: rgba(62, 207, 142, 0.14);
+        --content-c: #58a6ff;
+        --content-bg: rgba(88, 166, 255, 0.17);
+        --pink: #ff4f8b;
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: dark;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 15px;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+      ::selection {
+        background: rgba(88, 166, 255, 0.35);
+      }
+      .mono {
+        font-family: var(--mono);
+      }
+      section {
+        scroll-margin-top: 76px;
+      }
+      b {
+        font-weight: 600;
+      }
+
+      .bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            700px 460px at 12% -6%,
+            rgba(242, 193, 78, 0.07),
+            transparent 60%
+          ),
+          radial-gradient(
+            760px 520px at 92% 22%,
+            rgba(88, 166, 255, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            600px 480px at 40% 105%,
+            rgba(62, 207, 142, 0.05),
+            transparent 60%
+          );
+      }
+      .bg::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(233, 238, 247, 0.035) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(233, 238, 247, 0.035) 1px,
+            transparent 1px
+          );
+        background-size: 28px 28px;
+        mask-image: radial-gradient(
+          ellipse 120% 90% at 50% 0%,
+          #000 40%,
+          transparent 100%
+        );
+      }
+      .bg .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.5;
+        animation: drift 26s ease-in-out infinite alternate;
+      }
+      .bg .g1 {
+        width: 420px;
+        height: 420px;
+        left: -120px;
+        top: 30%;
+        background: rgba(240, 127, 79, 0.1);
+      }
+      .bg .g2 {
+        width: 460px;
+        height: 460px;
+        right: -140px;
+        top: 60%;
+        background: rgba(88, 166, 255, 0.1);
+        animation-delay: -12s;
+      }
+      @keyframes drift {
+        from {
+          transform: translateY(-30px);
+        }
+        to {
+          transform: translateY(40px);
+        }
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 12px clamp(16px, 4vw, 44px);
+        background: rgba(11, 14, 21, 0.92);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar nav {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .topbar nav a {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 6px 11px;
+        border-radius: 999px;
+        transition: 0.2s;
+      }
+      .topbar nav a:hover {
+        color: var(--text);
+        background: #161d2c;
+      }
+      .lesson-tag {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--border-c);
+        border: 1px dashed rgba(242, 193, 78, 0.45);
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .wrap {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: 0 clamp(16px, 4vw, 44px);
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        padding: clamp(20px, 4vh, 48px) 0 clamp(30px, 5vh, 56px);
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--padding-c);
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(2.3rem, 5.2vw, 3.7rem);
+        line-height: 1.06;
+        letter-spacing: -0.02em;
+      }
+      .word-style {
+        display: inline-block;
+        padding: 0.02em 0.22em;
+        background: var(--margin-bg);
+        border: 0.06em solid var(--margin-c);
+        border-radius: 0.14em;
+        color: #ffc9ae;
+        transition: transform 0.3s;
+        cursor: default;
+        margin-top: 10px;
+        padding-bottom: 10px;
+      }
+      .word-style:hover {
+        transform: rotate(-2deg) scale(1.03);
+      }
+      .lede {
+        color: var(--muted);
+        max-width: 56ch;
+        margin-top: 18px;
+        font-size: 1.05rem;
+      }
+      .lede b {
+        color: var(--text);
+      }
+      .css-full {
+        display: inline-block;
+        margin-top: 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--faint);
+        letter-spacing: 0.08em;
+      }
+      .intro-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 26px;
+        display: grid;
+        place-items: center;
+        gap: 16px;
+        box-shadow: 0 30px 60px -40px rgba(0, 0, 0, 0.8);
+      }
+      .ix-box {
+        width: 100%;
+        max-width: 280px;
+        height: 160px;
+        border: 1px dashed var(--line2);
+        border-radius: 10px;
+        padding: 10px;
+        display: grid;
+        gap: 6px;
+        transition: 0.4s;
+      }
+      .ix-item {
+        border-radius: 5px;
+        transition: all 0.4s;
+        min-width: 0;
+        min-height: 0;
+      }
+      .intro-fmt {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--content-c);
+        background: var(--ink);
+        border: 1px solid var(--line2);
+        border-radius: 9px;
+        padding: 7px 16px;
+        min-height: 36px;
+      }
+      .imode {
+        font-size: 11px;
+        color: var(--faint);
+        letter-spacing: 0.1em;
+      }
+
+      .sec {
+        padding: clamp(36px, 6vh, 64px) 0;
+      }
+      .sec-head {
+        margin-bottom: 26px;
+        max-width: 72ch;
+      }
+      .sec-head h2 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+        letter-spacing: -0.015em;
+        line-height: 1.15;
+      }
+      .sec-head .lede {
+        margin-top: 10px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 18px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .panel-head h3 {
+        font-family: var(--disp);
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dots i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dots i:nth-child(1) {
+        background: #f07f4f;
+      }
+      .dots i:nth-child(2) {
+        background: #f2c14e;
+      }
+      .dots i:nth-child(3) {
+        background: #3ecf8e;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.85;
+        overflow-x: auto;
+      }
+      .c-sel {
+        color: #7fe0b0;
+      }
+      .c-prop {
+        color: #8ab4ff;
+      }
+      .c-val {
+        color: #f2c14e;
+      }
+      .c-com {
+        color: #5b6a84;
+      }
+      .grp {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+
+      .pick-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 18px;
+        align-items: stretch;
+      }
+      .stage-wrap {
+        padding: 28px;
+        display: grid;
+        place-items: center;
+        min-height: 340px;
+        gap: 14px;
+      }
+      .side {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .sel-chip {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .sel-chip:hover {
+        color: var(--text);
+        border-color: var(--content-c);
+        transform: translateY(-2px);
+      }
+      .sel-chip.on {
+        color: #0e1017;
+        background: var(--content-c);
+        border-color: var(--content-c);
+        font-weight: 600;
+      }
+      .ghost-btn {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--faint);
+        background: none;
+        border: 1px dashed var(--line2);
+        border-radius: 8px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .ghost-btn:hover {
+        color: var(--content-c);
+        border-color: var(--content-c);
+      }
+      .code-box {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .code-box pre {
+        min-height: 0;
+        font-size: 12.5px;
+      }
+      .side-note {
+        font-size: 12px;
+        color: var(--faint);
+      }
+      .segmented {
+        position: relative;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 1fr;
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        padding: 3px;
+      }
+      .segmented button {
+        position: relative;
+        z-index: 1;
+        background: none;
+        border: 0;
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--muted);
+        padding: 8px 4px;
+        cursor: pointer;
+        transition: color 0.25s;
+        border-radius: 8px;
+      }
+      .segmented button:hover {
+        color: var(--text);
+      }
+      .segmented button.active {
+        color: #fff;
+      }
+      .seg-thumb {
+        position: absolute;
+        top: 3px;
+        bottom: 3px;
+        left: 3px;
+        width: calc((100% - 6px) / 2);
+        background: #26334c;
+        border-radius: 8px;
+        transition:
+          transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+          width 0.28s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      }
+      .read {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 14px;
+      }
+      .read b {
+        color: var(--text);
+      }
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        outline: none;
+        cursor: pointer;
+        background: linear-gradient(
+          90deg,
+          var(--ac) var(--fill, 50%),
+          #232c40 var(--fill, 50%)
+        );
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        transition: transform 0.15s;
+      }
+      input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.15);
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+      }
+      .ctl {
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 7px 11px;
+        transition: 0.2s;
+      }
+      .ctl:hover {
+        background: #101725;
+        border-color: var(--line);
+      }
+      .ctl-top {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+      .ctl-top label {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text);
+      }
+      .ctl-val {
+        margin-left: auto;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--ac);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 2px 9px;
+      }
+
+      /* ===== project 1: dashboard ===== */
+      .dash {
+        display: grid;
+        width: 100%;
+        max-width: 460px;
+        height: 290px;
+        gap: 10px;
+        grid-template-columns: 96px 1fr 1fr 1fr;
+        grid-template-rows: 42px 74px 1fr;
+        grid-template-areas: "side head head head" "side s1 s2 s3" "side chart chart table";
+        transition: 0.3s;
+      }
+      .dash.mobile {
+        height: auto;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+        grid-template-areas: "head" "s1" "s2" "s3" "chart" "table" "side";
+      }
+      .dash .rg {
+        border-radius: 9px;
+        display: grid;
+        place-items: center;
+        font-family: var(--mono);
+        font-size: 9.5px;
+        cursor: pointer;
+        transition: 0.2s;
+        border: 1px solid;
+        padding: 8px;
+      }
+      .dash .rg:hover {
+        filter: brightness(1.25);
+      }
+      .dash .rg.on {
+        box-shadow: 0 0 0 2px currentColor;
+      }
+      .d-side {
+        grid-area: side;
+        background: var(--padding-bg);
+        border-color: var(--padding-c);
+        color: #8fe6bd;
+      }
+      .d-head {
+        grid-area: head;
+        background: var(--border-bg);
+        border-color: var(--border-c);
+        color: #ffe3a1;
+      }
+      .d-s1 {
+        grid-area: s1;
+        background: var(--content-bg);
+        border-color: var(--content-c);
+        color: #a7cdff;
+      }
+      .d-s2 {
+        grid-area: s2;
+        background: var(--content-bg);
+        border-color: var(--content-c);
+        color: #a7cdff;
+      }
+      .d-s3 {
+        grid-area: s3;
+        background: var(--content-bg);
+        border-color: var(--content-c);
+        color: #a7cdff;
+      }
+      .d-chart {
+        grid-area: chart;
+        background: var(--margin-bg);
+        border-color: var(--margin-c);
+        color: #ffc9ae;
+      }
+      .d-table {
+        grid-area: table;
+        background: rgba(255, 255, 255, 0.04);
+        border-color: var(--line2);
+        color: var(--muted);
+      }
+
+      /* ===== project 2: gallery ===== */
+      .gal {
+        display: grid;
+        width: 100%;
+        max-width: 460px;
+        gap: 10px;
+        grid-auto-flow: dense;
+        grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+        grid-auto-rows: 72px;
+        transition: 0.3s;
+      }
+      .gal-item {
+        border-radius: 9px;
+        transition: 0.3s;
+        position: relative;
+        overflow: hidden;
+      }
+      .gal-item::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          80px 50px at 30% 30%,
+          rgba(255, 255, 255, 0.25),
+          transparent
+        );
+      }
+      .g-w {
+        grid-column: span 2;
+      }
+      .g-h {
+        grid-row: span 2;
+      }
+      .g-b {
+        grid-column: span 2;
+        grid-row: span 2;
+      }
+
+      /* ===== project 3: blog ===== */
+      .blog {
+        display: grid;
+        width: 100%;
+        max-width: 460px;
+        gap: 10px;
+        transition: 0.3s;
+        grid-template-columns: 1fr 120px;
+        grid-template-areas: "head head" "main aside" "foot foot";
+      }
+      .blog.focus {
+        grid-template-columns: 1fr;
+        grid-template-areas: "head" "main" "aside" "foot";
+      }
+      .b-head {
+        grid-area: head;
+        background: var(--border-bg);
+        border: 1px solid var(--border-c);
+        border-radius: 9px;
+        padding: 12px;
+        font-family: var(--mono);
+        font-size: 10px;
+        color: #ffe3a1;
+      }
+      .b-main {
+        grid-area: main;
+        background: var(--panel2);
+        border: 1px solid var(--line2);
+        border-radius: 9px;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+      .b-main i {
+        height: 9px;
+        border-radius: 3px;
+        background: #232c40;
+      }
+      .b-main i:nth-child(3n) {
+        width: 70%;
+      }
+      .b-aside {
+        grid-area: aside;
+        background: var(--padding-bg);
+        border: 1px solid var(--padding-c);
+        border-radius: 9px;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+      .b-aside i {
+        height: 9px;
+        border-radius: 3px;
+        background: rgba(62, 207, 142, 0.25);
+      }
+      .b-foot {
+        grid-area: foot;
+        background: var(--margin-bg);
+        border: 1px solid var(--margin-c);
+        border-radius: 9px;
+        padding: 10px;
+        font-family: var(--mono);
+        font-size: 9.5px;
+        color: #ffc9ae;
+        text-align: center;
+      }
+
+      /* ===== project 4: products ===== */
+      .prod {
+        display: grid;
+        width: 100%;
+        max-width: 460px;
+        gap: 12px;
+        grid-template-columns: repeat(auto-fit, minmax(var(--pw, 120px), 1fr));
+        transition: 0.3s;
+      }
+      .prod-card {
+        background: var(--panel2);
+        border: 1px solid var(--line2);
+        border-radius: 12px;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        transition: 0.25s;
+      }
+      .prod-card:hover {
+        border-color: var(--content-c);
+        transform: translateY(-3px);
+      }
+      .prod-img {
+        height: 62px;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        font-size: 24px;
+      }
+      .prod-name {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--text);
+      }
+      .prod-price {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--padding-c);
+      }
+      .prod-btn {
+        margin-top: auto;
+        background: var(--content-c);
+        color: #0e1017;
+        border: none;
+        border-radius: 6px;
+        padding: 6px 0;
+        font: 700 9px var(--mono);
+        cursor: pointer;
+      }
+
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      @media (min-width: 1180px) {
+        .notes-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media (max-width: 640px) {
+        .notes-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .note-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.3s,
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+      .note-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--nc);
+        opacity: 0.85;
+      }
+      .note-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--nc);
+        box-shadow: 0 24px 44px -28px rgba(0, 0, 0, 0.85);
+      }
+      .note-card h3 {
+        font-family: var(--mono);
+        font-size: 15px;
+        color: var(--nc);
+        margin-bottom: 8px;
+      }
+      .note-card p {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .note-tip {
+        margin-top: 12px;
+        font-size: 11px;
+        color: var(--faint);
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+      }
+      .note-demo {
+        height: 104px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        overflow: hidden;
+      }
+      .demo-dsh {
+        width: 78%;
+        height: 75%;
+        display: grid;
+        gap: 5px;
+        grid-template-columns: 24px 1fr 1fr;
+        grid-template-areas: "s a a" "s b c";
+        transition: 0.35s;
+      }
+      .demo-dsh i {
+        border-radius: 4px;
+      }
+      .demo-dsh i:nth-child(1) {
+        grid-area: s;
+        background: var(--padding-bg);
+        border: 1px solid var(--padding-c);
+      }
+      .demo-dsh i:nth-child(2) {
+        grid-area: a;
+        background: var(--border-bg);
+        border: 1px solid var(--border-c);
+      }
+      .demo-dsh i:nth-child(3) {
+        grid-area: b;
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+      }
+      .demo-dsh i:nth-child(4) {
+        grid-area: c;
+        background: var(--margin-bg);
+        border: 1px solid var(--margin-c);
+      }
+      .note-card:hover .demo-dsh {
+        grid-template-columns: 1fr;
+        grid-template-areas: "a" "s" "b" "c";
+      }
+      .demo-gal2 {
+        width: 78%;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-auto-rows: 20px;
+        gap: 5px;
+      }
+      .demo-gal2 i {
+        border-radius: 4px;
+        background: linear-gradient(135deg, var(--content-c), var(--padding-c));
+        opacity: 0.7;
+      }
+      .demo-gal2 i:first-child {
+        grid-column: span 2;
+        grid-row: span 2;
+        opacity: 1;
+      }
+      .note-card:hover .demo-gal2 {
+        grid-auto-rows: 26px;
+      }
+      .demo-bl2 {
+        width: 78%;
+        height: 70%;
+        display: grid;
+        gap: 5px;
+        grid-template-columns: 1fr 30px;
+        grid-template-areas: "h h" "m a" "f f";
+        transition: 0.35s;
+      }
+      .demo-bl2 i {
+        border-radius: 4px;
+      }
+      .demo-bl2 i:nth-child(1) {
+        grid-area: h;
+        background: var(--border-bg);
+        border: 1px solid var(--border-c);
+      }
+      .demo-bl2 i:nth-child(2) {
+        grid-area: m;
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+      }
+      .demo-bl2 i:nth-child(3) {
+        grid-area: a;
+        background: var(--padding-bg);
+        border: 1px solid var(--padding-c);
+      }
+      .demo-bl2 i:nth-child(4) {
+        grid-area: f;
+        background: var(--margin-bg);
+        border: 1px solid var(--margin-c);
+      }
+      .note-card:hover .demo-bl2 {
+        grid-template-columns: 1fr;
+        grid-template-areas: "h" "m" "a" "f";
+      }
+      .demo-pr2 {
+        width: 78%;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(24px, 1fr));
+        gap: 5px;
+      }
+      .demo-pr2 i {
+        height: 30px;
+        border-radius: 5px;
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+      }
+      .note-card:hover .demo-pr2 {
+        gap: 10px;
+      }
+
+      .lesson-nav {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px clamp(18px, 3vw, 28px);
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+        align-items: center;
+      }
+      .ln-status {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--padding-c);
+        border: 1px solid rgba(62, 207, 142, 0.45);
+        border-radius: 999px;
+        padding: 3px 10px;
+      }
+      .lesson-nav h3 {
+        font-family: var(--disp);
+        font-size: 17px;
+        margin-top: 8px;
+      }
+      .ln-track {
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .tick {
+        width: 7px;
+        height: 15px;
+        border-radius: 2px;
+        background: #212a3e;
+        transition: 0.2s;
+      }
+      .tick.done {
+        background: var(--padding-c);
+        box-shadow: 0 0 8px rgba(62, 207, 142, 0.55);
+      }
+      .tick:hover {
+        background: var(--line2);
+      }
+      .ln-next {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        text-align: right;
+      }
+      .ln-next span {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .ln-next b {
+        font-family: var(--disp);
+        font-size: 15px;
+        color: var(--text);
+      }
+      footer {
+        border-top: 1px solid var(--line);
+        margin-top: 40px;
+        padding: 30px 0 44px;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+        color: var(--faint);
+        font-size: 12.5px;
+      }
+      footer .mono {
+        font-size: 11.5px;
+      }
+      footer .sp {
+        margin-left: auto;
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+      @media (max-width: 1020px) {
+        .intro {
+          grid-template-columns: 1fr;
+        }
+        .pick-grid {
+          grid-template-columns: 1fr;
+        }
+        .lesson-nav {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .ln-next {
+          align-items: center;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg">
+      <span class="glow g1"></span><span class="glow g2"></span>
+    </div>
+
+    <header class="topbar">
+      <span class="lesson-tag">lesson 19 / 45</span>
+      <nav>
+        <a href="#dashboard">dashboard</a>
+        <a href="#gallery">photo-gallery</a>
+        <a href="#blog">blog-layout</a>
+        <a href="#products">product-grid</a>
+        <a href="#notes">cheat-codes</a>
+      </nav>
+    </header>
+
+    <div class="wrap">
+      <!-- ============ intro ============ -->
+      <section class="intro">
+        <div>
+          <p class="eyebrow">lesson 19 · interactive</p>
+          <h1>Theory ends. <span class="word-style">Ship something.</span></h1>
+          <p class="lede">
+            Four real layouts, built only with what lessons 16–18 gave you:
+            <b>areas</b> for the dashboard &amp; blog,
+            <b>auto-fill + spans</b> for the gallery,
+            <b>auto-fit + minmax</b> for the product grid. Click around — every
+            region knows its own code.
+          </p>
+          <span class="css-full">B · UILD · S · HIP · R · EPEAT</span>
+        </div>
+        <div class="intro-panel">
+          <div class="ix-box" id="ixBox"></div>
+          <span class="intro-fmt" id="introFmt">project 1 / 4 — dashboard</span>
+          <p class="imode mono">four blueprints, one property set…</p>
+        </div>
+      </section>
+
+      <!-- ============ 01 · dashboard ============ -->
+      <section id="dashboard" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">project 01 · dashboard</p>
+          <h2>grid-template-areas at work</h2>
+          <p class="lede">
+            Sidebar, header, stat cards, chart, table — seven regions, one ASCII
+            map. <b>Click any region</b> to read its
+            <span class="mono">grid-area</span>; flip to mobile and watch the
+            same items re-stack from a new map.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>click a region</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="dash" id="dash">
+                <div class="rg d-side" data-a="side">nav</div>
+                <div class="rg d-head" data-a="head">header</div>
+                <div class="rg d-s1" data-a="s1">stat</div>
+                <div class="rg d-s2" data-a="s2">stat</div>
+                <div class="rg d-s3" data-a="s3">stat</div>
+                <div class="rg d-chart" data-a="chart">chart</div>
+                <div class="rg d-table" data-a="table">table</div>
+              </div>
+              <p class="read" id="dashRead">click any region ↑</p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="segmented" id="segDash">
+              <span class="seg-thumb"></span>
+              <button data-v="desktop" class="active">desktop</button>
+              <button data-v="mobile">mobile</button>
+            </div>
+            <div class="code-box"><pre id="codeDash"></pre></div>
+            <p class="side-note">
+              The HTML never changes between breakpoints — only the map string
+              does. That's the whole responsive story with areas.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 02 · photo gallery ============ -->
+      <section id="gallery" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">project 02 · photo gallery</p>
+          <h2>auto-fill + spans + dense</h2>
+          <p class="lede">
+            Uniform tracks from
+            <span class="mono">repeat(auto-fill, minmax(…))</span>, fixed row
+            height from <span class="mono">grid-auto-rows</span>, and a few
+            items that break the rhythm with <span class="mono">span 2</span>.
+            <span class="mono">grid-auto-flow: dense</span> backfills the holes.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>resize the tracks</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="gal" id="gal"></div>
+              <p class="read" id="galRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rGal">min track size</label
+                ><output class="ctl-val" id="oGal">90px</output>
+              </div>
+              <input type="range" id="rGal" min="60" max="140" value="90" />
+            </div>
+            <div class="chips">
+              <button class="sel-chip on" id="galUni">uniform</button>
+              <button class="sel-chip" id="galEd">editorial spans</button>
+            </div>
+            <div class="code-box"><pre id="codeGal"></pre></div>
+            <p class="side-note">
+              Dense flow pulls later small items up into gaps left by big spans
+              — the masonry look without JavaScript.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 03 · blog layout ============ -->
+      <section id="blog" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">project 03 · blog layout</p>
+          <h2>Header, article, aside, footer</h2>
+          <p class="lede">
+            The classic reading layout: full-width header &amp; footer, article
+            with a sidebar. <b>Focus mode</b> swaps the map to a single column —
+            sidebar drops below the article, measure widens, zero HTML edits.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>two maps, same markup</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="blog" id="blogGrid">
+                <div class="b-head">header · "why we roast on tuesdays"</div>
+                <div class="b-main">
+                  <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                </div>
+                <div class="b-aside"><i></i><i></i><i></i></div>
+                <div class="b-foot">footer · aurora coffee journal</div>
+              </div>
+              <p class="read" id="blogRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="segmented" id="segBlog">
+              <span class="seg-thumb"></span>
+              <button data-v="two" class="active">two-column</button>
+              <button data-v="focus">focus mode</button>
+            </div>
+            <div class="code-box"><pre id="codeBlog"></pre></div>
+            <p class="side-note">
+              65–75 characters per line is the readable measure. Focus mode is
+              just a narrower template — the text reflows itself.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 04 · product grid ============ -->
+      <section id="products" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">project 04 · product grid</p>
+          <h2>auto-fit: responsive with no media queries</h2>
+          <p class="lede">
+            <span class="mono">repeat(auto-fit, minmax(120px, 1fr))</span> —
+            cards wrap when tight, stretch when wide. Add products, drag the min
+            width, and watch the grid negotiate by itself.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>the self-arranging shelf</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="prod" id="prod"></div>
+              <p class="read" id="prodRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--padding-c)">
+              <div class="ctl-top">
+                <label for="rProd">min card width</label
+                ><output class="ctl-val" id="oProd">120px</output>
+              </div>
+              <input type="range" id="rProd" min="90" max="180" value="120" />
+            </div>
+            <div class="chips">
+              <button class="ghost-btn" id="prodAdd">+ add product</button>
+              <button class="ghost-btn" id="prodRm">− remove</button>
+            </div>
+            <div class="code-box"><pre id="codeProd"></pre></div>
+            <p class="side-note">
+              One line replaces a drawer full of breakpoint overrides. This is
+              the grid pattern you'll use most in real work.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 05 · field notes ============ -->
+      <section id="notes" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">05 · field notes</p>
+          <h2>Cheat codes from lesson 19</h2>
+        </div>
+        <div class="notes-grid">
+          <article class="note-card" style="--nc: var(--content-c)">
+            <div class="note-demo">
+              <div class="demo-dsh"><i></i><i></i><i></i><i></i></div>
+            </div>
+            <h3>areas = the wireframe</h3>
+            <p>
+              Name the regions, draw the map, swap the map per breakpoint. HTML
+              stays untouched; the layout is just a string.
+            </p>
+            <p class="note-tip mono">↳ hover: desktop collapses to mobile</p>
+          </article>
+          <article class="note-card" style="--nc: var(--padding-c)">
+            <div class="note-demo">
+              <div class="demo-gal2"><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+            <h3>galleries = spans + dense</h3>
+            <p>
+              Fixed auto-rows + a few span-2 heroes + dense backfilling =
+              editorial rhythm without masonry libraries.
+            </p>
+            <p class="note-tip mono">↳ hover: rows breathe</p>
+          </article>
+          <article class="note-card" style="--nc: var(--border-c)">
+            <div class="note-demo">
+              <div class="demo-bl2"><i></i><i></i><i></i><i></i></div>
+            </div>
+            <h3>blogs = measure control</h3>
+            <p>
+              Two columns for browsing, one for reading. The aside never
+              disappears — the map just reorders it below the article.
+            </p>
+            <p class="note-tip mono">↳ hover: focus mode engages</p>
+          </article>
+          <article class="note-card" style="--nc: var(--margin-c)">
+            <div class="note-demo">
+              <div class="demo-pr2"><i></i><i></i><i></i><i></i></div>
+            </div>
+            <h3>shops = auto-fit</h3>
+            <p>
+              minmax(min, 1fr) inside auto-fit: cards wrap when cramped, stretch
+              when spacious. Zero media queries, forever responsive.
+            </p>
+            <p class="note-tip mono">↳ hover: the gutters widen</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ lesson nav ============ -->
+      <div class="lesson-nav reveal">
+        <div>
+          <span class="ln-status">✓ completed</span>
+          <h3>19 — Grid Layout Projects</h3>
+        </div>
+        <div class="ln-track" id="lnTrack"></div>
+        <div class="ln-next">
+          <span>up next</span>
+          <b>20 · Styling Forms</b>
+        </div>
+      </div>
+
+      <footer>
+        <span class="mono">drag things, break things, learn things.</span>
+        <span class="sp mono"
+          >45 lessons · lesson 19 · grid layout projects</span
+        >
+      </footer>
+    </div>
+    <!-- /wrap -->
+
+    <script>
+      (() => {
+        const $ = (id) => document.getElementById(id);
+        const rule = (sel, decls) =>
+          `<span class="c-sel">${sel}</span> {\n${decls
+            .map((d) => {
+              const i = d.indexOf(":");
+              return `  <span class="c-prop">${d.slice(0, i)}</span>: <span class="c-val">${d.slice(i + 1).trim()}</span>;`;
+            })
+            .join("\n")}\n}`;
+        function range(el, out, fmt, cb) {
+          const f = () => {
+            const v = +el.value;
+            out.textContent = fmt(v);
+            const min = +el.min,
+              max = +el.max;
+            el.style.setProperty(
+              "--fill",
+              ((v - min) / (max - min)) * 100 + "%",
+            );
+            cb(v);
+          };
+          el.addEventListener("input", f);
+          f();
+        }
+        function initSeg(seg, onPick) {
+          const btns = [...seg.querySelectorAll("button")],
+            thumb = seg.querySelector(".seg-thumb"),
+            n = btns.length;
+          function set(i) {
+            btns.forEach((b, j) => b.classList.toggle("active", i === j));
+            thumb.style.width = `calc((100% - 6px)/${n})`;
+            thumb.style.transform = `translateX(${i * 100}%)`;
+          }
+          btns.forEach((b, i) =>
+            b.addEventListener("click", () => {
+              set(i);
+              onPick(b.dataset.v);
+            }),
+          );
+          set(0);
+        }
+
+        /* ---------- intro cycle: four project silhouettes ---------- */
+        const PROJ = [
+          {
+            l: "project 1 / 4 — dashboard",
+            cols: "30px 1fr 1fr",
+            rows: "20px 30px 50px",
+            areas: `'s h h' 's a b' 's c c'`,
+            spans: {},
+          },
+          {
+            l: "project 2 / 4 — photo gallery",
+            cols: "repeat(4,1fr)",
+            rows: "repeat(3,34px)",
+            areas: "",
+            spans: { 0: "1 / span 2 / span 2" },
+          },
+          {
+            l: "project 3 / 4 — blog layout",
+            cols: "1fr 40px",
+            rows: "24px 60px 20px",
+            areas: `'h h' 'm a' 'f f'`,
+            spans: {},
+          },
+          {
+            l: "project 4 / 4 — product grid",
+            cols: "repeat(3,1fr)",
+            rows: "repeat(2,44px)",
+            areas: "",
+            spans: {},
+          },
+        ];
+        const COLS = [
+          "var(--padding-bg)",
+          "var(--border-bg)",
+          "var(--content-bg)",
+          "var(--margin-bg)",
+          "var(--content-bg)",
+          "var(--content-bg)",
+        ];
+        let pi = 0;
+        function buildIntro() {
+          const P = PROJ[pi],
+            box = $("ixBox");
+          box.innerHTML = "";
+          box.style.gridTemplateColumns = P.cols;
+          box.style.gridTemplateRows = P.rows;
+          box.style.gridTemplateAreas = P.areas || "none";
+          const n = P.areas ? 4 : 6;
+          for (let i = 0; i < n; i++) {
+            const it = document.createElement("div");
+            it.className = "ix-item";
+            it.style.background = COLS[i % COLS.length];
+            it.style.border = "1px solid var(--line2)";
+            if (P.spans[i]) {
+              const [c, rw, rh] = P.spans[i].split(" / ");
+              it.style.gridColumn = c === "1" ? "span 2" : c;
+              it.style.gridRow = "span 2";
+            }
+            box.appendChild(it);
+          }
+          $("introFmt").textContent = P.l;
+          pi = (pi + 1) % PROJ.length;
+        }
+        buildIntro();
+        setInterval(buildIntro, 2300);
+
+        /* ---------- 01 dashboard ---------- */
+        const DASH_MAPS = {
+          desktop: {
+            cols: "96px 1fr 1fr 1fr",
+            rows: "42px 74px 1fr",
+            areas: `'side head head head' 'side s1 s2 s3' 'side chart chart table'`,
+          },
+          mobile: {
+            cols: "1fr",
+            rows: "auto",
+            areas: `'head' 's1' 's2' 's3' 'chart' 'table' 'side'`,
+          },
+        };
+        let dashMode = "desktop";
+        function renderDash() {
+          const M = DASH_MAPS[dashMode],
+            d = $("dash");
+          d.classList.toggle("mobile", dashMode === "mobile");
+          if (dashMode === "desktop") {
+            d.style.gridTemplateColumns = M.cols;
+            d.style.gridTemplateRows = M.rows;
+          } else {
+            d.style.gridTemplateColumns = M.cols;
+            d.style.gridTemplateRows = "";
+          }
+          d.style.gridTemplateAreas = M.areas;
+          $("codeDash").innerHTML = rule(".dashboard", [
+            `display: grid`,
+            `grid-template-columns: ${M.cols}`,
+            `grid-template-areas:`,
+            `  ${M.areas
+              .split("' ")
+              .map((s) => `'${s.replace(/'/g, "")}`)
+              .join(`\n    `)
+              .replace(/\n/g, '"\n    "')}`,
+          ]);
+        }
+        $("dash").addEventListener("click", (e) => {
+          const r = e.target.closest(".rg");
+          if (!r) return;
+          $("dash")
+            .querySelectorAll(".rg")
+            .forEach((x) => x.classList.remove("on"));
+          r.classList.add("on");
+          $("dashRead").innerHTML =
+            `region <b>${r.dataset.a}</b> → <b>grid-area: ${r.dataset.a}</b>`;
+        });
+        initSeg($("segDash"), (v) => {
+          dashMode = v;
+          renderDash();
+        });
+        renderDash();
+        $("codeDash").innerHTML = rule(".dashboard", [
+          `display: grid`,
+          `grid-template-areas:`,
+          `  "side head head head"`,
+          `  "side s1 s2 s3"`,
+          `  "side chart chart table"`,
+        ]);
+
+        /* ---------- 02 gallery ---------- */
+        const GRADS = [
+          "linear-gradient(135deg,#f07f4f,#f2c14e)",
+          "linear-gradient(135deg,#58a6ff,#3ecf8e)",
+          "linear-gradient(135deg,#ff4f8b,#f07f4f)",
+          "linear-gradient(135deg,#3ecf8e,#f2c14e)",
+          "linear-gradient(135deg,#58a6ff,#ff4f8b)",
+          "linear-gradient(135deg,#f2c14e,#3ecf8e)",
+          "linear-gradient(135deg,#f07f4f,#58a6ff)",
+          "linear-gradient(135deg,#3ecf8e,#58a6ff)",
+          "linear-gradient(135deg,#f2c14e,#ff4f8b)",
+        ];
+        const gal = $("gal");
+        GRADS.forEach((g) => {
+          const it = document.createElement("div");
+          it.className = "gal-item";
+          it.style.background = g;
+          gal.appendChild(it);
+        });
+        let editorial = false;
+        function renderGal(min) {
+          gal.style.gridTemplateColumns = `repeat(auto-fill, minmax(${min}px, 1fr))`;
+          const items = [...gal.children];
+          items.forEach((it) => (it.className = "gal-item"));
+          if (editorial) {
+            items[0].classList.add("g-b");
+            items[3].classList.add("g-w");
+            items[5].classList.add("g-h");
+            items[7].classList.add("g-w");
+          }
+          $("galRead").innerHTML = editorial
+            ? "editorial: three heroes span — <b>dense</b> backfills the gaps"
+            : "uniform: every photo one cell";
+          $("codeGal").innerHTML =
+            rule(".gallery", [
+              `display: grid`,
+              `grid-template-columns: repeat(auto-fill, minmax(${min}px, 1fr))`,
+              `grid-auto-rows: 72px`,
+              `grid-auto-flow: dense`,
+            ]) +
+            (editorial
+              ? "\n" +
+                rule(".hero", [`grid-column: span 2`, `grid-row: span 2`])
+              : "");
+        }
+        range($("rGal"), $("oGal"), (v) => v + "px", renderGal);
+        $("galUni").addEventListener("click", () => {
+          editorial = false;
+          $("galUni").classList.add("on");
+          $("galEd").classList.remove("on");
+          renderGal(+$("rGal").value);
+        });
+        $("galEd").addEventListener("click", () => {
+          editorial = true;
+          $("galEd").classList.add("on");
+          $("galUni").classList.remove("on");
+          renderGal(+$("rGal").value);
+        });
+
+        /* ---------- 03 blog ---------- */
+        function renderBlog(v) {
+          $("blogGrid").classList.toggle("focus", v === "focus");
+          $("blogRead").innerHTML =
+            v === "focus"
+              ? "focus: single column — aside drops <b>below</b> the article"
+              : "two-column: article + sidebar share the row";
+          $("codeBlog").innerHTML =
+            v === "focus"
+              ? rule(".blog", [
+                  `grid-template-columns: 1fr`,
+                  `grid-template-areas:`,
+                  `  "head"`,
+                  `  "main"`,
+                  `  "aside"`,
+                  `  "foot"`,
+                ])
+              : rule(".blog", [
+                  `grid-template-columns: 1fr 120px`,
+                  `grid-template-areas:`,
+                  `  "head head"`,
+                  `  "main aside"`,
+                  `  "foot foot"`,
+                ]);
+        }
+        initSeg($("segBlog"), renderBlog);
+        renderBlog("two");
+
+        /* ---------- 04 products ---------- */
+        const EMO = ["☕", "", "🥐", "🍫", "🧋", "🍪", "🥛", "🍰"];
+        const NAMES = [
+          "espresso",
+          "beans",
+          "croissant",
+          "cocoa",
+          "matcha",
+          "cookie",
+          "oat milk",
+          "cheesecake",
+        ];
+        const PRICES = ["$4", "$12", "$3.5", "$5", "$6", "$2.5", "$4.5", "$7"];
+        let pCount = 6;
+        function renderProd(min) {
+          const box = $("prod");
+          box.style.setProperty("--pw", min + "px");
+          box.innerHTML = "";
+          for (let i = 0; i < pCount; i++) {
+            const c = document.createElement("div");
+            c.className = "prod-card";
+            c.innerHTML = `<div class="prod-img" style="background:${GRADS[i % GRADS.length]}">${EMO[i % 8]}</div>
+        <span class="prod-name">${NAMES[i % 8]}</span><span class="prod-price">${PRICES[i % 8]}</span>
+        <button class="prod-btn">add to bag</button>`;
+            box.appendChild(c);
+          }
+          $("prodRead").innerHTML =
+            `<b>${pCount}</b> products · min card <b>${min}px</b> — the grid wraps &amp; stretches alone`;
+          $("codeProd").innerHTML = rule(".shelf", [
+            `display: grid`,
+            `grid-template-columns:`,
+            `  repeat(auto-fit, minmax(${min}px, 1fr))`,
+            `gap: 12px`,
+          ]);
+        }
+        range($("rProd"), $("oProd"), (v) => v + "px", renderProd);
+        $("prodAdd").addEventListener("click", () => {
+          if (pCount < 8) {
+            pCount++;
+            renderProd(+$("rProd").value);
+          }
+        });
+        $("prodRm").addEventListener("click", () => {
+          if (pCount > 2) {
+            pCount--;
+            renderProd(+$("rProd").value);
+          }
+        });
+
+        /* ---------- lesson track ---------- */
+        const t = $("lnTrack");
+        for (let i = 0; i < 45; i++) {
+          const s = document.createElement("span");
+          s.className = "tick" + (i < 19 ? " done" : "");
+          s.title = "lesson " + (i + 1);
+          t.appendChild(s);
+        }
+
+        /* ---------- reveal ---------- */
+        const io = new IntersectionObserver(
+          (es) =>
+            es.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                io.unobserve(e.target);
+              }
+            }),
+          { threshold: 0.12 },
+        );
+        document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      })();
+    </script>
+  </body>
+</html>

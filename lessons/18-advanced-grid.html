@@ -1,0 +1,1566 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Advanced Grid — Lesson 18</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' fill='none' stroke='%23f07f4f' stroke-width='2'/%3E%3Crect x='8' y='8' width='16' height='16' fill='none' stroke='%23f2c14e' stroke-width='2'/%3E%3Crect x='13' y='13' width='6' height='6' fill='%2358a6ff'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0e15;
+        --panel: #121826;
+        --panel2: #0d1220;
+        --ink: #10141d;
+        --line: #222c40;
+        --line2: #31405e;
+        --text: #e9eef7;
+        --muted: #8d9ab0;
+        --faint: #5b6a84;
+        --margin-c: #f07f4f;
+        --margin-bg: rgba(240, 127, 79, 0.14);
+        --border-c: #f2c14e;
+        --border-bg: rgba(242, 193, 78, 0.16);
+        --padding-c: #3ecf8e;
+        --padding-bg: rgba(62, 207, 142, 0.14);
+        --content-c: #58a6ff;
+        --content-bg: rgba(88, 166, 255, 0.17);
+        --pink: #ff4f8b;
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: dark;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 15px;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+      ::selection {
+        background: rgba(88, 166, 255, 0.35);
+      }
+      .mono {
+        font-family: var(--mono);
+      }
+      section {
+        scroll-margin-top: 76px;
+      }
+      b {
+        font-weight: 600;
+      }
+
+      .bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            700px 460px at 12% -6%,
+            rgba(242, 193, 78, 0.07),
+            transparent 60%
+          ),
+          radial-gradient(
+            760px 520px at 92% 22%,
+            rgba(88, 166, 255, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            600px 480px at 40% 105%,
+            rgba(62, 207, 142, 0.05),
+            transparent 60%
+          );
+      }
+      .bg::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(233, 238, 247, 0.035) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(233, 238, 247, 0.035) 1px,
+            transparent 1px
+          );
+        background-size: 28px 28px;
+        mask-image: radial-gradient(
+          ellipse 120% 90% at 50% 0%,
+          #000 40%,
+          transparent 100%
+        );
+      }
+      .bg .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.5;
+        animation: drift 26s ease-in-out infinite alternate;
+      }
+      .bg .g1 {
+        width: 420px;
+        height: 420px;
+        left: -120px;
+        top: 30%;
+        background: rgba(240, 127, 79, 0.1);
+      }
+      .bg .g2 {
+        width: 460px;
+        height: 460px;
+        right: -140px;
+        top: 60%;
+        background: rgba(88, 166, 255, 0.1);
+        animation-delay: -12s;
+      }
+      @keyframes drift {
+        from {
+          transform: translateY(-30px);
+        }
+        to {
+          transform: translateY(40px);
+        }
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 12px clamp(16px, 4vw, 44px);
+        background: rgba(11, 14, 21, 0.92);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar nav {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .topbar nav a {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 6px 11px;
+        border-radius: 999px;
+        transition: 0.2s;
+      }
+      .topbar nav a:hover {
+        color: var(--text);
+        background: #161d2c;
+      }
+      .lesson-tag {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--border-c);
+        border: 1px dashed rgba(242, 193, 78, 0.45);
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .wrap {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: 0 clamp(16px, 4vw, 44px);
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        padding: clamp(20px, 4vh, 48px) 0 clamp(30px, 5vh, 56px);
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--padding-c);
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(2.3rem, 5.2vw, 3.7rem);
+        line-height: 1.06;
+        letter-spacing: -0.02em;
+      }
+      .word-style {
+        display: inline-block;
+        padding: 0.02em 0.22em;
+        background: var(--padding-bg);
+        border: 0.06em solid var(--padding-c);
+        border-radius: 0.14em;
+        color: #b8f2d9;
+        transition: transform 0.3s;
+        cursor: default;
+        margin-top: 10px;
+      }
+      .word-style:hover {
+        transform: rotate(-2deg) scale(1.03);
+      }
+      .lede {
+        color: var(--muted);
+        max-width: 56ch;
+        margin-top: 18px;
+        font-size: 1.05rem;
+      }
+      .lede b {
+        color: var(--text);
+      }
+      .css-full {
+        display: inline-block;
+        margin-top: 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--faint);
+        letter-spacing: 0.08em;
+      }
+      .intro-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 26px;
+        display: grid;
+        place-items: center;
+        gap: 16px;
+        box-shadow: 0 30px 60px -40px rgba(0, 0, 0, 0.8);
+      }
+      .ix-box {
+        width: 100%;
+        max-width: 280px;
+        min-height: 140px;
+        border: 1px dashed var(--line2);
+        border-radius: 10px;
+        padding: 12px;
+        display: grid;
+        gap: 8px;
+        transition: 0.4s;
+      }
+      .ix-item {
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+        border-radius: 6px;
+        color: #a7cdff;
+        font-family: var(--mono);
+        font-size: 10px;
+        padding: 10px 4px;
+        transition: all 0.4s;
+        display: grid;
+        place-items: center;
+        min-width: 0;
+      }
+      .intro-fmt {
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--content-c);
+        background: var(--ink);
+        border: 1px solid var(--line2);
+        border-radius: 9px;
+        padding: 7px 14px;
+        min-height: 36px;
+      }
+      .imode {
+        font-size: 11px;
+        color: var(--faint);
+        letter-spacing: 0.1em;
+      }
+
+      .sec {
+        padding: clamp(36px, 6vh, 64px) 0;
+      }
+      .sec-head {
+        margin-bottom: 26px;
+        max-width: 72ch;
+      }
+      .sec-head h2 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+        letter-spacing: -0.015em;
+        line-height: 1.15;
+      }
+      .sec-head .lede {
+        margin-top: 10px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 18px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .panel-head h3 {
+        font-family: var(--disp);
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dots i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dots i:nth-child(1) {
+        background: #f07f4f;
+      }
+      .dots i:nth-child(2) {
+        background: #f2c14e;
+      }
+      .dots i:nth-child(3) {
+        background: #3ecf8e;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.85;
+        overflow-x: auto;
+      }
+      .c-sel {
+        color: #7fe0b0;
+      }
+      .c-prop {
+        color: #8ab4ff;
+      }
+      .c-val {
+        color: #f2c14e;
+      }
+      .c-com {
+        color: #5b6a84;
+      }
+      .grp {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+
+      .pick-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 18px;
+        align-items: stretch;
+      }
+      .stage-wrap {
+        padding: 28px;
+        display: grid;
+        place-items: center;
+        min-height: 340px;
+        gap: 14px;
+      }
+      .side {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .sel-chip {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .sel-chip:hover {
+        color: var(--text);
+        border-color: var(--content-c);
+        transform: translateY(-2px);
+      }
+      .sel-chip.on {
+        color: #0e1017;
+        background: var(--content-c);
+        border-color: var(--content-c);
+        font-weight: 600;
+      }
+      .code-box {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .code-box pre {
+        min-height: 0;
+        font-size: 12.5px;
+      }
+      .side-note {
+        font-size: 12px;
+        color: var(--faint);
+      }
+      .segmented {
+        position: relative;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 1fr;
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        padding: 3px;
+      }
+      .segmented button {
+        position: relative;
+        z-index: 1;
+        background: none;
+        border: 0;
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--muted);
+        padding: 8px 4px;
+        cursor: pointer;
+        transition: color 0.25s;
+        border-radius: 8px;
+      }
+      .segmented button:hover {
+        color: var(--text);
+      }
+      .segmented button.active {
+        color: #fff;
+      }
+      .seg-thumb {
+        position: absolute;
+        top: 3px;
+        bottom: 3px;
+        left: 3px;
+        width: calc((100% - 6px) / 2);
+        background: #26334c;
+        border-radius: 8px;
+        transition:
+          transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+          width 0.28s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      }
+      .read {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 14px;
+      }
+      .read b {
+        color: var(--text);
+      }
+
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        outline: none;
+        cursor: pointer;
+        background: linear-gradient(
+          90deg,
+          var(--ac) var(--fill, 50%),
+          #232c40 var(--fill, 50%)
+        );
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        transition: transform 0.15s;
+      }
+      input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.15);
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+      }
+      .ctl {
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 7px 11px;
+        transition: 0.2s;
+      }
+      .ctl:hover {
+        background: #101725;
+        border-color: var(--line);
+      }
+      .ctl-top {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+      .ctl-top label {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text);
+      }
+      .ctl-val {
+        margin-left: auto;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--ac);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 2px 9px;
+      }
+
+      /* advanced grid stages */
+      .ag-cont {
+        display: grid;
+        gap: 10px;
+        width: 100%;
+        max-width: 460px;
+        border: 1px dashed var(--line2);
+        border-radius: 12px;
+        padding: 12px;
+        transition: width 0.2s;
+        position: relative;
+      }
+      .ag-lab {
+        position: absolute;
+        top: -9px;
+        left: 14px;
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--faint);
+        background: var(--panel);
+        padding: 0 8px;
+      }
+      .ag-item {
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+        color: #a7cdff;
+        border-radius: 8px;
+        font-family: var(--mono);
+        font-size: 11px;
+        display: grid;
+        place-items: center;
+        padding: 16px 6px;
+        min-width: 0;
+        transition: 0.25s;
+        text-align: center;
+      }
+      .ag-item .w {
+        font-size: 9px;
+        opacity: 0.75;
+        display: block;
+        margin-top: 3px;
+      }
+      .ag-item.fixed {
+        background: var(--border-bg);
+        border-color: var(--border-c);
+        color: #ffe3a1;
+      }
+      .duo {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        width: 100%;
+        max-width: 460px;
+      }
+      .duo .ag-cont {
+        max-width: none;
+      }
+      .duo-lab {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--padding-c);
+        margin-bottom: -8px;
+      }
+      .duo-lab.fill {
+        color: var(--margin-c);
+      }
+      .ar-item {
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        font-family: var(--mono);
+        font-size: 11px;
+        font-weight: 700;
+        padding: 14px;
+        transition: 0.3s;
+      }
+      .ar-h {
+        grid-area: h;
+        background: var(--border-bg);
+        border: 1px solid var(--border-c);
+        color: #ffe3a1;
+      }
+      .ar-s {
+        grid-area: s;
+        background: var(--padding-bg);
+        border: 1px solid var(--padding-c);
+        color: #8fe6bd;
+      }
+      .ar-m {
+        grid-area: m;
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+        color: #a7cdff;
+      }
+      .ar-f {
+        grid-area: f;
+        background: var(--margin-bg);
+        border: 1px solid var(--margin-c);
+        color: #ffc9ae;
+      }
+
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      @media (min-width: 1180px) {
+        .notes-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media (max-width: 640px) {
+        .notes-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .note-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.3s,
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+      .note-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--nc);
+        opacity: 0.85;
+      }
+      .note-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--nc);
+        box-shadow: 0 24px 44px -28px rgba(0, 0, 0, 0.85);
+      }
+      .note-card h3 {
+        font-family: var(--mono);
+        font-size: 15px;
+        color: var(--nc);
+        margin-bottom: 8px;
+      }
+      .note-card p {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .note-tip {
+        margin-top: 12px;
+        font-size: 11px;
+        color: var(--faint);
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+      }
+      .note-demo {
+        height: 104px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        overflow: hidden;
+      }
+      .demo-fr2 {
+        width: 75%;
+        height: 50px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+        transition: 0.35s;
+      }
+      .demo-fr2 i {
+        border-radius: 5px;
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+      }
+      .demo-fr2 i:last-child {
+        background: var(--border-bg);
+        border-color: var(--border-c);
+      }
+      .note-card:hover .demo-fr2 {
+        grid-template-columns: 1fr 3fr;
+      }
+      .demo-rp {
+        width: 75%;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 5px;
+        transition: 0.35s;
+      }
+      .demo-rp i {
+        height: 18px;
+        border-radius: 4px;
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+      }
+      .note-card:hover .demo-rp {
+        grid-template-columns: repeat(6, 1fr);
+      }
+      .demo-mm {
+        width: 75%;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(24px, 1fr));
+        gap: 5px;
+        transition: 0.35s;
+      }
+      .demo-mm i {
+        height: 18px;
+        border-radius: 4px;
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+      }
+      .note-card:hover .demo-mm {
+        width: 50%;
+      }
+      .demo-af {
+        width: 75%;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(20px, 1fr));
+        gap: 5px;
+      }
+      .demo-af i {
+        height: 18px;
+        border-radius: 4px;
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+      }
+      .demo-af i:nth-child(n + 4) {
+        opacity: 0.25;
+        border-style: dashed;
+      }
+      .note-card:hover .demo-af {
+        grid-template-columns: repeat(auto-fit, minmax(20px, 1fr));
+      }
+      .note-card:hover .demo-af i:nth-child(n + 4) {
+        display: none;
+      }
+
+      .lesson-nav {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px clamp(18px, 3vw, 28px);
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+        align-items: center;
+      }
+      .ln-status {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--padding-c);
+        border: 1px solid rgba(62, 207, 142, 0.45);
+        border-radius: 999px;
+        padding: 3px 10px;
+      }
+      .lesson-nav h3 {
+        font-family: var(--disp);
+        font-size: 17px;
+        margin-top: 8px;
+      }
+      .ln-track {
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .tick {
+        width: 7px;
+        height: 15px;
+        border-radius: 2px;
+        background: #212a3e;
+        transition: 0.2s;
+      }
+      .tick.done {
+        background: var(--padding-c);
+        box-shadow: 0 0 8px rgba(62, 207, 142, 0.55);
+      }
+      .tick:hover {
+        background: var(--line2);
+      }
+      .ln-next {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        text-align: right;
+      }
+      .ln-next span {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .ln-next b {
+        font-family: var(--disp);
+        font-size: 15px;
+        color: var(--text);
+      }
+      footer {
+        border-top: 1px solid var(--line);
+        margin-top: 40px;
+        padding: 30px 0 44px;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+        color: var(--faint);
+        font-size: 12.5px;
+      }
+      footer .mono {
+        font-size: 11.5px;
+      }
+      footer .sp {
+        margin-left: auto;
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+      @media (max-width: 1020px) {
+        .intro {
+          grid-template-columns: 1fr;
+        }
+        .pick-grid {
+          grid-template-columns: 1fr;
+        }
+        .lesson-nav {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .ln-next {
+          align-items: center;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg">
+      <span class="glow g1"></span><span class="glow g2"></span>
+    </div>
+
+    <header class="topbar">
+      <span class="lesson-tag">lesson 18 / 45</span>
+      <nav>
+        <a href="#fr">fr</a>
+        <a href="#repeat">repeat()</a>
+        <a href="#minmax">minmax()</a>
+        <a href="#autofit">auto-fit · auto-fill</a>
+        <a href="#areas">template-areas</a>
+        <a href="#notes">cheat-codes</a>
+      </nav>
+    </header>
+
+    <div class="wrap">
+      <!-- ============ intro ============ -->
+      <section class="intro">
+        <div>
+          <p class="eyebrow">lesson 18 · interactive</p>
+          <h1>The grid grows a <span class="word-style">brain</span>.</h1>
+          <p class="lede">
+            Fixed tracks are a ruler; these tools are a <b>negotiator</b>.
+            <span class="mono">fr</span> shares free space,
+            <span class="mono">repeat()</span> writes the pattern,
+            <span class="mono">minmax()</span> sets guardrails,
+            <span class="mono">auto-fit/auto-fill</span> make tracks responsive
+            without media queries — and
+            <span class="mono">grid-template-areas</span> lets you draw layouts
+            in ASCII.
+          </p>
+          <span class="css-full">F · R · R · EPEAT · M · INMAX</span>
+        </div>
+        <div class="intro-panel">
+          <div
+            class="ix-box"
+            id="ixBox"
+            style="grid-template-columns: repeat(3, 1fr)"
+          >
+            <div class="ix-item">1</div>
+            <div class="ix-item">2</div>
+            <div class="ix-item">3</div>
+            <div class="ix-item">4</div>
+            <div class="ix-item">5</div>
+            <div class="ix-item">6</div>
+          </div>
+          <span class="intro-fmt" id="introFmt">repeat(3, 1fr)</span>
+          <p class="imode mono">the blueprint gets smarter…</p>
+        </div>
+      </section>
+
+      <!-- ============ 01 · fr ============ -->
+      <section id="fr" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">01 · the fr unit</p>
+          <h2>Shares of what's left</h2>
+          <p class="lede">
+            Fixed tracks eat first; <b>fr</b> tracks split whatever survives.
+            Here an 80px track takes its cut, then the two fr tracks divide the
+            rest by ratio. Drag the shares and read the measured widths.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>fixed eats first, fr splits the rest</h3>
+            </div>
+            <div class="stage-wrap">
+              <div
+                class="ag-cont"
+                id="frGrid"
+                style="grid-template-columns: 1fr 2fr 80px"
+              >
+                <div class="ag-item" id="fr1">
+                  1fr<span class="w" id="frw1"></span>
+                </div>
+                <div class="ag-item" id="fr2">
+                  2fr<span class="w" id="frw2"></span>
+                </div>
+                <div class="ag-item fixed">
+                  80px<span class="w" id="frw3"></span>
+                </div>
+              </div>
+              <p class="read" id="frRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rFr1">track 1 shares</label
+                ><output class="ctl-val" id="oFr1">1</output>
+              </div>
+              <input type="range" id="rFr1" min="1" max="4" value="1" />
+            </div>
+            <div class="ctl" style="--ac: var(--padding-c)">
+              <div class="ctl-top">
+                <label for="rFr2">track 2 shares</label
+                ><output class="ctl-val" id="oFr2">2</output>
+              </div>
+              <input type="range" id="rFr2" min="1" max="4" value="2" />
+            </div>
+            <div class="code-box"><pre id="codeFr"></pre></div>
+            <p class="side-note">
+              fr is flex-grow's cousin: a ratio, not a size. 1fr next to 2fr
+              always means "half as wide" — at any container width.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 02 · repeat() ============ -->
+      <section id="repeat" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">02 · repeat()</p>
+          <h2>Write the pattern once</h2>
+          <p class="lede">
+            <span class="mono">repeat(4, 1fr)</span> is four equal tracks
+            without typing four values. And repeat takes <b>patterns</b>, not
+            just single tracks:
+            <span class="mono">repeat(2, 1fr 2fr)</span> writes four tracks in
+            an alternating rhythm.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>count × pattern</h3>
+            </div>
+            <div class="stage-wrap">
+              <div
+                class="ag-cont"
+                id="rpGrid"
+                style="grid-template-columns: repeat(3, 1fr)"
+              >
+                <div class="ag-item">1</div>
+                <div class="ag-item">2</div>
+                <div class="ag-item">3</div>
+                <div class="ag-item">4</div>
+                <div class="ag-item">5</div>
+                <div class="ag-item">6</div>
+              </div>
+              <p class="read" id="rpRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rRp">repeat(n, 1fr)</label
+                ><output class="ctl-val" id="oRp">3</output>
+              </div>
+              <input type="range" id="rRp" min="1" max="6" value="3" />
+            </div>
+            <p class="grp">or a pattern</p>
+            <div class="chips" id="rpChips">
+              <button class="sel-chip" data-v="repeat(2, 1fr 2fr)">
+                repeat(2, 1fr 2fr)
+              </button>
+              <button class="sel-chip" data-v="repeat(3, 80px 1fr)">
+                repeat(3, 80px 1fr)
+              </button>
+            </div>
+            <div class="code-box"><pre id="codeRp"></pre></div>
+            <p class="side-note">
+              The pattern repeats as a block: repeat(2, A B) = A B A B. Six
+              tracks from two values.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 03 · minmax() ============ -->
+      <section id="minmax" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">03 · minmax()</p>
+          <h2>Guardrails per track</h2>
+          <p class="lede">
+            <span class="mono">minmax(90px, 1fr)</span> = "never below 90, grow
+            if you can". Shrink the container: tracks hold the floor and the
+            grid overflows instead of crushing its content. That's responsive
+            design with zero media queries.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>shrink the container</h3>
+            </div>
+            <div class="stage-wrap">
+              <div
+                class="ag-cont"
+                id="mmGrid"
+                style="
+                  grid-template-columns: repeat(3, minmax(90px, 1fr));
+                  width: 440px;
+                "
+              >
+                <span class="ag-lab">min 90px per track</span>
+                <div class="ag-item" id="mm1">
+                  track<span class="w" id="mmw"></span>
+                </div>
+                <div class="ag-item">track</div>
+                <div class="ag-item">track</div>
+              </div>
+              <p class="read" id="mmRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--margin-c)">
+              <div class="ctl-top">
+                <label for="rMm">container width</label
+                ><output class="ctl-val" id="oMm">440px</output>
+              </div>
+              <input type="range" id="rMm" min="260" max="460" value="440" />
+            </div>
+            <div class="code-box"><pre id="codeMm"></pre></div>
+            <p class="side-note" id="mmNote"></p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 04 · auto-fit vs auto-fill ============ -->
+      <section id="autofit" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">04 · auto-fit vs auto-fill</p>
+          <h2>How many tracks fit?</h2>
+          <p class="lede">
+            Both compute "as many minmax tracks as fit". The difference:
+            <b>auto-fill</b> keeps the empty ones (reserved seats),
+            <b>auto-fit</b> collapses them so your items stretch into the spare
+            space. Three items, wide container — watch the right edge.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>same items, two philosophies</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="duo">
+                <p class="duo-lab">
+                  auto-fit — empties collapse, items stretch
+                </p>
+                <div
+                  class="ag-cont"
+                  id="afFit"
+                  style="
+                    grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+                  "
+                >
+                  <div class="ag-item" id="fitIt">
+                    item<span class="w" id="fitW"></span>
+                  </div>
+                  <div class="ag-item">item</div>
+                  <div class="ag-item">item</div>
+                </div>
+                <p class="duo-lab fill">
+                  auto-fill — empty tracks stay reserved
+                </p>
+                <div
+                  class="ag-cont"
+                  id="afFill"
+                  style="
+                    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+                  "
+                >
+                  <div class="ag-item" id="fillIt">
+                    item<span class="w" id="fillW"></span>
+                  </div>
+                  <div class="ag-item">item</div>
+                  <div class="ag-item">item</div>
+                </div>
+              </div>
+              <p class="read" id="afRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rAf">container width</label
+                ><output class="ctl-val" id="oAf">440px</output>
+              </div>
+              <input type="range" id="rAf" min="260" max="460" value="440" />
+            </div>
+            <div class="code-box"><pre id="codeAf"></pre></div>
+            <p class="side-note">
+              The famous responsive card grid:
+              <span class="mono">repeat(auto-fit, minmax(220px, 1fr))</span> —
+              cards wrap AND stretch, no media queries.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 05 · grid-template-areas ============ -->
+      <section id="areas" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">05 · grid-template-areas</p>
+          <h2>Draw the layout in ASCII</h2>
+          <p class="lede">
+            Name your regions, then paint them with strings — one string per
+            row. Items claim a name with <span class="mono">grid-area</span>.
+            Swap the map and the whole page reorganizes without touching the
+            HTML.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>same four items, new maps</h3>
+            </div>
+            <div class="stage-wrap">
+              <div
+                class="ag-cont"
+                id="arGrid"
+                style="
+                  grid-template-columns: 140px 1fr;
+                  grid-template-areas: &quot;h h&quot; &quot;s m&quot; &quot;f f&quot;;
+                "
+              >
+                <div class="ar-item ar-h">header</div>
+                <div class="ar-item ar-s">sidebar</div>
+                <div class="ar-item ar-m">main</div>
+                <div class="ar-item ar-f">footer</div>
+              </div>
+              <p class="read" id="arRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="segmented" id="segAr">
+              <span class="seg-thumb"></span>
+              <button data-v="desktop" class="active">desktop</button>
+              <button data-v="swapped">swapped</button>
+              <button data-v="stacked">stacked</button>
+            </div>
+            <div class="code-box"><pre id="codeAr"></pre></div>
+            <p class="side-note">
+              Every string must describe the same number of columns. Use
+              <span class="mono">.</span> for an empty cell. Readability &gt;
+              cleverness.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 06 · field notes ============ -->
+      <section id="notes" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">06 · field notes</p>
+          <h2>Cheat codes from lesson 18</h2>
+        </div>
+        <div class="notes-grid">
+          <article class="note-card" style="--nc: var(--content-c)">
+            <div class="note-demo">
+              <div class="demo-fr2"><i></i><i></i></div>
+            </div>
+            <h3>fr = ratio</h3>
+            <p>
+              Fixed tracks eat first; fr splits the leftovers by share. 1fr/2fr
+              means "half as wide" at every screen size. Flex-grow's grid twin.
+            </p>
+            <p class="note-tip mono">↳ hover: the ratio rebalances</p>
+          </article>
+          <article class="note-card" style="--nc: var(--padding-c)">
+            <div class="note-demo">
+              <div class="demo-rp"><i></i><i></i><i></i></div>
+            </div>
+            <h3>repeat = pattern</h3>
+            <p>
+              count × track(s). The track argument can be a list: repeat(2, 1fr
+              2fr) = four tracks, alternating rhythm, two values typed.
+            </p>
+            <p class="note-tip mono">↳ hover: 3 tracks → 6</p>
+          </article>
+          <article class="note-card" style="--nc: var(--border-c)">
+            <div class="note-demo">
+              <div class="demo-mm"><i></i><i></i><i></i></div>
+            </div>
+            <h3>minmax = guardrails</h3>
+            <p>
+              Never below min, grow to max. Pair with repeat for fluid layouts
+              that refuse to crush content. Overflow before collapse.
+            </p>
+            <p class="note-tip mono">↳ hover: the floor holds</p>
+          </article>
+          <article class="note-card" style="--nc: var(--margin-c)">
+            <div class="note-demo">
+              <div class="demo-af">
+                <i></i><i></i><i></i><i></i><i></i><i></i>
+              </div>
+            </div>
+            <h3>fit vs fill</h3>
+            <p>
+              auto-fill reserves empty tracks; auto-fit collapses them so items
+              stretch. For "cards that always fill the row", it's auto-fit.
+            </p>
+            <p class="note-tip mono">↳ hover: phantoms vanish</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ lesson nav ============ -->
+      <div class="lesson-nav reveal">
+        <div>
+          <span class="ln-status">✓ completed</span>
+          <h3>18 — Advanced Grid</h3>
+        </div>
+        <div class="ln-track" id="lnTrack"></div>
+        <div class="ln-next">
+          <span>up next</span>
+          <b>19 · Grid Layout Projects</b>
+        </div>
+      </div>
+
+      <footer>
+        <span class="mono">drag things, break things, learn things.</span>
+        <span class="sp mono">45 lessons · lesson 18 · advanced grid</span>
+      </footer>
+    </div>
+    <!-- /wrap -->
+
+    <script>
+      (() => {
+        const $ = (id) => document.getElementById(id);
+        const rule = (sel, decls) =>
+          `<span class="c-sel">${sel}</span> {\n${decls
+            .map((d) => {
+              const i = d.indexOf(":");
+              return `  <span class="c-prop">${d.slice(0, i)}</span>: <span class="c-val">${d.slice(i + 1).trim()}</span>;`;
+            })
+            .join("\n")}\n}`;
+        function range(el, out, fmt, cb) {
+          const f = () => {
+            const v = +el.value;
+            out.textContent = fmt(v);
+            const min = +el.min,
+              max = +el.max;
+            el.style.setProperty(
+              "--fill",
+              ((v - min) / (max - min)) * 100 + "%",
+            );
+            cb(v);
+          };
+          el.addEventListener("input", f);
+          f();
+        }
+        function initSeg(seg, onPick) {
+          const btns = [...seg.querySelectorAll("button")],
+            thumb = seg.querySelector(".seg-thumb"),
+            n = btns.length;
+          function set(i) {
+            btns.forEach((b, j) => b.classList.toggle("active", i === j));
+            thumb.style.width = `calc((100% - 6px)/${n})`;
+            thumb.style.transform = `translateX(${i * 100}%)`;
+          }
+          btns.forEach((b, i) =>
+            b.addEventListener("click", () => {
+              set(i);
+              onPick(b.dataset.v);
+            }),
+          );
+          set(0);
+        }
+        function chipGroup(box, cb) {
+          box.addEventListener("click", (e) => {
+            const c = e.target.closest(".sel-chip");
+            if (!c) return;
+            box
+              .querySelectorAll(".sel-chip")
+              .forEach((x) => x.classList.remove("on"));
+            c.classList.add("on");
+            cb(c.dataset.v);
+          });
+        }
+
+        /* ---------- intro cycle ---------- */
+        const TPL = [
+          "repeat(3, 1fr)",
+          "1fr 2fr",
+          "repeat(auto-fit, minmax(60px, 1fr))",
+          "repeat(2, 1fr 2fr)",
+        ];
+        let ti = 0;
+        function intro() {
+          $("ixBox").style.gridTemplateColumns = TPL[ti];
+          $("introFmt").textContent = TPL[ti];
+          ti = (ti + 1) % TPL.length;
+        }
+        intro();
+        setInterval(intro, 2100);
+
+        /* ---------- 01 fr ---------- */
+        function renderFr() {
+          const a = +$("rFr1").value,
+            b = +$("rFr2").value;
+          $("frGrid").style.gridTemplateColumns = `${a}fr ${b}fr 80px`;
+          $("fr1").firstChild.textContent = a + "fr";
+          $("fr2").firstChild.textContent = b + "fr";
+          requestAnimationFrame(() => {
+            $("frw1").textContent = $("fr1").offsetWidth + "px";
+            $("frw2").textContent = $("fr2").offsetWidth + "px";
+            $("frw3").textContent = $("frGrid").children[2].offsetWidth + "px";
+            $("frRead").innerHTML =
+              `shares <b>${a} : ${b}</b> of (width − 80px − gaps)`;
+          });
+          $("codeFr").innerHTML = rule(".container", [
+            `grid-template-columns: ${a}fr ${b}fr 80px`,
+          ]);
+        }
+        range($("rFr1"), $("oFr1"), (v) => v, renderFr);
+        range($("rFr2"), $("oFr2"), (v) => v, renderFr);
+
+        /* ---------- 02 repeat ---------- */
+        function renderRp(t) {
+          $("rpGrid").style.gridTemplateColumns = t;
+          $("rpRead").innerHTML = "blueprint: <b>" + t + "</b>";
+          $("codeRp").innerHTML = rule(".container", [
+            `grid-template-columns: ${t}`,
+          ]);
+        }
+        range(
+          $("rRp"),
+          $("oRp"),
+          (v) => v,
+          (v) => {
+            $("rpChips")
+              .querySelectorAll(".sel-chip")
+              .forEach((x) => x.classList.remove("on"));
+            renderRp(`repeat(${v}, 1fr)`);
+          },
+        );
+        chipGroup($("rpChips"), renderRp);
+        renderRp("repeat(3, 1fr)");
+
+        /* ---------- 03 minmax ---------- */
+        range(
+          $("rMm"),
+          $("oMm"),
+          (v) => v + "px",
+          (v) => {
+            $("mmGrid").style.width = v + "px";
+            requestAnimationFrame(() => {
+              const w = $("mm1").offsetWidth;
+              const clamped = w <= 91;
+              $("mmw").textContent = w + "px";
+              $("mmRead").innerHTML = clamped
+                ? `tracks at the <b>90px floor</b> — grid overflows rather than crush`
+                : `tracks at <b>${w}px</b> — free space to spare, growing toward 1fr`;
+              $("mmNote").innerHTML = clamped
+                ? "3 × 90px + gaps > container. The min wins; content stays readable and the grid spills. That's the guardrail doing its job."
+                : "Plenty of room: each track grows from its 90px floor toward 1fr. Drag left to hit the floor.";
+            });
+            $("codeMm").innerHTML = rule(".container", [
+              `grid-template-columns: repeat(3, minmax(90px, 1fr))`,
+            ]);
+          },
+        );
+
+        /* ---------- 04 auto-fit / auto-fill ---------- */
+        range(
+          $("rAf"),
+          $("oAf"),
+          (v) => v + "px",
+          (v) => {
+            $("afFit").style.width = v + "px";
+            $("afFill").style.width = v + "px";
+            requestAnimationFrame(() => {
+              const fw = $("fitIt").offsetWidth,
+                flw = $("fillIt").offsetWidth;
+              $("fitW").textContent = fw + "px";
+              $("fillW").textContent = flw + "px";
+              $("afRead").innerHTML =
+                fw > flw
+                  ? `auto-fit items <b>${fw}px</b> &gt; auto-fill <b>${flw}px</b> — fit collapsed the empty tracks`
+                  : `both equal at <b>${fw}px</b> — items fill every track, nothing to collapse`;
+            });
+            $("codeAf").innerHTML =
+              rule(".fit", [
+                `grid-template-columns: repeat(auto-fit, minmax(70px, 1fr))`,
+              ]) +
+              "\n" +
+              rule(".fill", [
+                `grid-template-columns: repeat(auto-fill, minmax(70px, 1fr))`,
+              ]);
+          },
+        );
+
+        /* ---------- 05 areas ---------- */
+        const AREAS = {
+          desktop: {
+            cols: "140px 1fr",
+            map: `'h h' 's m' 'f f'`,
+            css: `"h h"\n    "s m"\n    "f f"`,
+          },
+          swapped: {
+            cols: "1fr 140px",
+            map: `'h h' 'm s' 'f f'`,
+            css: `"h h"\n    "m s"\n    "f f"`,
+          },
+          stacked: {
+            cols: "1fr",
+            map: `'h' 'm' 's' 'f'`,
+            css: `"h"\n    "m"\n    "s"\n    "f"`,
+          },
+        };
+        function renderAr(v) {
+          const A = AREAS[v];
+          const g = $("arGrid");
+          g.style.gridTemplateColumns = A.cols;
+          g.style.gridTemplateAreas = A.map;
+          $("arRead").innerHTML =
+            "map: <b>" +
+            A.map.replace(/ /g, " ·") +
+            "</b> — items never moved in the HTML";
+          $("codeAr").innerHTML = rule(".container", [
+            `display: grid`,
+            `grid-template-columns: ${A.cols}`,
+            `grid-template-areas: ${A.css}`,
+          ]);
+        }
+        initSeg($("segAr"), renderAr);
+        renderAr("desktop");
+
+        /* ---------- lesson track ---------- */
+        const t = $("lnTrack");
+        for (let i = 0; i < 45; i++) {
+          const s = document.createElement("span");
+          s.className = "tick" + (i < 18 ? " done" : "");
+          s.title = "lesson " + (i + 1);
+          t.appendChild(s);
+        }
+
+        /* ---------- reveal ---------- */
+        const io = new IntersectionObserver(
+          (es) =>
+            es.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                io.unobserve(e.target);
+              }
+            }),
+          { threshold: 0.12 },
+        );
+        document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      })();
+    </script>
+  </body>
+</html>

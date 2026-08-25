@@ -1,0 +1,1569 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grid Placement — Lesson 17</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' fill='none' stroke='%23f07f4f' stroke-width='2'/%3E%3Crect x='8' y='8' width='16' height='16' fill='none' stroke='%23f2c14e' stroke-width='2'/%3E%3Crect x='13' y='13' width='6' height='6' fill='%2358a6ff'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0e15;
+        --panel: #121826;
+        --panel2: #0d1220;
+        --ink: #10141d;
+        --line: #222c40;
+        --line2: #31405e;
+        --text: #e9eef7;
+        --muted: #8d9ab0;
+        --faint: #5b6a84;
+        --margin-c: #f07f4f;
+        --margin-bg: rgba(240, 127, 79, 0.14);
+        --border-c: #f2c14e;
+        --border-bg: rgba(242, 193, 78, 0.16);
+        --padding-c: #3ecf8e;
+        --padding-bg: rgba(62, 207, 142, 0.14);
+        --content-c: #58a6ff;
+        --content-bg: rgba(88, 166, 255, 0.17);
+        --pink: #ff4f8b;
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: dark;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 15px;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+      ::selection {
+        background: rgba(88, 166, 255, 0.35);
+      }
+      .mono {
+        font-family: var(--mono);
+      }
+      section {
+        scroll-margin-top: 76px;
+      }
+      b {
+        font-weight: 600;
+      }
+
+      .bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            700px 460px at 12% -6%,
+            rgba(242, 193, 78, 0.07),
+            transparent 60%
+          ),
+          radial-gradient(
+            760px 520px at 92% 22%,
+            rgba(88, 166, 255, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            600px 480px at 40% 105%,
+            rgba(62, 207, 142, 0.05),
+            transparent 60%
+          );
+      }
+      .bg::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(233, 238, 247, 0.035) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(233, 238, 247, 0.035) 1px,
+            transparent 1px
+          );
+        background-size: 28px 28px;
+        mask-image: radial-gradient(
+          ellipse 120% 90% at 50% 0%,
+          #000 40%,
+          transparent 100%
+        );
+      }
+      .bg .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.5;
+        animation: drift 26s ease-in-out infinite alternate;
+      }
+      .bg .g1 {
+        width: 420px;
+        height: 420px;
+        left: -120px;
+        top: 30%;
+        background: rgba(240, 127, 79, 0.1);
+      }
+      .bg .g2 {
+        width: 460px;
+        height: 460px;
+        right: -140px;
+        top: 60%;
+        background: rgba(88, 166, 255, 0.1);
+        animation-delay: -12s;
+      }
+      @keyframes drift {
+        from {
+          transform: translateY(-30px);
+        }
+        to {
+          transform: translateY(40px);
+        }
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 12px clamp(16px, 4vw, 44px);
+        background: rgba(11, 14, 21, 0.92);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar nav {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .topbar nav a {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 6px 11px;
+        border-radius: 999px;
+        transition: 0.2s;
+      }
+      .topbar nav a:hover {
+        color: var(--text);
+        background: #161d2c;
+      }
+      .lesson-tag {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--border-c);
+        border: 1px dashed rgba(242, 193, 78, 0.45);
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .wrap {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: 0 clamp(16px, 4vw, 44px);
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        padding: clamp(20px, 4vh, 48px) 0 clamp(30px, 5vh, 56px);
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--padding-c);
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(2.3rem, 5.2vw, 3.7rem);
+        line-height: 1.06;
+        letter-spacing: -0.02em;
+      }
+      .word-style {
+        display: inline-block;
+        padding: 0.02em 0.22em;
+        background: var(--border-bg);
+        border: 0.06em solid var(--border-c);
+        border-radius: 0.14em;
+        color: #ffe3a1;
+        transition: transform 0.3s;
+        cursor: default;
+      }
+      .word-style:hover {
+        transform: rotate(-2deg) scale(1.03);
+      }
+      .lede {
+        color: var(--muted);
+        max-width: 56ch;
+        margin-top: 18px;
+        font-size: 1.05rem;
+      }
+      .lede b {
+        color: var(--text);
+      }
+      .css-full {
+        display: inline-block;
+        margin-top: 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--faint);
+        letter-spacing: 0.08em;
+      }
+      .intro-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 26px;
+        display: grid;
+        place-items: center;
+        gap: 16px;
+        box-shadow: 0 30px 60px -40px rgba(0, 0, 0, 0.8);
+      }
+      .ix-frame {
+        position: relative;
+        width: 100%;
+        max-width: 280px;
+      }
+      .ix-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(2, 52px);
+        gap: 8px;
+      }
+      .ix-cell {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px dashed var(--line);
+        border-radius: 6px;
+      }
+      .ix-item {
+        grid-column: 1/3;
+        grid-row: 1/2;
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+        border-radius: 6px;
+        display: grid;
+        place-items: center;
+        font-family: var(--mono);
+        font-size: 10px;
+        color: #a7cdff;
+        transition: all 0.5s;
+      }
+      .intro-fmt {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--content-c);
+        background: var(--ink);
+        border: 1px solid var(--line2);
+        border-radius: 9px;
+        padding: 7px 16px;
+        min-height: 36px;
+      }
+      .imode {
+        font-size: 11px;
+        color: var(--faint);
+        letter-spacing: 0.1em;
+      }
+
+      .sec {
+        padding: clamp(36px, 6vh, 64px) 0;
+      }
+      .sec-head {
+        margin-bottom: 26px;
+        max-width: 72ch;
+      }
+      .sec-head h2 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+        letter-spacing: -0.015em;
+        line-height: 1.15;
+      }
+      .sec-head .lede {
+        margin-top: 10px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 18px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .panel-head h3 {
+        font-family: var(--disp);
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dots i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dots i:nth-child(1) {
+        background: #f07f4f;
+      }
+      .dots i:nth-child(2) {
+        background: #f2c14e;
+      }
+      .dots i:nth-child(3) {
+        background: #3ecf8e;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.85;
+        overflow-x: auto;
+      }
+      .c-sel {
+        color: #7fe0b0;
+      }
+      .c-prop {
+        color: #8ab4ff;
+      }
+      .c-val {
+        color: #f2c14e;
+      }
+      .c-com {
+        color: #5b6a84;
+      }
+      .grp {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+
+      .pick-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 18px;
+        align-items: stretch;
+      }
+      .stage-wrap {
+        padding: 28px;
+        display: grid;
+        place-items: center;
+        min-height: 340px;
+        gap: 14px;
+      }
+      .side {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .sel-chip {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .sel-chip:hover {
+        color: var(--text);
+        border-color: var(--content-c);
+        transform: translateY(-2px);
+      }
+      .sel-chip.on {
+        color: #0e1017;
+        background: var(--content-c);
+        border-color: var(--content-c);
+        font-weight: 600;
+      }
+      .code-box {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .code-box pre {
+        min-height: 0;
+        font-size: 12.5px;
+      }
+      .side-note {
+        font-size: 12px;
+        color: var(--faint);
+      }
+      .read {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 14px;
+      }
+      .read b {
+        color: var(--text);
+      }
+
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        outline: none;
+        cursor: pointer;
+        background: linear-gradient(
+          90deg,
+          var(--ac) var(--fill, 50%),
+          #232c40 var(--fill, 50%)
+        );
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        transition: transform 0.15s;
+      }
+      input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.15);
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+      }
+      .ctl {
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 7px 11px;
+        transition: 0.2s;
+      }
+      .ctl:hover {
+        background: #101725;
+        border-color: var(--line);
+      }
+      .ctl-top {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+      .ctl-top label {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text);
+      }
+      .ctl-val {
+        margin-left: auto;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--ac);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 2px 9px;
+      }
+
+      /* placement stages */
+      .gp-frame {
+        position: relative;
+        width: 100%;
+        max-width: 460px;
+        padding: 20px 10px 10px 26px;
+      }
+      .gp-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(3, 78px);
+        gap: 10px;
+      }
+      .gp-grid.g3 {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .gp-cell {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px dashed var(--line);
+        border-radius: 8px;
+        transition: 0.2s;
+        cursor: pointer;
+      }
+      .gp-cell:hover {
+        border-color: var(--line2);
+        background: rgba(255, 255, 255, 0.05);
+      }
+      .gp-cell.hit {
+        border-color: var(--padding-c);
+        background: var(--padding-bg);
+      }
+      .gp-item {
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+        color: #a7cdff;
+        border-radius: 8px;
+        display: grid;
+        place-items: center;
+        font-family: var(--mono);
+        font-size: 11px;
+        transition: all 0.25s;
+        z-index: 2;
+      }
+      .cl {
+        position: absolute;
+        top: 4px;
+        transform: translateX(-50%);
+        font-family: var(--mono);
+        font-size: 9.5px;
+        color: var(--content-c);
+        opacity: 0.9;
+      }
+      .rl {
+        position: absolute;
+        left: 8px;
+        transform: translateY(-50%);
+        font-family: var(--mono);
+        font-size: 9.5px;
+        color: var(--margin-c);
+        opacity: 0.9;
+      }
+
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      @media (min-width: 1180px) {
+        .notes-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media (max-width: 640px) {
+        .notes-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .note-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.3s,
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+      .note-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--nc);
+        opacity: 0.85;
+      }
+      .note-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--nc);
+        box-shadow: 0 24px 44px -28px rgba(0, 0, 0, 0.85);
+      }
+      .note-card h3 {
+        font-family: var(--mono);
+        font-size: 15px;
+        color: var(--nc);
+        margin-bottom: 8px;
+      }
+      .note-card p {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .note-tip {
+        margin-top: 12px;
+        font-size: 11px;
+        color: var(--faint);
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+      }
+      .note-demo {
+        height: 104px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        overflow: hidden;
+      }
+      .demo-ln {
+        width: 75%;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+        position: relative;
+      }
+      .demo-ln i {
+        height: 22px;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px dashed var(--line);
+      }
+      .demo-ln b {
+        position: absolute;
+        top: -8px;
+        font: 700 9px var(--mono);
+        color: var(--content-c);
+      }
+      .demo-ln b:nth-of-type(1) {
+        left: 0;
+      }
+      .demo-ln b:nth-of-type(2) {
+        left: 33%;
+      }
+      .demo-ln b:nth-of-type(3) {
+        left: 66%;
+      }
+      .demo-ln b:nth-of-type(4) {
+        right: 0;
+      }
+      .note-card:hover .demo-ln i {
+        border-color: var(--content-c);
+      }
+      .demo-sp {
+        width: 75%;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+      }
+      .demo-sp i {
+        height: 22px;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px dashed var(--line);
+        transition: 0.35s;
+      }
+      .demo-sp i.hero {
+        grid-column: span 2;
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+      }
+      .note-card:hover .demo-sp i.hero {
+        grid-column: span 4;
+      }
+      .demo-neg {
+        width: 75%;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+      }
+      .demo-neg i {
+        height: 22px;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px dashed var(--line);
+        transition: 0.35s;
+      }
+      .demo-neg i.hero {
+        grid-column: 2/-1;
+        background: var(--border-bg);
+        border: 1px solid var(--border-c);
+      }
+      .note-card:hover .demo-neg i.hero {
+        grid-column: 1/-1;
+      }
+      .demo-sh {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--muted);
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        width: 78%;
+      }
+      .demo-sh em {
+        font-style: normal;
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        padding: 3px 8px;
+        transition: 0.3s;
+        opacity: 0.55;
+      }
+      .demo-sh em:first-child {
+        color: var(--content-c);
+      }
+      .note-card:hover .demo-sh em {
+        opacity: 1;
+      }
+      .note-card:hover .demo-sh em:first-child {
+        box-shadow: 0 0 0 1px var(--content-c);
+      }
+
+      .lesson-nav {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px clamp(18px, 3vw, 28px);
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+        align-items: center;
+      }
+      .ln-status {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--padding-c);
+        border: 1px solid rgba(62, 207, 142, 0.45);
+        border-radius: 999px;
+        padding: 3px 10px;
+      }
+      .lesson-nav h3 {
+        font-family: var(--disp);
+        font-size: 17px;
+        margin-top: 8px;
+      }
+      .ln-track {
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .tick {
+        width: 7px;
+        height: 15px;
+        border-radius: 2px;
+        background: #212a3e;
+        transition: 0.2s;
+      }
+      .tick.done {
+        background: var(--padding-c);
+        box-shadow: 0 0 8px rgba(62, 207, 142, 0.55);
+      }
+      .tick:hover {
+        background: var(--line2);
+      }
+      .ln-next {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        text-align: right;
+      }
+      .ln-next span {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .ln-next b {
+        font-family: var(--disp);
+        font-size: 15px;
+        color: var(--text);
+      }
+      footer {
+        border-top: 1px solid var(--line);
+        margin-top: 40px;
+        padding: 30px 0 44px;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+        color: var(--faint);
+        font-size: 12.5px;
+      }
+      footer .mono {
+        font-size: 11.5px;
+      }
+      footer .sp {
+        margin-left: auto;
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+      @media (max-width: 1020px) {
+        .intro {
+          grid-template-columns: 1fr;
+        }
+        .pick-grid {
+          grid-template-columns: 1fr;
+        }
+        .lesson-nav {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .ln-next {
+          align-items: center;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg">
+      <span class="glow g1"></span><span class="glow g2"></span>
+    </div>
+
+    <header class="topbar">
+      <span class="lesson-tag">lesson 17 / 45</span>
+      <nav>
+        <a href="#lines">grid-lines</a>
+        <a href="#column">grid-column</a>
+        <a href="#row">grid-row</a>
+        <a href="#longhand">longhand</a>
+        <a href="#notes">cheat-codes</a>
+      </nav>
+    </header>
+
+    <div class="wrap">
+      <!-- ============ intro ============ -->
+      <section class="intro">
+        <div>
+          <p class="eyebrow">lesson 17 · interactive</p>
+          <h1>
+            Items don't flow here. They're
+            <span class="word-style">placed</span>.
+          </h1>
+          <p class="lede">
+            Lesson 16 drew the map; this lesson drives on it. Every grid has
+            <b>numbered lines</b> — columns and rows — and four numbers (<b
+              >start / end</b
+            >
+            on each axis) tell an item exactly where to sit.
+            <span class="mono">grid-column</span> and
+            <span class="mono">grid-row</span> are the shorthand; the
+            <span class="mono">-start / -end</span> properties are the longhand.
+          </p>
+          <span class="css-full">S · TART · E · ND · S · PAN</span>
+        </div>
+        <div class="intro-panel">
+          <div class="ix-frame">
+            <div class="ix-grid">
+              <div class="ix-item" id="ixItem">item</div>
+              <div class="ix-cell"></div>
+              <div class="ix-cell"></div>
+              <div class="ix-cell"></div>
+              <div class="ix-cell"></div>
+              <div class="ix-cell"></div>
+            </div>
+          </div>
+          <span class="intro-fmt" id="introFmt">grid-column: 1 / 3</span>
+          <p class="imode mono">same grid, new coordinates…</p>
+        </div>
+      </section>
+
+      <!-- ============ 01 · grid lines ============ -->
+      <section id="lines" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">01 · the numbered lines</p>
+          <h2>Count the gaps, not the cells</h2>
+          <p class="lede">
+            Grid lines are numbered from <b>1</b> at each edge — columns in blue
+            across the top, rows in orange down the side.
+            <b>Click any cell</b> and read its address: the four line numbers
+            that surround it.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>click a cell for its address</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="gp-frame">
+                <span class="cl" style="left: 26px">1</span
+                ><span
+                  class="cl"
+                  style="left: calc(26px + (100% - 36px) * 0.25 + 5px)"
+                  >2</span
+                ><span
+                  class="cl"
+                  style="left: calc(26px + (100% - 36px) * 0.5 + 5px)"
+                  >3</span
+                ><span
+                  class="cl"
+                  style="left: calc(26px + (100% - 36px) * 0.75 + 5px)"
+                  >4</span
+                ><span class="cl" style="left: calc(100% - 10px)">5</span>
+                <span class="rl" style="top: 20px">1</span
+                ><span
+                  class="rl"
+                  style="top: calc(20px + (100% - 30px) * 0.333 + 5px)"
+                  >2</span
+                ><span
+                  class="rl"
+                  style="top: calc(20px + (100% - 30px) * 0.666 + 5px)"
+                  >3</span
+                ><span class="rl" style="top: calc(100% - 10px)">4</span>
+                <div class="gp-grid" id="linesGrid"></div>
+              </div>
+              <p class="read" id="linesRead">click any cell ↑</p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <p class="grp">how numbering works</p>
+            <div class="code-box"><pre id="codeLines"></pre></div>
+            <p class="side-note">
+              4 columns → lines 1–5. 3 rows → lines 1–4. An item spanning two
+              columns sits between, say, line 2 and line 4. Negative numbers
+              count from the end: <span class="mono">-1</span> is always the
+              last line.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 02 · grid-column ============ -->
+      <section id="column" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">02 · grid-column</p>
+          <h2>Horizontal address: start / end</h2>
+          <p class="lede">
+            <span class="mono">grid-column: 2 / 4</span> means "start at column
+            line 2, stop at line 4" — a span of two tracks. Drag the lines and
+            watch the item stretch. <span class="mono">-1</span> jumps to the
+            far edge.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>drag the column lines</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="gp-frame">
+                <span class="cl" style="left: 26px">1</span
+                ><span
+                  class="cl"
+                  style="left: calc(26px + (100% - 36px) * 0.25 + 5px)"
+                  >2</span
+                ><span
+                  class="cl"
+                  style="left: calc(26px + (100% - 36px) * 0.5 + 5px)"
+                  >3</span
+                ><span
+                  class="cl"
+                  style="left: calc(26px + (100% - 36px) * 0.75 + 5px)"
+                  >4</span
+                ><span class="cl" style="left: calc(100% - 10px)">5</span>
+                <div
+                  class="gp-grid"
+                  style="grid-template-rows: repeat(2, 78px)"
+                >
+                  <div class="gp-item" id="colItem" style="grid-column: 1/3">
+                    item
+                  </div>
+                </div>
+              </div>
+              <p class="read" id="colRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rCs">grid-column-start</label
+                ><output class="ctl-val" id="oCs">1</output>
+              </div>
+              <input type="range" id="rCs" min="1" max="4" value="1" />
+            </div>
+            <div class="ctl" style="--ac: var(--border-c)">
+              <div class="ctl-top">
+                <label for="rCe">grid-column-end</label
+                ><output class="ctl-val" id="oCe">3</output>
+              </div>
+              <input type="range" id="rCe" min="2" max="5" value="3" />
+            </div>
+            <p class="grp">presets</p>
+            <div class="chips" id="colChips">
+              <button class="sel-chip" data-s="1" data-e="3">1 / 3</button>
+              <button class="sel-chip" data-s="2" data-e="4">2 / 4</button>
+              <button class="sel-chip" data-s="1" data-e="5">
+                1 / -1 (full)
+              </button>
+            </div>
+            <div class="code-box"><pre id="codeCol"></pre></div>
+            <p class="side-note">
+              <span class="mono">span 2</span> is the lazy cousin: "start here,
+              take two tracks". end − start = span.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 03 · grid-row ============ -->
+      <section id="row" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">03 · grid-row</p>
+          <h2>Vertical address: same game, rotated</h2>
+          <p class="lede">
+            Rows use the identical syntax on the other axis. Tall heroes,
+            sidebars that stretch, footers pinned to the last row — all just two
+            numbers.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>drag the row lines</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="gp-frame">
+                <span class="rl" style="top: 20px">1</span
+                ><span
+                  class="rl"
+                  style="top: calc(20px + (100% - 30px) * 0.333 + 5px)"
+                  >2</span
+                ><span
+                  class="rl"
+                  style="top: calc(20px + (100% - 30px) * 0.666 + 5px)"
+                  >3</span
+                ><span class="rl" style="top: calc(100% - 10px)">4</span>
+                <div
+                  class="gp-grid"
+                  style="grid-template-columns: repeat(2, 1fr)"
+                >
+                  <div class="gp-item" id="rowItem" style="grid-row: 1/2">
+                    item
+                  </div>
+                </div>
+              </div>
+              <p class="read" id="rowRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--margin-c)">
+              <div class="ctl-top">
+                <label for="rRs">grid-row-start</label
+                ><output class="ctl-val" id="oRs">1</output>
+              </div>
+              <input type="range" id="rRs" min="1" max="3" value="1" />
+            </div>
+            <div class="ctl" style="--ac: var(--padding-c)">
+              <div class="ctl-top">
+                <label for="rRe">grid-row-end</label
+                ><output class="ctl-val" id="oRe">2</output>
+              </div>
+              <input type="range" id="rRe" min="2" max="4" value="2" />
+            </div>
+            <div class="chips" id="rowChips">
+              <button class="sel-chip" data-s="1" data-e="2">1 / 2</button>
+              <button class="sel-chip" data-s="1" data-e="4">
+                1 / -1 (tall)
+              </button>
+              <button class="sel-chip" data-s="3" data-e="4">last row</button>
+            </div>
+            <div class="code-box"><pre id="codeRow"></pre></div>
+            <p class="side-note">
+              Combine both axes and you can park an item anywhere:
+              <span class="mono">grid-column: 2 / 4; grid-row: 1 / 3;</span> —
+              that's the whole placement API.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 04 · longhand ============ -->
+      <section id="longhand" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">04 · the longhand properties</p>
+          <h2>Four numbers, written out</h2>
+          <p class="lede">
+            <span class="mono">grid-column</span> is just
+            <span class="mono">grid-column-start + grid-column-end</span> in one
+            line; same for rows. Drive all four longhands and read both
+            spellings side by side — they're the same placement.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>one item, four numbers</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="gp-frame">
+                <span class="cl" style="left: 26px">1</span
+                ><span
+                  class="cl"
+                  style="left: calc(26px + (100% - 36px) * 0.25 + 5px)"
+                  >2</span
+                ><span
+                  class="cl"
+                  style="left: calc(26px + (100% - 36px) * 0.5 + 5px)"
+                  >3</span
+                ><span
+                  class="cl"
+                  style="left: calc(26px + (100% - 36px) * 0.75 + 5px)"
+                  >4</span
+                ><span class="cl" style="left: calc(100% - 10px)">5</span>
+                <span class="rl" style="top: 20px">1</span
+                ><span
+                  class="rl"
+                  style="top: calc(20px + (100% - 30px) * 0.333 + 5px)"
+                  >2</span
+                ><span
+                  class="rl"
+                  style="top: calc(20px + (100% - 30px) * 0.666 + 5px)"
+                  >3</span
+                ><span class="rl" style="top: calc(100% - 10px)">4</span>
+                <div class="gp-grid">
+                  <div
+                    class="gp-item"
+                    id="lhItem"
+                    style="grid-column: 1/3; grid-row: 1/3"
+                  >
+                    item
+                  </div>
+                </div>
+              </div>
+              <p class="read" id="lhRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rLcs">column-start</label
+                ><output class="ctl-val" id="oLcs">1</output>
+              </div>
+              <input type="range" id="rLcs" min="1" max="4" value="1" />
+            </div>
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rLce">column-end</label
+                ><output class="ctl-val" id="oLce">3</output>
+              </div>
+              <input type="range" id="rLce" min="2" max="5" value="3" />
+            </div>
+            <div class="ctl" style="--ac: var(--margin-c)">
+              <div class="ctl-top">
+                <label for="rLrs">row-start</label
+                ><output class="ctl-val" id="oLrs">1</output>
+              </div>
+              <input type="range" id="rLrs" min="1" max="3" value="1" />
+            </div>
+            <div class="ctl" style="--ac: var(--margin-c)">
+              <div class="ctl-top">
+                <label for="rLre">row-end</label
+                ><output class="ctl-val" id="oLre">3</output>
+              </div>
+              <input type="range" id="rLre" min="2" max="4" value="3" />
+            </div>
+            <div class="code-box"><pre id="codeLh"></pre></div>
+            <p class="side-note">
+              Use the shorthand when both numbers live together; the longhand
+              when you're overriding one edge (media queries love it).
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 05 · field notes ============ -->
+      <section id="notes" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">05 · field notes</p>
+          <h2>Cheat codes from lesson 17</h2>
+        </div>
+        <div class="notes-grid">
+          <article class="note-card" style="--nc: var(--content-c)">
+            <div class="note-demo">
+              <div class="demo-ln">
+                <b>1</b><b>2</b><b>3</b><b>4</b><i></i><i></i><i></i>
+              </div>
+            </div>
+            <h3>lines, not cells</h3>
+            <p>
+              Placement counts the numbered <i>lines</i> (the gaps' edges),
+              starting at 1. N tracks → N+1 lines. Addresses are always start /
+              end.
+            </p>
+            <p class="note-tip mono">↳ hover: the lines light up</p>
+          </article>
+          <article class="note-card" style="--nc: var(--padding-c)">
+            <div class="note-demo">
+              <div class="demo-sp">
+                <i class="hero"></i><i></i><i></i><i></i><i></i>
+              </div>
+            </div>
+            <h3>span = end − start</h3>
+            <p>
+              <span class="mono">2 / 4</span> spans two tracks.
+              <span class="mono">span 2</span> says the same with one number.
+              The item stretches; the grid doesn't reflow.
+            </p>
+            <p class="note-tip mono">↳ hover: span 2 → span 4</p>
+          </article>
+          <article class="note-card" style="--nc: var(--border-c)">
+            <div class="note-demo">
+              <div class="demo-neg"><i></i><i class="hero"></i><i></i></div>
+            </div>
+            <h3>-1 = the last line</h3>
+            <p>
+              Negative numbers count backwards from the end.
+              <span class="mono">1 / -1</span> = "the whole track", and it
+              survives template changes.
+            </p>
+            <p class="note-tip mono">↳ hover: grab the full row</p>
+          </article>
+          <article class="note-card" style="--nc: var(--margin-c)">
+            <div class="note-demo">
+              <div class="demo-sh">
+                <em>grid-column: 1 / 3;</em
+                ><em>= column-start: 1; column-end: 3;</em>
+              </div>
+            </div>
+            <h3>shorthand = longhand</h3>
+            <p>
+              grid-column packs start/end into one line; grid-row does the same
+              vertically. The four -start/-end props are the expanded spelling.
+            </p>
+            <p class="note-tip mono">↳ hover: both spellings glow</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ lesson nav ============ -->
+      <div class="lesson-nav reveal">
+        <div>
+          <span class="ln-status">✓ completed</span>
+          <h3>17 — Grid Placement</h3>
+        </div>
+        <div class="ln-track" id="lnTrack"></div>
+        <div class="ln-next">
+          <span>up next</span>
+          <b>18 · Advanced Grid</b>
+        </div>
+      </div>
+
+      <footer>
+        <span class="mono">drag things, break things, learn things.</span>
+        <span class="sp mono">45 lessons · lesson 17 · grid placement</span>
+      </footer>
+    </div>
+    <!-- /wrap -->
+
+    <script>
+      (() => {
+        const $ = (id) => document.getElementById(id);
+        const rule = (sel, decls) =>
+          `<span class="c-sel">${sel}</span> {\n${decls
+            .map((d) => {
+              const i = d.indexOf(":");
+              return `  <span class="c-prop">${d.slice(0, i)}</span>: <span class="c-val">${d.slice(i + 1).trim()}</span>;`;
+            })
+            .join("\n")}\n}`;
+        function range(el, out, fmt, cb) {
+          const f = () => {
+            const v = +el.value;
+            out.textContent = fmt(v);
+            const min = +el.min,
+              max = +el.max;
+            el.style.setProperty(
+              "--fill",
+              ((v - min) / (max - min)) * 100 + "%",
+            );
+            cb(v);
+          };
+          el.addEventListener("input", f);
+          f();
+        }
+        function chipSet(box, cb) {
+          box.addEventListener("click", (e) => {
+            const c = e.target.closest(".sel-chip");
+            if (!c) return;
+            cb(+c.dataset.s, +c.dataset.e, c);
+          });
+        }
+
+        /* ---------- intro cycle ---------- */
+        const PL = [
+          ["1 / 3", "grid-column: 1 / 3"],
+          ["2 / 4", "grid-column: 2 / 4"],
+          ["1 / -1", "grid-column: 1 / -1"],
+          ["3 / 4", "grid-column: 3 / 4"],
+        ];
+        let pi = 0;
+        function intro() {
+          $("ixItem").style.gridColumn = PL[pi][0];
+          $("introFmt").textContent = PL[pi][1];
+          pi = (pi + 1) % PL.length;
+        }
+        intro();
+        setInterval(intro, 1900);
+
+        /* ---------- 01 lines ---------- */
+        const lg = $("linesGrid");
+        for (let i = 0; i < 12; i++) {
+          const c = document.createElement("div");
+          c.className = "gp-cell";
+          c.addEventListener("click", () => {
+            lg.querySelectorAll(".gp-cell").forEach((x) =>
+              x.classList.remove("hit"),
+            );
+            c.classList.add("hit");
+            const col = (i % 4) + 1,
+              row = Math.floor(i / 4) + 1;
+            $("linesRead").innerHTML =
+              `cell address → <b>grid-column: ${col} / ${col + 1}</b> · <b>grid-row: ${row} / ${row + 1}</b>`;
+            $("codeLines").innerHTML = rule(".item", [
+              `grid-column: ${col} / ${col + 1}`,
+              `grid-row: ${row} / ${row + 1}`,
+            ]);
+          });
+          lg.appendChild(c);
+        }
+        $("codeLines").innerHTML = rule(".item", [
+          `grid-column: 2 / 3`,
+          `grid-row: 2 / 3`,
+          `/* the clicked cell's address */`,
+        ]);
+
+        /* ---------- 02 grid-column ---------- */
+        const CS = { s: 1, e: 3 };
+        function renderCol() {
+          if (CS.e <= CS.s) CS.e = CS.s + 1;
+          $("colItem").style.gridColumn = CS.s + " / " + CS.e;
+          $("colRead").innerHTML =
+            `grid-column: <b>${CS.s} / ${CS.e}</b> → spans <b>${CS.e - CS.s}</b> track${CS.e - CS.s > 1 ? "s" : ""}`;
+          $("codeCol").innerHTML = rule(".item", [
+            `grid-column: ${CS.s} / ${CS.e}`,
+            `/* = grid-column: ${CS.s} / span ${CS.e - CS.s} */`,
+          ]);
+        }
+        range(
+          $("rCs"),
+          $("oCs"),
+          (v) => v,
+          (v) => {
+            CS.s = v;
+            if (CS.e <= CS.s) {
+              CS.e = CS.s + 1;
+              $("rCe").value = CS.e;
+              $("oCe").textContent = CS.e;
+            }
+            renderCol();
+          },
+        );
+        range(
+          $("rCe"),
+          $("oCe"),
+          (v) => v,
+          (v) => {
+            CS.e = v;
+            if (CS.e <= CS.s) {
+              CS.s = CS.e - 1;
+              $("rCs").value = CS.s;
+              $("oCs").textContent = CS.s;
+            }
+            renderCol();
+          },
+        );
+        chipSet($("colChips"), (s, e, c) => {
+          CS.s = s;
+          CS.e = e;
+          $("rCs").value = s;
+          $("oCs").textContent = s;
+          $("rCe").value = e;
+          $("oCe").textContent = e;
+          renderCol();
+        });
+        renderCol();
+
+        /* ---------- 03 grid-row ---------- */
+        const RS = { s: 1, e: 2 };
+        function renderRow() {
+          if (RS.e <= RS.s) RS.e = RS.s + 1;
+          $("rowItem").style.gridRow = RS.s + " / " + RS.e;
+          $("rowRead").innerHTML =
+            `grid-row: <b>${RS.s} / ${RS.e}</b> → spans <b>${RS.e - RS.s}</b> track${RS.e - RS.s > 1 ? "s" : ""}`;
+          $("codeRow").innerHTML = rule(".item", [
+            `grid-row: ${RS.s} / ${RS.e}`,
+            `/* = grid-row: ${RS.s} / span ${RS.e - RS.s} */`,
+          ]);
+        }
+        range(
+          $("rRs"),
+          $("oRs"),
+          (v) => v,
+          (v) => {
+            RS.s = v;
+            if (RS.e <= RS.s) {
+              RS.e = RS.s + 1;
+              $("rRe").value = RS.e;
+              $("oRe").textContent = RS.e;
+            }
+            renderRow();
+          },
+        );
+        range(
+          $("rRe"),
+          $("oRe"),
+          (v) => v,
+          (v) => {
+            RS.e = v;
+            if (RS.e <= RS.s) {
+              RS.s = RS.e - 1;
+              $("rRs").value = RS.s;
+              $("oRs").textContent = RS.s;
+            }
+            renderRow();
+          },
+        );
+        chipSet($("rowChips"), (s, e) => {
+          RS.s = s;
+          RS.e = e;
+          $("rRs").value = s;
+          $("oRs").textContent = s;
+          $("rRe").value = e;
+          $("oRe").textContent = e;
+          renderRow();
+        });
+        renderRow();
+
+        /* ---------- 04 longhand ---------- */
+        const LH = { cs: 1, ce: 3, rs: 1, re: 3 };
+        function renderLh() {
+          if (LH.ce <= LH.cs) LH.ce = LH.cs + 1;
+          if (LH.re <= LH.rs) LH.re = LH.rs + 1;
+          const it = $("lhItem");
+          it.style.gridColumn = LH.cs + " / " + LH.ce;
+          it.style.gridRow = LH.rs + " / " + LH.re;
+          $("lhRead").innerHTML =
+            `parked at col <b>${LH.cs}→${LH.ce}</b>, row <b>${LH.rs}→${LH.re}</b>`;
+          $("codeLh").innerHTML = rule(".item", [
+            `grid-column-start: ${LH.cs}`,
+            `grid-column-end: ${LH.ce}`,
+            `grid-row-start: ${LH.rs}`,
+            `grid-row-end: ${LH.re}`,
+            `/* shorthand: */`,
+            `grid-column: ${LH.cs} / ${LH.ce}`,
+            `grid-row: ${LH.rs} / ${LH.re}`,
+          ]);
+        }
+        range(
+          $("rLcs"),
+          $("oLcs"),
+          (v) => v,
+          (v) => {
+            LH.cs = v;
+            renderLh();
+          },
+        );
+        range(
+          $("rLce"),
+          $("oLce"),
+          (v) => v,
+          (v) => {
+            LH.ce = v;
+            renderLh();
+          },
+        );
+        range(
+          $("rLrs"),
+          $("oLrs"),
+          (v) => v,
+          (v) => {
+            LH.rs = v;
+            renderLh();
+          },
+        );
+        range(
+          $("rLre"),
+          $("oLre"),
+          (v) => v,
+          (v) => {
+            LH.re = v;
+            renderLh();
+          },
+        );
+        renderLh();
+
+        /* ---------- lesson track ---------- */
+        const t = $("lnTrack");
+        for (let i = 0; i < 45; i++) {
+          const s = document.createElement("span");
+          s.className = "tick" + (i < 17 ? " done" : "");
+          s.title = "lesson " + (i + 1);
+          t.appendChild(s);
+        }
+
+        /* ---------- reveal ---------- */
+        const io = new IntersectionObserver(
+          (es) =>
+            es.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                io.unobserve(e.target);
+              }
+            }),
+          { threshold: 0.12 },
+        );
+        document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      })();
+    </script>
+  </body>
+</html>
