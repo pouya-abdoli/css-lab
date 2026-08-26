@@ -1,0 +1,1710 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CSS Custom Properties — Lesson 32</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' fill='none' stroke='%23f07f4f' stroke-width='2'/%3E%3Crect x='8' y='8' width='16' height='16' fill='none' stroke='%23f2c14e' stroke-width='2'/%3E%3Crect x='13' y='13' width='6' height='6' fill='%2358a6ff'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0e15;
+        --panel: #121826;
+        --panel2: #0d1220;
+        --ink: #10141d;
+        --line: #222c40;
+        --line2: #31405e;
+        --text: #e9eef7;
+        --muted: #8d9ab0;
+        --faint: #5b6a84;
+        --margin-c: #f07f4f;
+        --margin-bg: rgba(240, 127, 79, 0.14);
+        --border-c: #f2c14e;
+        --border-bg: rgba(242, 193, 78, 0.16);
+        --padding-c: #3ecf8e;
+        --padding-bg: rgba(62, 207, 142, 0.14);
+        --content-c: #58a6ff;
+        --content-bg: rgba(88, 166, 255, 0.17);
+        --pink: #ff4f8b;
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: dark;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 15px;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+      ::selection {
+        background: rgba(88, 166, 255, 0.35);
+      }
+      .mono {
+        font-family: var(--mono);
+      }
+      section {
+        scroll-margin-top: 76px;
+      }
+      b {
+        font-weight: 600;
+      }
+
+      .bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            700px 460px at 12% -6%,
+            rgba(242, 193, 78, 0.07),
+            transparent 60%
+          ),
+          radial-gradient(
+            760px 520px at 92% 22%,
+            rgba(88, 166, 255, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            600px 480px at 40% 105%,
+            rgba(62, 207, 142, 0.05),
+            transparent 60%
+          );
+      }
+      .bg::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(233, 238, 247, 0.035) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(233, 238, 247, 0.035) 1px,
+            transparent 1px
+          );
+        background-size: 28px 28px;
+        mask-image: radial-gradient(
+          ellipse 120% 90% at 50% 0%,
+          #000 40%,
+          transparent 100%
+        );
+      }
+      .bg .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.5;
+        animation: drift 26s ease-in-out infinite alternate;
+      }
+      .bg .g1 {
+        width: 420px;
+        height: 420px;
+        left: -120px;
+        top: 30%;
+        background: rgba(240, 127, 79, 0.1);
+      }
+      .bg .g2 {
+        width: 460px;
+        height: 460px;
+        right: -140px;
+        top: 60%;
+        background: rgba(88, 166, 255, 0.1);
+        animation-delay: -12s;
+      }
+      @keyframes drift {
+        from {
+          transform: translateY(-30px);
+        }
+        to {
+          transform: translateY(40px);
+        }
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 12px clamp(16px, 4vw, 44px);
+        background: rgba(11, 14, 21, 0.92);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar nav {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .topbar nav a {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 6px 11px;
+        border-radius: 999px;
+        transition: 0.2s;
+      }
+      .topbar nav a:hover {
+        color: var(--text);
+        background: #161d2c;
+      }
+      .lesson-tag {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--border-c);
+        border: 1px dashed rgba(242, 193, 78, 0.45);
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .wrap {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: 0 clamp(16px, 4vw, 44px);
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        padding: clamp(20px, 4vh, 48px) 0 clamp(30px, 5vh, 56px);
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--padding-c);
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(2.3rem, 5.2vw, 3.7rem);
+        line-height: 1.06;
+        letter-spacing: -0.02em;
+      }
+      .word-style {
+        display: inline-block;
+        padding: 0.02em 0.22em;
+        background: var(--border-bg);
+        border: 0.06em solid var(--border-c);
+        border-radius: 0.14em;
+        color: #ffe3a1;
+        transition: transform 0.3s;
+        cursor: default;
+      }
+      .word-style:hover {
+        transform: rotate(-2deg) scale(1.03);
+      }
+      .lede {
+        color: var(--muted);
+        max-width: 56ch;
+        margin-top: 18px;
+        font-size: 1.05rem;
+      }
+      .lede b {
+        color: var(--text);
+      }
+      .css-full {
+        display: inline-block;
+        margin-top: 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--faint);
+        letter-spacing: 0.08em;
+      }
+      .intro-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 26px;
+        display: grid;
+        place-items: center;
+        gap: 14px;
+        box-shadow: 0 30px 60px -40px rgba(0, 0, 0, 0.8);
+        width: 100%;
+      }
+      .live-vars {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        width: 100%;
+      }
+      .live-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 7px 12px;
+        align-items: center;
+      }
+      .live-row .sw {
+        width: 18px;
+        height: 18px;
+        border-radius: 5px;
+        border: 1px solid var(--line2);
+        transition: 0.3s;
+      }
+      .live-row b {
+        color: var(--padding-c);
+      }
+      .imode {
+        font-size: 11px;
+        color: var(--faint);
+        letter-spacing: 0.1em;
+      }
+
+      .sec {
+        padding: clamp(36px, 6vh, 64px) 0;
+      }
+      .sec-head {
+        margin-bottom: 26px;
+        max-width: 72ch;
+      }
+      .sec-head h2 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+        letter-spacing: -0.015em;
+        line-height: 1.15;
+      }
+      .sec-head .lede {
+        margin-top: 10px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 18px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .panel-head h3 {
+        font-family: var(--disp);
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dots i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dots i:nth-child(1) {
+        background: #f07f4f;
+      }
+      .dots i:nth-child(2) {
+        background: #f2c14e;
+      }
+      .dots i:nth-child(3) {
+        background: #3ecf8e;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.85;
+        overflow-x: auto;
+      }
+      .c-sel {
+        color: #7fe0b0;
+      }
+      .c-prop {
+        color: #8ab4ff;
+      }
+      .c-val {
+        color: #f2c14e;
+      }
+      .c-com {
+        color: #5b6a84;
+      }
+      .grp {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+
+      .pick-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 18px;
+        align-items: stretch;
+      }
+      .stage-wrap {
+        padding: 28px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 360px;
+        gap: 16px;
+        width: 100%;
+      }
+      .side {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .sel-chip {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .sel-chip:hover {
+        color: var(--text);
+        border-color: var(--content-c);
+        transform: translateY(-2px);
+      }
+      .sel-chip.on {
+        color: #0e1017;
+        background: var(--content-c);
+        border-color: var(--content-c);
+        font-weight: 600;
+      }
+      .ghost-btn {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--faint);
+        background: none;
+        border: 1px dashed var(--line2);
+        border-radius: 8px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .ghost-btn:hover {
+        color: var(--content-c);
+        border-color: var(--content-c);
+      }
+      .code-box {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .code-box pre {
+        min-height: 0;
+        font-size: 12px;
+      }
+      .side-note {
+        font-size: 12px;
+        color: var(--faint);
+      }
+      .read {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 14px;
+        text-align: center;
+        width: 100%;
+        max-width: 440px;
+      }
+      .read b {
+        color: var(--text);
+      }
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        outline: none;
+        cursor: pointer;
+        background: linear-gradient(
+          90deg,
+          var(--ac) var(--fill, 50%),
+          #232c40 var(--fill, 50%)
+        );
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        transition: transform 0.15s;
+      }
+      input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.15);
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+      }
+      .ctl {
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 7px 11px;
+        transition: 0.2s;
+      }
+      .ctl:hover {
+        background: #101725;
+        border-color: var(--line);
+      }
+      .ctl-top {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+      .ctl-top label {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text);
+      }
+      .ctl-val {
+        margin-left: auto;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--ac);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 2px 9px;
+      }
+      input[type="color"].pick {
+        width: 48px;
+        height: 34px;
+        border: 1px solid var(--line2);
+        border-radius: 9px;
+        background: none;
+        padding: 2px;
+        cursor: pointer;
+      }
+      .picker-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .picker-row label {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        flex: 1;
+      }
+      .switch {
+        position: relative;
+        width: 52px;
+        height: 28px;
+        background: var(--line2);
+        border-radius: 999px;
+        cursor: pointer;
+        transition: 0.25s;
+        border: none;
+      }
+      .switch::after {
+        content: "";
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: #fff;
+        transition: 0.25s;
+      }
+      .switch.on {
+        background: var(--padding-c);
+      }
+      .switch.on::after {
+        left: 27px;
+      }
+
+      /* 01 define */
+      .df-stage {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+        max-width: 440px;
+      }
+      .df-consumer {
+        transition: all 0.3s;
+        padding: 14px;
+        border-radius: 12px;
+        font: 600 12px var(--mono);
+        text-align: center;
+      }
+      .df-c1 {
+        border: 2px solid var(--user-primary, #58a6ff);
+        color: var(--user-primary, #58a6ff);
+        background: var(--panel2);
+        min-width: 110px;
+      }
+      .df-c2 {
+        background: var(--user-primary, #58a6ff);
+        color: #0e1017;
+        min-width: 110px;
+      }
+      .df-c3 {
+        background: rgba(88, 166, 255, 0.15);
+        border: 1px solid var(--line2);
+        color: var(--text);
+        min-width: 110px;
+        box-shadow: inset 0 0 0 2px var(--user-primary, #58a6ff);
+      }
+      .df-c3 span {
+        display: block;
+        font-size: 9px;
+        color: var(--faint);
+        font-weight: 400;
+        margin-top: 4px;
+      }
+
+      /* 02 cascade */
+      .cs-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        width: 100%;
+        max-width: 440px;
+      }
+      .cs-card {
+        background: var(--panel2);
+        border: 2px solid var(--scope-accent, #58a6ff);
+        border-radius: 12px;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        cursor: pointer;
+        transition: 0.25s;
+        position: relative;
+      }
+      .cs-card:hover {
+        transform: translateY(-3px);
+      }
+      .cs-card.active {
+        box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.4);
+      }
+      .cs-tag {
+        position: absolute;
+        top: -9px;
+        left: 10px;
+        font: 700 8.5px var(--mono);
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: var(--panel);
+        border: 1px solid var(--scope-accent, #58a6ff);
+        color: var(--scope-accent, #58a6ff);
+      }
+      .cs-dot {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--scope-accent, #58a6ff);
+      }
+      .cs-label {
+        font: 10px var(--mono);
+        color: var(--muted);
+      }
+
+      /* 03 fallback */
+      .fb-wrap {
+        width: 100%;
+        max-width: 340px;
+        background: var(--panel2);
+        border: 2px solid var(--user-brand, #f07f4f);
+        border-radius: 14px;
+        padding: 18px;
+        transition: all 0.3s;
+      }
+      .fb-title {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: 15px;
+        color: var(--text);
+        margin-bottom: 6px;
+      }
+      .fb-text {
+        font-size: 11.5px;
+        color: var(--muted);
+        margin-bottom: 12px;
+      }
+      .fb-btn {
+        font: 700 10px var(--mono);
+        color: #0e1017;
+        background: var(--user-brand, #f07f4f);
+        border: none;
+        border-radius: 7px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.25s;
+      }
+
+      /* 04 theming */
+      .theme-lab {
+        width: 100%;
+        max-width: 440px;
+        background: var(--lab-bg, #0d1220);
+        border: 1px solid var(--lab-line, #222c40);
+        border-radius: 14px;
+        padding: 18px;
+        transition: all 0.35s;
+        color: var(--lab-text, #e9eef7);
+      }
+      .theme-lab .th-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid var(--lab-line, #222c40);
+      }
+      .theme-lab .th-logo {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: 14px;
+        color: var(--lab-text, #e9eef7);
+      }
+      .theme-lab .th-nav {
+        display: flex;
+        gap: 8px;
+        font: 10px var(--mono);
+        color: var(--lab-muted, #8d9ab0);
+      }
+      .theme-lab .th-card {
+        background: var(--lab-surface, #121826);
+        border: 1px solid var(--lab-line, #222c40);
+        border-radius: var(--lab-radius, 10px);
+        padding: var(--lab-spacing, 14px);
+        transition: all 0.35s;
+      }
+      .theme-lab .th-title {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: 15px;
+        color: var(--lab-text, #e9eef7);
+        margin-bottom: 6px;
+      }
+      .theme-lab .th-body {
+        font-size: 11.5px;
+        color: var(--lab-muted, #8d9ab0);
+        margin-bottom: var(--lab-spacing, 14px);
+      }
+      .theme-lab .th-btn {
+        font: 700 10px var(--mono);
+        color: #0e1017;
+        background: var(--lab-primary, #58a6ff);
+        border: none;
+        border-radius: var(--lab-radius, 10px);
+        padding: 9px 16px;
+        cursor: pointer;
+        transition: 0.25s;
+      }
+      .theme-lab .th-btn:hover {
+        transform: translateY(-1px);
+      }
+
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      @media (min-width: 1180px) {
+        .notes-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media (max-width: 640px) {
+        .notes-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .note-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.3s,
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+      .note-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--nc);
+        opacity: 0.85;
+      }
+      .note-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--nc);
+        box-shadow: 0 24px 44px -28px rgba(0, 0, 0, 0.85);
+      }
+      .note-card h3 {
+        font-family: var(--mono);
+        font-size: 15px;
+        color: var(--nc);
+        margin-bottom: 8px;
+      }
+      .note-card p {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .note-tip {
+        margin-top: 12px;
+        font-size: 11px;
+        color: var(--faint);
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+      }
+      .note-demo {
+        height: 104px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        overflow: hidden;
+      }
+      .demo-def {
+        font: 10px var(--mono);
+        color: var(--muted);
+        transition: 0.3s;
+      }
+      .note-card:hover .demo-def {
+        color: var(--border-c);
+      }
+      .demo-use {
+        display: flex;
+        gap: 5px;
+      }
+      .demo-use i {
+        width: 14px;
+        height: 30px;
+        border-radius: 4px;
+        background: var(--content-c);
+        transition: 0.3s;
+      }
+      .note-card:hover .demo-use i:nth-child(2) {
+        background: var(--padding-c);
+      }
+      .note-card:hover .demo-use i:nth-child(3) {
+        background: var(--border-c);
+      }
+      .demo-fb {
+        width: 70%;
+        height: 34px;
+        border-radius: 7px;
+        border: 2px solid var(--margin-c);
+        display: grid;
+        place-items: center;
+        font: 9px var(--mono);
+        color: var(--margin-c);
+        transition: 0.3s;
+      }
+      .note-card:hover .demo-fb {
+        border-color: var(--content-c);
+        color: var(--content-c);
+      }
+      .demo-th {
+        width: 78%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 5px;
+      }
+      .demo-th i {
+        height: 30px;
+        border-radius: 5px;
+        transition: 0.3s;
+      }
+      .demo-th i:nth-child(1) {
+        background: #0d1220;
+        border: 1px solid #222c40;
+      }
+      .demo-th i:nth-child(2) {
+        background: #f7f4ee;
+        border: 1px solid #dcd7cc;
+      }
+      .note-card:hover .demo-th i {
+        transform: scale(1.06);
+      }
+
+      .lesson-nav {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px clamp(18px, 3vw, 28px);
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+        align-items: center;
+        margin-top: 40px;
+      }
+      .ln-status {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--padding-c);
+        border: 1px solid rgba(62, 207, 142, 0.45);
+        border-radius: 999px;
+        padding: 3px 10px;
+      }
+      .lesson-nav h3 {
+        font-family: var(--disp);
+        font-size: 17px;
+        margin-top: 8px;
+      }
+      .ln-track {
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .tick {
+        width: 7px;
+        height: 15px;
+        border-radius: 2px;
+        background: #212a3e;
+        transition: 0.2s;
+      }
+      .tick.done {
+        background: var(--padding-c);
+        box-shadow: 0 0 8px rgba(62, 207, 142, 0.55);
+      }
+      .tick:hover {
+        background: var(--line2);
+      }
+      .ln-next {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        text-align: right;
+      }
+      .ln-next span {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .ln-next b {
+        font-family: var(--disp);
+        font-size: 15px;
+        color: var(--text);
+      }
+      footer {
+        border-top: 1px solid var(--line);
+        margin-top: 20px;
+        padding: 30px 0 44px;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+        color: var(--faint);
+        font-size: 12.5px;
+      }
+      footer .mono {
+        font-size: 11.5px;
+      }
+      footer .sp {
+        margin-left: auto;
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+      @media (max-width: 1020px) {
+        .intro {
+          grid-template-columns: 1fr;
+        }
+        .pick-grid {
+          grid-template-columns: 1fr;
+        }
+        .lesson-nav {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .ln-next {
+          align-items: center;
+        }
+        .cs-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg">
+      <span class="glow g1"></span><span class="glow g2"></span>
+    </div>
+
+    <header class="topbar">
+      <span class="lesson-tag">lesson 32 / 45</span>
+      <nav>
+        <a href="#define">defining</a>
+        <a href="#use">using</a>
+        <a href="#cascade">cascade</a>
+        <a href="#fallback">fallbacks</a>
+        <a href="#dynamic">dynamic</a>
+        <a href="#notes">cheat-codes</a>
+      </nav>
+    </header>
+
+    <div class="wrap">
+      <!-- ============ intro ============ -->
+      <section class="intro">
+        <div>
+          <p class="eyebrow">lesson 32 · interactive</p>
+          <h1>Variables that <span class="word-style">cascade</span>.</h1>
+          <p class="lede">
+            CSS custom properties are like Sass variables but <b>alive</b>: they
+            inherit, they cascade, they can be changed at runtime with one line
+            of JavaScript, and every consumer updates instantly. The panel shows
+            your page's current variables — pick a color anywhere and watch all
+            three update.
+          </p>
+          <span class="css-full">D · EFINE · U · SE · C · HANGE</span>
+        </div>
+        <div class="intro-panel">
+          <div class="live-vars">
+            <div class="live-row">
+              <span>--primary</span>
+              <div
+                class="sw"
+                id="sw1"
+                style="background: var(--content-c)"
+              ></div>
+              <b id="v1">#58a6ff</b>
+            </div>
+            <div class="live-row">
+              <span>--spacing</span>
+              <div
+                class="sw"
+                style="
+                  background: var(--padding-bg);
+                  border-color: var(--padding-c);
+                "
+              ></div>
+              <b>1rem</b>
+            </div>
+            <div class="live-row">
+              <span>--radius</span>
+              <div
+                class="sw"
+                style="
+                  background: var(--border-bg);
+                  border-color: var(--border-c);
+                  border-radius: 50%;
+                "
+              ></div>
+              <b>10px</b>
+            </div>
+          </div>
+          <p class="imode mono">the page, introspecting itself…</p>
+        </div>
+      </section>
+
+      <!-- ============ 01 · defining variables ============ -->
+      <section id="define" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">01 · defining variables</p>
+          <h2>Double-dash, one source of truth</h2>
+          <p class="lede">
+            Declare with <span class="mono">--name: value</span> inside any
+            selector. The three consumers below all read the same
+            <span class="mono">--user-primary</span>: a border, a background, an
+            inset glow. Pick a color — they all update from the same source.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>three consumers, one variable</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="df-stage">
+                <div class="df-consumer df-c1" id="dfC1">border</div>
+                <div class="df-consumer df-c2" id="dfC2">background</div>
+                <div class="df-consumer df-c3" id="dfC3">
+                  glow<span>box-shadow</span>
+                </div>
+              </div>
+              <p class="read" id="dfRead">--user-primary: <b>#58a6ff</b></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="picker-row">
+              <label for="cDf">--user-primary</label
+              ><input type="color" class="pick" id="cDf" value="#58a6ff" />
+            </div>
+            <div class="code-box"><pre id="codeDf"></pre></div>
+            <p class="side-note">
+              Names must start with <span class="mono">--</span> (two hyphens).
+              The rest is your choice — <span class="mono">--primary</span>,
+              <span class="mono">--color-brand</span>,
+              <span class="mono">--space-md</span>. Convention over rules.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 02 · using variables ============ -->
+      <section id="use" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">02 · using variables</p>
+          <h2>var(  ) reads the value</h2>
+          <p class="lede">
+            Wherever you'd write a value, write
+            <span class="mono">var(--name)</span> instead. The browser resolves
+            it at render time — so the same declaration stays correct even when
+            the variable changes. Works anywhere a value goes: colors, sizes,
+            shadows, even grid templates.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>everywhere a value goes</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="df-stage" style="flex-direction: column; gap: 18px">
+                <div
+                  class="df-consumer df-c1"
+                  id="usC1"
+                  style="min-width: 240px"
+                >
+                  color: var(--user-primary)
+                </div>
+                <div
+                  class="df-consumer df-c2"
+                  id="usC2"
+                  style="min-width: 240px"
+                >
+                  background: var(--user-primary)
+                </div>
+                <div
+                  class="df-consumer df-c3"
+                  id="usC3"
+                  style="min-width: 240px"
+                >
+                  border-radius: var(--user-radius)<span id="usRad">10px</span>
+                </div>
+              </div>
+              <p class="read">
+                one variable powers color, background <i>and</i> radius
+              </p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="picker-row">
+              <label for="cUs">color + bg</label
+              ><input type="color" class="pick" id="cUs" value="#58a6ff" />
+            </div>
+            <div class="ctl" style="--ac: var(--border-c)">
+              <div class="ctl-top">
+                <label for="rUs">--user-radius</label
+                ><output class="ctl-val" id="oUs">10px</output>
+              </div>
+              <input type="range" id="rUs" min="0" max="30" value="10" />
+            </div>
+            <div class="code-box"><pre id="codeUs"></pre></div>
+            <p class="side-note">
+              Variables can hold any value type: colors, numbers with units,
+              strings, even other variables (<span class="mono"
+                >--accent: var(--primary)</span
+              >).
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 03 · cascade ============ -->
+      <section id="cascade" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">03 · the cascade</p>
+          <h2>Same name, different scope</h2>
+          <p class="lede">
+            This is where custom properties beat preprocessors: they
+            <b>inherit</b>. Define <span class="mono">--scope-accent</span> on
+            three cards with different values; each card's dot reads the nearest
+            one. Click a card to see its scope.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>click a card to inspect</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="cs-grid" id="csGrid">
+                <div
+                  class="cs-card"
+                  data-scope=":root"
+                  data-color="#58a6ff"
+                  style="--scope-accent: #58a6ff"
+                >
+                  <span class="cs-tag">:root</span>
+                  <div class="cs-dot"></div>
+                  <span class="cs-label">reads from the root</span>
+                </div>
+                <div
+                  class="cs-card"
+                  data-scope=".card.warm"
+                  data-color="#f07f4f"
+                  style="--scope-accent: #f07f4f"
+                >
+                  <span class="cs-tag">.card.warm</span>
+                  <div class="cs-dot"></div>
+                  <span class="cs-label">redefines locally</span>
+                </div>
+                <div
+                  class="cs-card"
+                  data-scope=".card.mint"
+                  data-color="#3ecf8e"
+                  style="--scope-accent: #3ecf8e"
+                >
+                  <span class="cs-tag">.card.mint</span>
+                  <div class="cs-dot"></div>
+                  <span class="cs-label">redefines locally</span>
+                </div>
+              </div>
+              <p class="read" id="csRead">click any card ↑</p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="code-box"><pre id="codeCs"></pre></div>
+            <p class="side-note">
+              Sass variables are replaced at build time — once compiled, they're
+              gone. Custom properties resolve <i>at render time</i>, which is
+              why the same
+              <span class="mono">var(--scope-accent)</span> declaration can mean
+              three different colors.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 04 · fallback values ============ -->
+      <section id="fallback" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">04 · fallback values</p>
+          <h2>The comma is the safety net</h2>
+          <p class="lede">
+            <span class="mono">var(--brand, #f07f4f)</span> — if
+            <span class="mono">--brand</span> is undefined, the value after the
+            comma is used instead. Toggle the definition and watch the border
+            and button color flip between defined and fallback.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>defined vs fallback</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="fb-wrap" id="fbWrap">
+                <div class="fb-title">Aurora blend</div>
+                <p class="fb-text">small-batch beans, roasted every tuesday.</p>
+                <button class="fb-btn">add to bag</button>
+              </div>
+              <p class="read" id="fbRead">
+                --user-brand is <b>undefined</b> · fallback
+                <b>#f07f4f</b> active
+              </p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="picker-row">
+              <label>define --user-brand</label
+              ><button class="switch" id="fbSwitch"></button>
+            </div>
+            <div class="picker-row">
+              <label for="cFb">if defined →</label
+              ><input type="color" class="pick" id="cFb" value="#58a6ff" />
+            </div>
+            <div class="code-box"><pre id="codeFb"></pre></div>
+            <p class="side-note">
+              Fallbacks nest:
+              <span class="mono">var(--a, var(--b, red))</span> — if --a is
+              missing, try --b, else red. Great for progressive theming.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 05 · dynamic changes ============ -->
+      <section id="dynamic" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">05 · changing variables dynamically</p>
+          <h2>One line, whole theme</h2>
+          <p class="lede">
+            This is the payoff. The preview below uses five variables. Flip the
+            dark/light switch, pick a primary color, drag spacing — every change
+            is one <span class="mono">setProperty</span> call, and the entire
+            card re-skins. That's a whole theme engine in four lines.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>the theme lab</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="theme-lab" id="themeLab">
+                <div class="th-head">
+                  <span class="th-logo">Aurora</span>
+                  <span class="th-nav">roasts · shop · about</span>
+                </div>
+                <div class="th-card">
+                  <div class="th-title">Tuesday roast</div>
+                  <div class="th-body">
+                    small-batch beans, caramel notes, shipped in 24h.
+                  </div>
+                  <button class="th-btn">add to bag</button>
+                </div>
+              </div>
+              <p class="read" id="thRead">
+                theme: <b>dark</b> · primary: <b>#58a6ff</b> · spacing:
+                <b>14px</b>
+              </p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="picker-row">
+              <label>dark / light</label
+              ><button class="switch on" id="thDark"></button>
+            </div>
+            <div class="picker-row">
+              <label for="cTh">--lab-primary</label
+              ><input type="color" class="pick" id="cTh" value="#58a6ff" />
+            </div>
+            <div class="ctl" style="--ac: var(--padding-c)">
+              <div class="ctl-top">
+                <label for="rTh">--lab-spacing</label
+                ><output class="ctl-val" id="oTh">14px</output>
+              </div>
+              <input type="range" id="rTh" min="4" max="28" value="14" />
+            </div>
+            <div class="ctl" style="--ac: var(--border-c)">
+              <div class="ctl-top">
+                <label for="rThR">--lab-radius</label
+                ><output class="ctl-val" id="oThR">10px</output>
+              </div>
+              <input type="range" id="rThR" min="0" max="24" value="10" />
+            </div>
+            <div class="code-box"><pre id="codeTh"></pre></div>
+            <p class="side-note" id="thNote">
+              One JS call,
+              <span class="mono">setProperty('--lab-primary', '#f07f4f')</span>,
+              re-skins every consumer.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 06 · field notes ============ -->
+      <section id="notes" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">06 · field notes</p>
+          <h2>Cheat codes from lesson 32</h2>
+        </div>
+        <div class="notes-grid">
+          <article class="note-card" style="--nc: var(--border-c)">
+            <div class="note-demo">
+              <div class="demo-def">--primary: #58a6ff;</div>
+            </div>
+            <h3>define once, use everywhere</h3>
+            <p>
+              Double-dash names in <span class="mono">:root</span> give you a
+              global design-token file. Rename once, ship a new palette.
+            </p>
+            <p class="note-tip mono">↳ hover: the declaration glows</p>
+          </article>
+          <article class="note-card" style="--nc: var(--content-c)">
+            <div class="note-demo">
+              <div class="demo-use"><i></i><i></i><i></i></div>
+            </div>
+            <h3>var() resolves live</h3>
+            <p>
+              Values are looked up at render time, not at build time. Change the
+              variable, every consumer updates — no rebuild.
+            </p>
+            <p class="note-tip mono">↳ hover: the colors diverge</p>
+          </article>
+          <article class="note-card" style="--nc: var(--margin-c)">
+            <div class="note-demo">
+              <div class="demo-fb">var(--x, #f07f4f)</div>
+            </div>
+            <h3>fallback = safety net</h3>
+            <p>
+              The comma value is used when the variable is undefined. Lets
+              components work in contexts that don't provide every token.
+            </p>
+            <p class="note-tip mono">↳ hover: the fallback becomes the rule</p>
+          </article>
+          <article class="note-card" style="--nc: var(--padding-c)">
+            <div class="note-demo">
+              <div class="demo-th"><i></i><i></i></div>
+            </div>
+            <h3>themes = class swaps</h3>
+            <p>
+              Redefine variables on <span class="mono">.dark</span> (or any
+              scope) and every descendant re-skins. The whole dark-mode recipe
+              in one rule.
+            </p>
+            <p class="note-tip mono">↳ hover: light side pops</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ lesson nav ============ -->
+      <div class="lesson-nav reveal">
+        <div>
+          <span class="ln-status">✓ completed</span>
+          <h3>32 — CSS Custom Properties</h3>
+        </div>
+        <div class="ln-track" id="lnTrack"></div>
+        <div class="ln-next">
+          <span>up next</span>
+          <b>33 · CSS Math Functions</b>
+        </div>
+      </div>
+
+      <footer>
+        <span class="mono">drag things, break things, learn things.</span>
+        <span class="sp mono"
+          >45 lessons · lesson 32 · css custom properties</span
+        >
+      </footer>
+    </div>
+    <!-- /wrap -->
+
+    <script>
+      (() => {
+        const $ = (id) => document.getElementById(id);
+        const rule = (sel, decls) =>
+          `<span class="c-sel">${sel}</span> {\n${decls
+            .map((d) => {
+              const i = d.indexOf(":");
+              return `  <span class="c-prop">${d.slice(0, i)}</span>: <span class="c-val">${d.slice(i + 1).trim()}</span>;`;
+            })
+            .join("\n")}\n}`;
+        function range(el, out, fmt, cb) {
+          const f = () => {
+            const v = +el.value;
+            out.textContent = fmt(v);
+            const min = +el.min,
+              max = +el.max;
+            el.style.setProperty(
+              "--fill",
+              ((v - min) / (max - min)) * 100 + "%",
+            );
+            cb(v);
+          };
+          el.addEventListener("input", f);
+          f();
+        }
+
+        /* ---------- intro: live readouts ---------- */
+        function updateIntro() {
+          const v = getComputedStyle(document.documentElement)
+            .getPropertyValue("--content-c")
+            .trim();
+          $("v1").textContent = v || "#58a6ff";
+          $("sw1").style.background = v || "#58a6ff";
+        }
+        updateIntro();
+
+        /* ---------- 01 defining ---------- */
+        let userPrimary = "#58a6ff";
+        function renderDf() {
+          [$("dfC1"), $("dfC2"), $("dfC3")].forEach((el) =>
+            el.style.setProperty("--user-primary", userPrimary),
+          );
+          $("dfRead").innerHTML =
+            `--user-primary: <b>${userPrimary}</b> — one source, three consumers`;
+          $("codeDf").innerHTML =
+            rule(":root", [`--user-primary: ${userPrimary}`]) +
+            "\n" +
+            rule(".bordered", [`border: 2px solid var(--user-primary)`]) +
+            "\n" +
+            rule(".filled", [`background: var(--user-primary)`]) +
+            "\n" +
+            rule(".glow", [`box-shadow: inset 0 0 0 2px var(--user-primary)`]);
+        }
+        $("cDf").addEventListener("input", (e) => {
+          userPrimary = e.target.value;
+          renderDf();
+        });
+        renderDf();
+
+        /* ---------- 02 using ---------- */
+        let usColor = "#58a6ff",
+          usRad = 10;
+        function renderUs() {
+          [$("usC1"), $("usC2"), $("usC3")].forEach((el) => {
+            el.style.setProperty("--user-primary", usColor);
+            el.style.setProperty("--user-radius", usRad + "px");
+          });
+          $("usRad").textContent = usRad + "px";
+          $("usC3").style.borderRadius = usRad + "px";
+          $("codeUs").innerHTML =
+            rule(".component", [
+              `color: var(--user-primary)`,
+              `background: var(--user-primary)`,
+              `border-radius: var(--user-radius)`,
+            ]) +
+            `\n<span class="c-com">/* same var() call, any value type */</span>`;
+        }
+        $("cUs").addEventListener("input", (e) => {
+          usColor = e.target.value;
+          renderUs();
+        });
+        range(
+          $("rUs"),
+          $("oUs"),
+          (v) => v + "px",
+          (v) => {
+            usRad = v;
+            renderUs();
+          },
+        );
+        renderUs();
+
+        /* ---------- 03 cascade ---------- */
+        $("csGrid").addEventListener("click", (e) => {
+          const c = e.target.closest(".cs-card");
+          if (!c) return;
+          document
+            .querySelectorAll(".cs-card")
+            .forEach((x) => x.classList.remove("active"));
+          c.classList.add("active");
+          $("csRead").innerHTML =
+            `<b>${c.dataset.scope}</b> · <span class="mono">--scope-accent: ${c.dataset.color}</span> · the dot inherits the nearest`;
+          $("codeCs").innerHTML =
+            rule(":root", [`--scope-accent: ${c.dataset.color}`]) +
+            "\n" +
+            rule(".card .dot", [
+              `background: var(--scope-accent)  /* same decl, different value */`,
+            ]);
+        });
+        $("codeCs").innerHTML =
+          rule(":root", [`--scope-accent: #58a6ff`]) +
+          "\n" +
+          rule(".card.warm", [`--scope-accent: #f07f4f`]) +
+          "\n" +
+          rule(".card.mint", [`--scope-accent: #3ecf8e`]) +
+          "\n" +
+          rule(".dot", [`background: var(--scope-accent)`]);
+
+        /* ---------- 04 fallback ---------- */
+        let fbOn = false,
+          fbColor = "#58a6ff";
+        function renderFb() {
+          const wrap = $("fbWrap");
+          if (fbOn) wrap.style.setProperty("--user-brand", fbColor);
+          else wrap.style.removeProperty("--user-brand");
+          const display = fbOn ? fbColor : "#f07f4f";
+          wrap.style.borderColor = display;
+          wrap.querySelector(".fb-btn").style.background = display;
+          $("fbRead").innerHTML = fbOn
+            ? `--user-brand: <b>${fbColor}</b> (defined) — wins over fallback`
+            : `--user-brand is <b>undefined</b> · fallback <b>#f07f4f</b> active`;
+          $("codeFb").innerHTML =
+            (fbOn
+              ? rule(".wrapper", [`--user-brand: ${fbColor}`]) + "\n"
+              : "") +
+            rule(".widget", [
+              `border-color: var(--user-brand, #f07f4f)`,
+              `/* fallback after the comma */`,
+            ]);
+        }
+        $("fbSwitch").addEventListener("click", () => {
+          fbOn = !fbOn;
+          $("fbSwitch").classList.toggle("on", fbOn);
+          renderFb();
+        });
+        $("cFb").addEventListener("input", (e) => {
+          fbColor = e.target.value;
+          if (fbOn) renderFb();
+        });
+        renderFb();
+
+        /* ---------- 05 theming ---------- */
+        const DARK = {
+          bg: "#0d1220",
+          surface: "#121826",
+          line: "#222c40",
+          text: "#e9eef7",
+          muted: "#8d9ab0",
+        };
+        const LIGHT = {
+          bg: "#f7f4ee",
+          surface: "#ffffff",
+          line: "#dcd7cc",
+          text: "#1c1f26",
+          muted: "#6b7280",
+        };
+        let thDark = true,
+          thPrimary = "#58a6ff",
+          thSpace = 14,
+          thRad = 10;
+        function renderTh() {
+          const lab = $("themeLab");
+          const pal = thDark ? DARK : LIGHT;
+          lab.style.setProperty("--lab-bg", pal.bg);
+          lab.style.setProperty("--lab-surface", pal.surface);
+          lab.style.setProperty("--lab-line", pal.line);
+          lab.style.setProperty("--lab-text", pal.text);
+          lab.style.setProperty("--lab-muted", pal.muted);
+          lab.style.setProperty("--lab-primary", thPrimary);
+          lab.style.setProperty("--lab-spacing", thSpace + "px");
+          lab.style.setProperty("--lab-radius", thRad + "px");
+          $("thRead").innerHTML =
+            `theme: <b>${thDark ? "dark" : "light"}</b> · primary: <b>${thPrimary}</b> · spacing: <b>${thSpace}px</b> · radius: <b>${thRad}px</b>`;
+          $("codeTh").innerHTML = rule(".theme-lab", [
+            `--lab-bg: ${pal.bg}`,
+            `--lab-surface: ${pal.surface}`,
+            `--lab-line: ${pal.line}`,
+            `--lab-text: ${pal.text}`,
+            `--lab-muted: ${pal.muted}`,
+            `--lab-primary: ${thPrimary}`,
+            `--lab-spacing: ${thSpace}px`,
+            `--lab-radius: ${thRad}px`,
+          ]);
+        }
+        $("thDark").addEventListener("click", () => {
+          thDark = !thDark;
+          $("thDark").classList.toggle("on", thDark);
+          renderTh();
+        });
+        $("cTh").addEventListener("input", (e) => {
+          thPrimary = e.target.value;
+          renderTh();
+        });
+        range(
+          $("rTh"),
+          $("oTh"),
+          (v) => v + "px",
+          (v) => {
+            thSpace = v;
+            renderTh();
+          },
+        );
+        range(
+          $("rThR"),
+          $("oThR"),
+          (v) => v + "px",
+          (v) => {
+            thRad = v;
+            renderTh();
+          },
+        );
+        renderTh();
+
+        /* ---------- lesson track ---------- */
+        const t = $("lnTrack");
+        for (let i = 0; i < 45; i++) {
+          const s = document.createElement("span");
+          s.className = "tick" + (i < 32 ? " done" : "");
+          s.title = "lesson " + (i + 1);
+          t.appendChild(s);
+        }
+
+        /* ---------- reveal ---------- */
+        const io = new IntersectionObserver(
+          (es) =>
+            es.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                io.unobserve(e.target);
+              }
+            }),
+          { threshold: 0.12 },
+        );
+        document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      })();
+    </script>
+  </body>
+</html>

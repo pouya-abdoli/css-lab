@@ -1,0 +1,1752 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modern UI Effects — Lesson 31</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' fill='none' stroke='%23f07f4f' stroke-width='2'/%3E%3Crect x='8' y='8' width='16' height='16' fill='none' stroke='%23f2c14e' stroke-width='2'/%3E%3Crect x='13' y='13' width='6' height='6' fill='%2358a6ff'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0e15;
+        --panel: #121826;
+        --panel2: #0d1220;
+        --ink: #10141d;
+        --line: #222c40;
+        --line2: #31405e;
+        --text: #e9eef7;
+        --muted: #8d9ab0;
+        --faint: #5b6a84;
+        --margin-c: #f07f4f;
+        --margin-bg: rgba(240, 127, 79, 0.14);
+        --border-c: #f2c14e;
+        --border-bg: rgba(242, 193, 78, 0.16);
+        --padding-c: #3ecf8e;
+        --padding-bg: rgba(62, 207, 142, 0.14);
+        --content-c: #58a6ff;
+        --content-bg: rgba(88, 166, 255, 0.17);
+        --pink: #ff4f8b;
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: dark;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 15px;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+      ::selection {
+        background: rgba(88, 166, 255, 0.35);
+      }
+      .mono {
+        font-family: var(--mono);
+      }
+      section {
+        scroll-margin-top: 76px;
+      }
+      b {
+        font-weight: 600;
+      }
+
+      .bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            700px 460px at 12% -6%,
+            rgba(242, 193, 78, 0.07),
+            transparent 60%
+          ),
+          radial-gradient(
+            760px 520px at 92% 22%,
+            rgba(88, 166, 255, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            600px 480px at 40% 105%,
+            rgba(62, 207, 142, 0.05),
+            transparent 60%
+          );
+      }
+      .bg::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(233, 238, 247, 0.035) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(233, 238, 247, 0.035) 1px,
+            transparent 1px
+          );
+        background-size: 28px 28px;
+        mask-image: radial-gradient(
+          ellipse 120% 90% at 50% 0%,
+          #000 40%,
+          transparent 100%
+        );
+      }
+      .bg .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.5;
+        animation: drift 26s ease-in-out infinite alternate;
+      }
+      .bg .g1 {
+        width: 420px;
+        height: 420px;
+        left: -120px;
+        top: 30%;
+        background: rgba(240, 127, 79, 0.1);
+      }
+      .bg .g2 {
+        width: 460px;
+        height: 460px;
+        right: -140px;
+        top: 60%;
+        background: rgba(88, 166, 255, 0.1);
+        animation-delay: -12s;
+      }
+      @keyframes drift {
+        from {
+          transform: translateY(-30px);
+        }
+        to {
+          transform: translateY(40px);
+        }
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes ldBounce {
+        0%,
+        100% {
+          transform: translateY(0);
+          opacity: 0.4;
+        }
+        50% {
+          transform: translateY(-12px);
+          opacity: 1;
+        }
+      }
+      @keyframes ldSlide {
+        0% {
+          left: -40%;
+        }
+        100% {
+          left: 100%;
+        }
+      }
+      @keyframes shimmer {
+        to {
+          background-position: -200% 0;
+        }
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 12px clamp(16px, 4vw, 44px);
+        background: rgba(11, 14, 21, 0.92);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar nav {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .topbar nav a {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 6px 11px;
+        border-radius: 999px;
+        transition: 0.2s;
+      }
+      .topbar nav a:hover {
+        color: var(--text);
+        background: #161d2c;
+      }
+      .lesson-tag {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--border-c);
+        border: 1px dashed rgba(242, 193, 78, 0.45);
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .wrap {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: 0 clamp(16px, 4vw, 44px);
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        padding: clamp(20px, 4vh, 48px) 0 clamp(30px, 5vh, 56px);
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--padding-c);
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(2.3rem, 5.2vw, 3.7rem);
+        line-height: 1.06;
+        letter-spacing: -0.02em;
+      }
+      .word-style {
+        display: inline-block;
+        padding: 0.02em 0.22em;
+        background: var(--pink);
+        border: 0.06em solid var(--pink);
+        border-radius: 0.14em;
+        color: #fff;
+        transition: transform 0.3s;
+        cursor: default;
+      }
+      .word-style:hover {
+        transform: rotate(-2deg) scale(1.03);
+      }
+      .lede {
+        color: var(--muted);
+        max-width: 56ch;
+        margin-top: 18px;
+        font-size: 1.05rem;
+      }
+      .lede b {
+        color: var(--text);
+      }
+      .css-full {
+        display: inline-block;
+        margin-top: 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--faint);
+        letter-spacing: 0.08em;
+      }
+      .intro-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 26px;
+        display: grid;
+        place-items: center;
+        gap: 16px;
+        box-shadow: 0 30px 60px -40px rgba(0, 0, 0, 0.8);
+        width: 100%;
+      }
+      .ix-zone {
+        width: 120px;
+        height: 120px;
+        display: grid;
+        place-items: center;
+      }
+      .ix-el {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+      }
+      .ix-el.spin {
+        border-radius: 50%;
+        border: 5px solid var(--line2);
+        border-top-color: var(--content-c);
+        animation: spin 1s linear infinite;
+      }
+      .ix-el.shimmer {
+        background: linear-gradient(
+          90deg,
+          #182136 25%,
+          #24314a 50%,
+          #182136 75%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.1s linear infinite;
+      }
+      .ix-el.lift {
+        background: var(--content-c);
+        animation: ixLift 1.6s ease-in-out infinite;
+      }
+      @keyframes ixLift {
+        0%,
+        100% {
+          transform: translateY(0);
+          box-shadow: none;
+        }
+        50% {
+          transform: translateY(-14px);
+          box-shadow: 0 18px 30px -12px rgba(88, 166, 255, 0.5);
+        }
+      }
+      .ix-el.pop {
+        background: var(--padding-c);
+        animation: ixPop 1.6s cubic-bezier(0.34, 1.5, 0.4, 1) infinite;
+      }
+      @keyframes ixPop {
+        0% {
+          transform: scale(0.5);
+          opacity: 0;
+        }
+        60%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+      .intro-fmt {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--content-c);
+        background: var(--ink);
+        border: 1px solid var(--line2);
+        border-radius: 9px;
+        padding: 7px 16px;
+        min-height: 36px;
+        text-align: center;
+      }
+      .imode {
+        font-size: 11px;
+        color: var(--faint);
+        letter-spacing: 0.1em;
+      }
+
+      .sec {
+        padding: clamp(36px, 6vh, 64px) 0;
+      }
+      .sec-head {
+        margin-bottom: 26px;
+        max-width: 72ch;
+      }
+      .sec-head h2 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+        letter-spacing: -0.015em;
+        line-height: 1.15;
+      }
+      .sec-head .lede {
+        margin-top: 10px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 18px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .panel-head h3 {
+        font-family: var(--disp);
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dots i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dots i:nth-child(1) {
+        background: #f07f4f;
+      }
+      .dots i:nth-child(2) {
+        background: #f2c14e;
+      }
+      .dots i:nth-child(3) {
+        background: #3ecf8e;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.85;
+        overflow-x: auto;
+      }
+      .c-sel {
+        color: #7fe0b0;
+      }
+      .c-prop {
+        color: #8ab4ff;
+      }
+      .c-val {
+        color: #f2c14e;
+      }
+      .c-com {
+        color: #5b6a84;
+      }
+      .grp {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+
+      .pick-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 18px;
+        align-items: stretch;
+      }
+      .stage-wrap {
+        padding: 28px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 360px;
+        gap: 16px;
+        width: 100%;
+      }
+      .side {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .sel-chip {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .sel-chip:hover {
+        color: var(--text);
+        border-color: var(--content-c);
+        transform: translateY(-2px);
+      }
+      .sel-chip.on {
+        color: #0e1017;
+        background: var(--content-c);
+        border-color: var(--content-c);
+        font-weight: 600;
+      }
+      .ghost-btn {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--faint);
+        background: none;
+        border: 1px dashed var(--line2);
+        border-radius: 8px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .ghost-btn:hover {
+        color: var(--content-c);
+        border-color: var(--content-c);
+      }
+      .code-box {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .code-box pre {
+        min-height: 0;
+        font-size: 12px;
+      }
+      .side-note {
+        font-size: 12px;
+        color: var(--faint);
+      }
+      .read {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 14px;
+        text-align: center;
+        width: 100%;
+        max-width: 440px;
+      }
+      .read b {
+        color: var(--text);
+      }
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        outline: none;
+        cursor: pointer;
+        background: linear-gradient(
+          90deg,
+          var(--ac) var(--fill, 50%),
+          #232c40 var(--fill, 50%)
+        );
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        transition: transform 0.15s;
+      }
+      input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.15);
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+      }
+      .ctl {
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 7px 11px;
+        transition: 0.2s;
+      }
+      .ctl:hover {
+        background: #101725;
+        border-color: var(--line);
+      }
+      .ctl-top {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+      .ctl-top label {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text);
+      }
+      .ctl-val {
+        margin-left: auto;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--ac);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 2px 9px;
+      }
+
+      /* 01 hover card */
+      .hv-card {
+        width: 100%;
+        max-width: 300px;
+        background: var(--panel2);
+        border: 1px solid var(--line2);
+        border-radius: 14px;
+        padding: 14px;
+        transition:
+          transform 0.3s ease,
+          box-shadow 0.3s ease,
+          border-color 0.3s;
+        cursor: pointer;
+      }
+      .hv-card:hover,
+      .hv-card:focus-within {
+        transform: translateY(-6px);
+        box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.7);
+        border-color: var(--content-c);
+      }
+      .hv-img {
+        height: 90px;
+        border-radius: 10px;
+        background: linear-gradient(135deg, var(--content-c), var(--padding-c));
+        margin-bottom: 10px;
+        position: relative;
+        overflow: hidden;
+      }
+      .hv-img::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          105deg,
+          transparent 40%,
+          rgba(255, 255, 255, 0.5) 50%,
+          transparent 60%
+        );
+        transform: translateX(-130%);
+        transition: transform 0.6s;
+      }
+      .hv-card:hover .hv-img::after {
+        transform: translateX(130%);
+      }
+      .hv-title {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: 15px;
+        color: var(--text);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .hv-title span {
+        transition: transform 0.3s;
+        color: var(--content-c);
+      }
+      .hv-card:hover .hv-title span {
+        transform: translateX(5px);
+      }
+      .hv-text {
+        font-size: 11.5px;
+        color: var(--muted);
+        margin: 6px 0 10px;
+      }
+      .hv-link {
+        position: relative;
+        font: 700 10px var(--mono);
+        color: var(--padding-c);
+        width: max-content;
+      }
+      .hv-link::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -3px;
+        height: 2px;
+        width: 100%;
+        background: var(--padding-c);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s;
+      }
+      .hv-card:hover .hv-link::after {
+        transform: scaleX(1);
+      }
+
+      /* 02 loaders */
+      .ld-stage {
+        height: 150px;
+        display: grid;
+        place-items: center;
+        width: 100%;
+        max-width: 440px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+      }
+      .ld-spin {
+        width: 54px;
+        height: 54px;
+        border-radius: 50%;
+        border: 5px solid var(--line2);
+        border-top-color: var(--content-c);
+        animation: spin var(--spd, 1s) linear infinite;
+      }
+      .ld-dots {
+        display: flex;
+        gap: 9px;
+      }
+      .ld-dots i {
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        background: var(--content-c);
+        animation: ldBounce var(--spd, 1s) ease-in-out infinite;
+      }
+      .ld-dots i:nth-child(2) {
+        animation-delay: calc(var(--spd, 1s) / 6);
+      }
+      .ld-dots i:nth-child(3) {
+        animation-delay: calc(var(--spd, 1s) / 3);
+      }
+      .ld-bar {
+        width: 70%;
+        height: 6px;
+        border-radius: 3px;
+        background: var(--line);
+        overflow: hidden;
+        position: relative;
+      }
+      .ld-bar i {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 40%;
+        border-radius: 3px;
+        background: var(--content-c);
+        animation: ldSlide var(--spd, 1.2s) ease-in-out infinite;
+      }
+
+      /* 03 skeleton */
+      .sk-wrap {
+        width: 100%;
+        max-width: 320px;
+        background: var(--panel2);
+        border: 1px solid var(--line2);
+        border-radius: 14px;
+        padding: 14px;
+        min-height: 190px;
+      }
+      .sk {
+        background: linear-gradient(
+          90deg,
+          #182136 25%,
+          #24314a 50%,
+          #182136 75%
+        );
+        background-size: 200% 100%;
+        animation: shimmer 1.1s linear infinite;
+        border-radius: 6px;
+      }
+      .sk-img {
+        height: 84px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+      }
+      .sk-line {
+        height: 10px;
+        margin-bottom: 8px;
+      }
+      .sk-line.w60 {
+        width: 60%;
+      }
+      .sk-real {
+        display: none;
+      }
+      .sk-wrap.loaded .sk {
+        display: none;
+      }
+      .sk-wrap.loaded .sk-real {
+        display: block;
+        animation: fadeIn 0.45s ease;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      .sk-real .hv-img {
+        margin-bottom: 10px;
+      }
+      .sk-real h5 {
+        font-family: var(--disp);
+        font-size: 14px;
+        color: var(--text);
+        margin-bottom: 6px;
+      }
+      .sk-real p {
+        font-size: 11.5px;
+        color: var(--muted);
+      }
+
+      /* 04 modal */
+      .md-stage {
+        position: relative;
+        width: 100%;
+        max-width: 440px;
+        height: 250px;
+        background: var(--panel2);
+        border: 1px solid var(--line2);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .md-lines {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+      }
+      .md-lines i {
+        height: 9px;
+        border-radius: 3px;
+        background: #232c40;
+      }
+      .md-lines i:nth-child(3) {
+        width: 70%;
+      }
+      .md-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(5, 8, 14, 0.65);
+        display: grid;
+        place-items: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s;
+      }
+      .md-stage.open .md-overlay {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .md-modal {
+        width: 74%;
+        max-width: 280px;
+        background: var(--panel);
+        border: 1px solid var(--line2);
+        border-radius: 14px;
+        padding: 16px;
+        opacity: 0;
+        transition:
+          transform 0.35s cubic-bezier(0.3, 1.4, 0.4, 1),
+          opacity 0.25s;
+        transform: var(--md-from, scale(0.94));
+      }
+      .md-stage.open .md-modal {
+        opacity: 1;
+        transform: none;
+      }
+      .md-modal h5 {
+        font-family: var(--disp);
+        font-size: 14px;
+        color: var(--text);
+        margin-bottom: 6px;
+      }
+      .md-modal p {
+        font-size: 11px;
+        color: var(--muted);
+        margin-bottom: 12px;
+      }
+      .md-x {
+        font: 700 10px var(--mono);
+        color: #0e1017;
+        background: var(--margin-c);
+        border: none;
+        border-radius: 7px;
+        padding: 7px 14px;
+        cursor: pointer;
+      }
+
+      /* 05 dropdown */
+      .dd-stage {
+        position: relative;
+        width: 100%;
+        max-width: 440px;
+        height: 250px;
+        background: var(--panel2);
+        border: 1px solid var(--line2);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .dd-btn {
+        position: absolute;
+        top: 18px;
+        left: 20px;
+        font: 700 11px var(--mono);
+        color: #0e1017;
+        background: var(--content-c);
+        border: none;
+        border-radius: 8px;
+        padding: 9px 16px;
+        cursor: pointer;
+      }
+      .dd-menu {
+        position: absolute;
+        top: 56px;
+        left: 20px;
+        width: 190px;
+        background: var(--panel);
+        border: 1px solid var(--line2);
+        border-radius: 12px;
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        opacity: 0;
+        pointer-events: none;
+        transform-origin: top center;
+        transition:
+          transform 0.25s ease,
+          opacity 0.2s ease,
+          clip-path 0.3s ease;
+        transform: scale(0.92) translateY(-6px);
+      }
+      .dd-stage.open .dd-menu {
+        opacity: 1;
+        pointer-events: auto;
+        transform: none;
+        clip-path: inset(0 0 0 0 round 12px);
+      }
+      .dd-menu.v-slide {
+        transform: translateY(-14px);
+      }
+      .dd-menu.v-clip {
+        transform: none;
+        clip-path: inset(0 0 100% 0 round 12px);
+      }
+      .dd-item {
+        font: 11px var(--mono);
+        color: var(--muted);
+        padding: 8px 10px;
+        border-radius: 8px;
+        transition: 0.15s;
+        cursor: pointer;
+      }
+      .dd-item:hover {
+        background: var(--content-bg);
+        color: var(--text);
+      }
+
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      @media (min-width: 1180px) {
+        .notes-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media (max-width: 640px) {
+        .notes-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .note-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.3s,
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+      .note-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--nc);
+        opacity: 0.85;
+      }
+      .note-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--nc);
+        box-shadow: 0 24px 44px -28px rgba(0, 0, 0, 0.85);
+      }
+      .note-card h3 {
+        font-family: var(--mono);
+        font-size: 15px;
+        color: var(--nc);
+        margin-bottom: 8px;
+      }
+      .note-card p {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .note-tip {
+        margin-top: 12px;
+        font-size: 11px;
+        color: var(--faint);
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+      }
+      .note-demo {
+        height: 104px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        overflow: hidden;
+      }
+      .demo-hv {
+        width: 60px;
+        height: 44px;
+        border-radius: 10px;
+        background: var(--panel2);
+        border: 1px solid var(--line2);
+        transition: 0.3s;
+      }
+      .note-card:hover .demo-hv {
+        transform: translateY(-6px);
+        border-color: var(--content-c);
+        box-shadow: 0 14px 24px -10px rgba(88, 166, 255, 0.4);
+      }
+      .demo-ld {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        border: 4px solid var(--line2);
+        border-top-color: var(--padding-c);
+      }
+      .note-card:hover .demo-ld {
+        animation: spin 0.8s linear infinite;
+      }
+      .demo-sk {
+        width: 70%;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .demo-sk i {
+        height: 10px;
+        border-radius: 4px;
+        background: linear-gradient(
+          90deg,
+          #d0a748 25%,
+          #24314a 50%,
+          #182136 75%
+        );
+        background-size: 200% 100%;
+      }
+      .note-card:hover .demo-sk i {
+        animation: shimmer 1s linear infinite;
+      }
+      .demo-md {
+        width: 56px;
+        height: 40px;
+        border-radius: 9px;
+        background: #cf6f48;
+        border: 1px solid var(--line2);
+      }
+      .note-card:hover .demo-md {
+        animation: ixPop 0.9s cubic-bezier(0.3, 1.5, 0.4, 1);
+      }
+
+      .lesson-nav {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px clamp(18px, 3vw, 28px);
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+        align-items: center;
+        margin-top: 40px;
+      }
+      .ln-status {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--padding-c);
+        border: 1px solid rgba(62, 207, 142, 0.45);
+        border-radius: 999px;
+        padding: 3px 10px;
+      }
+      .lesson-nav h3 {
+        font-family: var(--disp);
+        font-size: 17px;
+        margin-top: 8px;
+      }
+      .ln-track {
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .tick {
+        width: 7px;
+        height: 15px;
+        border-radius: 2px;
+        background: #212a3e;
+        transition: 0.2s;
+      }
+      .tick.done {
+        background: var(--padding-c);
+        box-shadow: 0 0 8px rgba(62, 207, 142, 0.55);
+      }
+      .tick:hover {
+        background: var(--line2);
+      }
+      .ln-next {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        text-align: right;
+      }
+      .ln-next span {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .ln-next b {
+        font-family: var(--disp);
+        font-size: 15px;
+        color: var(--text);
+      }
+      footer {
+        border-top: 1px solid var(--line);
+        margin-top: 20px;
+        padding: 30px 0 44px;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+        color: var(--faint);
+        font-size: 12.5px;
+      }
+      footer .mono {
+        font-size: 11.5px;
+      }
+      footer .sp {
+        margin-left: auto;
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+      @media (max-width: 1020px) {
+        .intro {
+          grid-template-columns: 1fr;
+        }
+        .pick-grid {
+          grid-template-columns: 1fr;
+        }
+        .lesson-nav {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .ln-next {
+          align-items: center;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg">
+      <span class="glow g1"></span><span class="glow g2"></span>
+    </div>
+
+    <header class="topbar">
+      <span class="lesson-tag">lesson 31 / 45</span>
+      <nav>
+        <a href="#hover">hover</a>
+        <a href="#loading">loading</a>
+        <a href="#skeleton">skeleton</a>
+        <a href="#modal">modal</a>
+        <a href="#dropdown">dropdown</a>
+        <a href="#notes">cheat-codes</a>
+      </nav>
+    </header>
+
+    <div class="wrap">
+      <!-- ============ intro ============ -->
+      <section class="intro">
+        <div>
+          <p class="eyebrow">lesson 31 · interactive</p>
+          <h1>Micro-motion is the <span class="word-style">polish</span>.</h1>
+          <p class="lede">
+            The difference between "a page" and "a product" is a layer of small,
+            purposeful motion: hovers that acknowledge, loaders that reassure,
+            skeletons that pre-tell, modals that arrive. All of it is a few
+            lines of CSS.
+          </p>
+          <span class="css-full">F · EEL · N · OT · F · LASH</span>
+        </div>
+        <div class="intro-panel">
+          <div class="ix-zone"><div class="ix-el lift" id="ixEl"></div></div>
+          <span class="intro-fmt" id="ixFmt">hover lift + shadow</span>
+          <p class="imode mono">five effects, one loop…</p>
+        </div>
+      </section>
+
+      <!-- ============ 01 · hover animations ============ -->
+      <section id="hover" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">01 · hover animations</p>
+          <h2>Acknowledge the cursor</h2>
+          <p class="lede">
+            One card, four layered responses: lift + shadow, a light sweep
+            across the image, the arrow nudging, the underline drawing. Hover
+            (or Tab) — every layer answers. Restraint is the skill: 200–300ms,
+            transform &amp; opacity only.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>hover me — slowly</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="hv-card" tabindex="0">
+                <div class="hv-img"></div>
+                <div class="hv-title">Aurora blend <span>→</span></div>
+                <p class="hv-text">
+                  small-batch beans, roasted tuesday, shipped in 24 hours.
+                </p>
+                <span class="hv-link">view roast profile</span>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="code-box"><pre id="codeHv"></pre></div>
+            <p class="side-note">
+              The sweep is a <span class="mono">::after</span> gradient
+              translated across. The underline is
+              <span class="mono">scaleX(0→1)</span> from the left. Nothing
+              animates width, height or layout.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 02 · loading animations ============ -->
+      <section id="loading" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">02 · loading animations</p>
+          <h2>Reassure while waiting</h2>
+          <p class="lede">
+            Three classics: the <b>spinner</b> (border trick),
+            <b>pulsing dots</b>, and the <b>indeterminate bar</b>. Speed matters
+            — drag it. Under ~300ms per cycle feels nervous; over 1.5s feels
+            dead.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>pick a loader</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="ld-stage" id="ldStage">
+                <div class="ld-spin" id="ldSpin"></div>
+                <div class="ld-dots" id="ldDots" style="display: none">
+                  <i></i><i></i><i></i>
+                </div>
+                <div class="ld-bar" id="ldBar" style="display: none">
+                  <i></i>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="chips" id="ldChips">
+              <button class="sel-chip on" data-v="spin">spinner</button>
+              <button class="sel-chip" data-v="dots">dots</button>
+              <button class="sel-chip" data-v="bar">bar</button>
+            </div>
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rSpd">speed (1 cycle)</label
+                ><output class="ctl-val" id="oSpd">1s</output>
+              </div>
+              <input
+                type="range"
+                id="rSpd"
+                min="0.4"
+                max="2"
+                step="0.1"
+                value="1"
+              />
+            </div>
+            <div class="code-box"><pre id="codeLd"></pre></div>
+            <p class="side-note">
+              The spinner is just a circle with one colored border-edge, rotated
+              forever. Four lines of CSS, infinite reassurance.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 03 · skeleton loaders ============ -->
+      <section id="skeleton" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">03 · skeleton loaders</p>
+          <h2>Show the shape of what's coming</h2>
+          <p class="lede">
+            A skeleton pre-draws the layout in shimmering grey, so the arrival
+            of content feels like <b>filling in</b>, not jumping. Press fetch:
+            skeleton shimmers for 1.2s, then the real card fades in on the same
+            grid.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>fetch it</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="sk-wrap" id="skWrap">
+                <div class="sk sk-img"></div>
+                <div class="sk sk-line"></div>
+                <div class="sk sk-line w60"></div>
+                <div class="sk-real">
+                  <div class="hv-img"></div>
+                  <h5>Aurora blend</h5>
+                  <p>
+                    small-batch beans, roasted tuesday, shipped in 24 hours.
+                  </p>
+                </div>
+              </div>
+              <div class="chips">
+                <button class="ghost-btn" id="skFetch">
+                  ⚡ simulate fetch (1.2s)
+                </button>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="code-box"><pre id="codeSk"></pre></div>
+            <p class="side-note">
+              The shimmer is a moving gradient:
+              <span class="mono">background-size: 200%</span> + animated
+              <span class="mono">background-position</span>. Match skeleton
+              blocks to the real content's geometry — that's the whole trick.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 04 · modal animations ============ -->
+      <section id="modal" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">04 · modal animations</p>
+          <h2>Arrive with intention</h2>
+          <p class="lede">
+            Overlay fades while the panel enters — scale, slide or zoom. Open
+            and close it; notice closing is faster (exits should never linger).
+            Animate <b>transform + opacity</b> only.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>open the modal</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="md-stage" id="mdStage">
+                <div class="md-lines"><i></i><i></i><i></i><i></i></div>
+                <div class="md-overlay">
+                  <div class="md-modal" id="mdModal">
+                    <h5>Roast reminder</h5>
+                    <p>tuesday's batch drops in 3 hours. want a heads-up?</p>
+                    <button class="md-x" id="mdClose">close ✕</button>
+                  </div>
+                </div>
+              </div>
+              <div class="chips">
+                <button class="ghost-btn" id="mdOpen">◱ open modal</button>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="chips" id="mdChips">
+              <button class="sel-chip on" data-v="scale(.94)">
+                fade + scale
+              </button>
+              <button class="sel-chip" data-v="translateY(26px)">
+                slide up
+              </button>
+              <button class="sel-chip" data-v="scale(.6)">zoom</button>
+            </div>
+            <div class="code-box"><pre id="codeMd"></pre></div>
+            <p class="side-note">
+              Entry 300–350ms with a slight overshoot bezier; exit ~200ms, no
+              overshoot. The asymmetry is what makes it feel professional.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 05 · dropdown animations ============ -->
+      <section id="dropdown" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">05 · dropdown animations</p>
+          <h2>Grow from the trigger</h2>
+          <p class="lede">
+            A menu should unfold <b>from its button</b>:
+            <span class="mono">transform-origin: top</span> + scale/opacity, a
+            slide, or a clip-path wipe. Toggle it and switch the entrance — the
+            origin is what sells it.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>toggle the menu</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="dd-stage" id="ddStage">
+                <button class="dd-btn" id="ddBtn">menu ▾</button>
+                <div class="dd-menu" id="ddMenu">
+                  <span class="dd-item">espresso</span>
+                  <span class="dd-item">filter</span>
+                  <span class="dd-item">cold brew</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="chips" id="ddChips">
+              <button class="sel-chip on" data-v="scale">scale</button>
+              <button class="sel-chip" data-v="slide">slide</button>
+              <button class="sel-chip" data-v="clip">clip wipe</button>
+            </div>
+            <div class="code-box"><pre id="codeDd"></pre></div>
+            <p class="side-note">
+              Keep it under 250ms — menus are utility, not theater. And always
+              animate out too, just faster.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 06 · field notes ============ -->
+      <section id="notes" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">06 · field notes</p>
+          <h2>Cheat codes from lesson 31</h2>
+        </div>
+        <div class="notes-grid">
+          <article class="note-card" style="--nc: var(--content-c)">
+            <div class="note-demo"><div class="demo-hv"></div></div>
+            <h3>hover = feedback</h3>
+            <p>
+              Lift + shadow + one accent move, 200–300ms, transform/opacity
+              only. More than that is circus; less feels dead.
+            </p>
+            <p class="note-tip mono">↳ hover: it lifts</p>
+          </article>
+          <article class="note-card" style="--nc: var(--padding-c)">
+            <div class="note-demo"><div class="demo-ld"></div></div>
+            <h3>loaders reassure</h3>
+            <p>
+              Spinner for unknown waits, bar for known progress, dots for
+              compact spaces. ~1s per cycle reads calm.
+            </p>
+            <p class="note-tip mono">↳ hover: it spins</p>
+          </article>
+          <article class="note-card" style="--nc: var(--border-c)">
+            <div class="note-demo">
+              <div class="demo-sk"><i></i><i></i></div>
+            </div>
+            <h3>skeletons pre-tell</h3>
+            <p>
+              Grey blocks matching the incoming layout + a shimmer sweep.
+              Content arrival becomes "filling in", not reflow shock.
+            </p>
+            <p class="note-tip mono">↳ hover: the shimmer runs</p>
+          </article>
+          <article class="note-card" style="--nc: var(--margin-c)">
+            <div class="note-demo"><div class="demo-md"></div></div>
+            <h3>enter slow, exit fast</h3>
+            <p>
+              Modals &amp; menus: ~300ms in with personality, ~200ms out
+              without. Origins at the trigger make growth feel physical.
+            </p>
+            <p class="note-tip mono">↳ hover: it pops in</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ lesson nav ============ -->
+      <div class="lesson-nav reveal">
+        <div>
+          <span class="ln-status">✓ completed</span>
+          <h3>31 — Modern UI Effects</h3>
+        </div>
+        <div class="ln-track" id="lnTrack"></div>
+        <div class="ln-next">
+          <span>up next</span>
+          <b>32 · CSS Custom Properties</b>
+        </div>
+      </div>
+
+      <footer>
+        <span class="mono">drag things, break things, learn things.</span>
+        <span class="sp mono">45 lessons · lesson 31 · modern ui effects</span>
+      </footer>
+    </div>
+    <!-- /wrap -->
+
+    <script>
+      (() => {
+        const $ = (id) => document.getElementById(id);
+        const rule = (sel, decls) =>
+          `<span class="c-sel">${sel}</span> {\n${decls
+            .map((d) => {
+              const i = d.indexOf(":");
+              return `  <span class="c-prop">${d.slice(0, i)}</span>: <span class="c-val">${d.slice(i + 1).trim()}</span>;`;
+            })
+            .join("\n")}\n}`;
+        function range(el, out, fmt, cb) {
+          const f = () => {
+            const v = +el.value;
+            out.textContent = fmt(v);
+            const min = +el.min,
+              max = +el.max;
+            el.style.setProperty(
+              "--fill",
+              ((v - min) / (max - min)) * 100 + "%",
+            );
+            cb(v);
+          };
+          el.addEventListener("input", f);
+          f();
+        }
+        function chipGroup(box, cb) {
+          box.addEventListener("click", (e) => {
+            const c = e.target.closest(".sel-chip");
+            if (!c) return;
+            box
+              .querySelectorAll(".sel-chip")
+              .forEach((x) => x.classList.remove("on"));
+            c.classList.add("on");
+            cb(c.dataset.v);
+          });
+        }
+
+        /* ---------- intro cycle ---------- */
+        const IX = [
+          { c: "lift", l: "hover lift + shadow" },
+          { c: "spin", l: "spinner — border trick" },
+          { c: "shimmer", l: "skeleton shimmer" },
+          { c: "pop", l: "modal pop-in" },
+        ];
+        let ii = 0;
+        setInterval(() => {
+          const I = IX[ii];
+          $("ixEl").className = "ix-el " + I.c;
+          $("ixFmt").textContent = I.l;
+          ii = (ii + 1) % IX.length;
+        }, 1800);
+
+        /* ---------- 01 hover code ---------- */
+        $("codeHv").innerHTML =
+          rule(".card:hover", [
+            `transform: translateY(-6px)`,
+            `box-shadow: 0 18px 40px -18px rgb(0 0 0 / .7)`,
+          ]) +
+          "\n" +
+          rule(".card .img::after", [
+            `transform: translateX(130%)  /* sweep */`,
+          ]) +
+          "\n" +
+          rule(".card .link::after", [`transform: scaleX(1)  /* draw */`]);
+
+        /* ---------- 02 loaders ---------- */
+        let ldType = "spin",
+          ldSpd = 1;
+        const LD_CODE = {
+          spin: () =>
+            rule(".spinner", [
+              `width: 54px; height: 54px`,
+              `border: 5px solid #31405e`,
+              `border-top-color: #58a6ff`,
+              `border-radius: 50%`,
+              `animation: spin ${ldSpd}s linear infinite`,
+            ]),
+          dots: () =>
+            rule(".dot", [
+              `animation: bounce ${ldSpd}s ease-in-out infinite`,
+              `/* stagger via animation-delay */`,
+            ]),
+          bar: () =>
+            rule(".bar i", [`animation: slide ${ldSpd}s ease-in-out infinite`]),
+        };
+        function renderLd() {
+          $("ldSpin").style.display = ldType === "spin" ? "block" : "none";
+          $("ldDots").style.display = ldType === "dots" ? "flex" : "none";
+          $("ldBar").style.display = ldType === "bar" ? "block" : "none";
+          $("ldStage").style.setProperty("--spd", ldSpd + "s");
+          $("codeLd").innerHTML = LD_CODE[ldType]();
+        }
+        chipGroup($("ldChips"), (v) => {
+          ldType = v;
+          renderLd();
+        });
+        range(
+          $("rSpd"),
+          $("oSpd"),
+          (v) => v + "s",
+          (v) => {
+            ldSpd = v;
+            renderLd();
+          },
+        );
+
+        /* ---------- 03 skeleton ---------- */
+        $("codeSk").innerHTML = rule(".skeleton", [
+          `background: linear-gradient(90deg,`,
+          `  #182136 25%, #24314a 50%, #182136 75%)`,
+          `background-size: 200% 100%`,
+          `animation: shimmer 1.1s linear infinite`,
+        ]);
+        let skTimer = null;
+        $("skFetch").addEventListener("click", () => {
+          const w = $("skWrap");
+          w.classList.remove("loaded");
+          clearTimeout(skTimer);
+          skTimer = setTimeout(() => w.classList.add("loaded"), 1200);
+        });
+
+        /* ---------- 04 modal ---------- */
+        let mdFrom = "scale(.94)";
+        function renderMd() {
+          $("mdModal").style.setProperty("--md-from", mdFrom);
+          $("codeMd").innerHTML =
+            rule(".overlay", [`transition: opacity .3s`]) +
+            "\n" +
+            rule(".modal", [
+              `opacity: 0`,
+              `transform: ${mdFrom}`,
+              `transition: transform .35s cubic-bezier(.3,1.4,.4,1), opacity .25s`,
+            ]) +
+            "\n" +
+            rule(".open .modal", [`opacity: 1`, `transform: none`]);
+        }
+        $("mdOpen").addEventListener("click", () =>
+          $("mdStage").classList.add("open"),
+        );
+        $("mdClose").addEventListener("click", () =>
+          $("mdStage").classList.remove("open"),
+        );
+        chipGroup($("mdChips"), (v) => {
+          mdFrom = v;
+          renderMd();
+        });
+        renderMd();
+
+        /* ---------- 05 dropdown ---------- */
+        let ddVar = "scale";
+        function renderDd() {
+          const m = $("ddMenu");
+          m.classList.remove("v-slide", "v-clip");
+          if (ddVar === "slide") m.classList.add("v-slide");
+          if (ddVar === "clip") m.classList.add("v-clip");
+          const closed =
+            ddVar === "scale"
+              ? "scale(.92) translateY(-6px)"
+              : ddVar === "slide"
+                ? "translateY(-14px)"
+                : "clip-path: inset(0 0 100% 0)";
+          $("codeDd").innerHTML =
+            rule(".menu", [
+              `transform-origin: top center`,
+              `opacity: 0`,
+              `transform: ${ddVar === "clip" ? "none" : closed}`,
+              ...(ddVar === "clip"
+                ? [`clip-path: inset(0 0 100% 0 round 12px)`]
+                : []),
+              `transition: .25s ease`,
+            ]) +
+            "\n" +
+            rule(".open .menu", [
+              `opacity: 1`,
+              `transform: none`,
+              `clip-path: inset(0 0 0 0 round 12px)`,
+            ]);
+        }
+        $("ddBtn").addEventListener("click", () =>
+          $("ddStage").classList.toggle("open"),
+        );
+        chipGroup($("ddChips"), (v) => {
+          ddVar = v;
+          renderDd();
+        });
+        renderDd();
+
+        /* ---------- lesson track ---------- */
+        const t = $("lnTrack");
+        for (let i = 0; i < 45; i++) {
+          const s = document.createElement("span");
+          s.className = "tick" + (i < 31 ? " done" : "");
+          s.title = "lesson " + (i + 1);
+          t.appendChild(s);
+        }
+
+        /* ---------- reveal ---------- */
+        const io = new IntersectionObserver(
+          (es) =>
+            es.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                io.unobserve(e.target);
+              }
+            }),
+          { threshold: 0.12 },
+        );
+        document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      })();
+    </script>
+  </body>
+</html>

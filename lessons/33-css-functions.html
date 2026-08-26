@@ -1,0 +1,1716 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CSS Functions — Lesson 33</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' fill='none' stroke='%23f07f4f' stroke-width='2'/%3E%3Crect x='8' y='8' width='16' height='16' fill='none' stroke='%23f2c14e' stroke-width='2'/%3E%3Crect x='13' y='13' width='6' height='6' fill='%2358a6ff'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0e15;
+        --panel: #121826;
+        --panel2: #0d1220;
+        --ink: #10141d;
+        --line: #222c40;
+        --line2: #31405e;
+        --text: #e9eef7;
+        --muted: #8d9ab0;
+        --faint: #5b6a84;
+        --margin-c: #f07f4f;
+        --margin-bg: rgba(240, 127, 79, 0.14);
+        --border-c: #f2c14e;
+        --border-bg: rgba(242, 193, 78, 0.16);
+        --padding-c: #3ecf8e;
+        --padding-bg: rgba(62, 207, 142, 0.14);
+        --content-c: #58a6ff;
+        --content-bg: rgba(88, 166, 255, 0.17);
+        --pink: #ff4f8b;
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: dark;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 15px;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+      ::selection {
+        background: rgba(88, 166, 255, 0.35);
+      }
+      .mono {
+        font-family: var(--mono);
+      }
+      section {
+        scroll-margin-top: 76px;
+      }
+      b {
+        font-weight: 600;
+      }
+
+      .bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            700px 460px at 12% -6%,
+            rgba(242, 193, 78, 0.07),
+            transparent 60%
+          ),
+          radial-gradient(
+            760px 520px at 92% 22%,
+            rgba(88, 166, 255, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            600px 480px at 40% 105%,
+            rgba(62, 207, 142, 0.05),
+            transparent 60%
+          );
+      }
+      .bg::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(233, 238, 247, 0.035) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(233, 238, 247, 0.035) 1px,
+            transparent 1px
+          );
+        background-size: 28px 28px;
+        mask-image: radial-gradient(
+          ellipse 120% 90% at 50% 0%,
+          #000 40%,
+          transparent 100%
+        );
+      }
+      .bg .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.5;
+        animation: drift 26s ease-in-out infinite alternate;
+      }
+      .bg .g1 {
+        width: 420px;
+        height: 420px;
+        left: -120px;
+        top: 30%;
+        background: rgba(240, 127, 79, 0.1);
+      }
+      .bg .g2 {
+        width: 460px;
+        height: 460px;
+        right: -140px;
+        top: 60%;
+        background: rgba(88, 166, 255, 0.1);
+        animation-delay: -12s;
+      }
+      @keyframes drift {
+        from {
+          transform: translateY(-30px);
+        }
+        to {
+          transform: translateY(40px);
+        }
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 12px clamp(16px, 4vw, 44px);
+        background: rgba(11, 14, 21, 0.92);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar nav {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .topbar nav a {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 6px 11px;
+        border-radius: 999px;
+        transition: 0.2s;
+      }
+      .topbar nav a:hover {
+        color: var(--text);
+        background: #161d2c;
+      }
+      .lesson-tag {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--border-c);
+        border: 1px dashed rgba(242, 193, 78, 0.45);
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .wrap {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: 0 clamp(16px, 4vw, 44px);
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        padding: clamp(20px, 4vh, 48px) 0 clamp(30px, 5vh, 56px);
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--padding-c);
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(2.3rem, 5.2vw, 3.7rem);
+        line-height: 1.06;
+        letter-spacing: -0.02em;
+      }
+      .word-style {
+        display: inline-block;
+        padding: 0.02em 0.22em;
+        background: var(--content-bg);
+        border: 0.06em solid var(--content-c);
+        border-radius: 0.14em;
+        color: #bcd8ff;
+        transition: transform 0.3s;
+        cursor: default;
+      }
+      .word-style:hover {
+        transform: rotate(-2deg) scale(1.03);
+      }
+      .lede {
+        color: var(--muted);
+        max-width: 56ch;
+        margin-top: 18px;
+        font-size: 1.05rem;
+      }
+      .lede b {
+        color: var(--text);
+      }
+      .css-full {
+        display: inline-block;
+        margin-top: 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--faint);
+        letter-spacing: 0.08em;
+      }
+      .intro-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 26px;
+        display: grid;
+        place-items: center;
+        gap: 14px;
+        box-shadow: 0 30px 60px -40px rgba(0, 0, 0, 0.8);
+        width: 100%;
+      }
+      .ix-fn {
+        font-family: var(--mono);
+        font-size: 15px;
+        color: var(--content-c);
+        background: var(--ink);
+        border: 1px solid var(--line2);
+        border-radius: 10px;
+        padding: 12px 18px;
+        min-width: 240px;
+        text-align: center;
+        transition: 0.3s;
+      }
+      .imode {
+        font-size: 11px;
+        color: var(--faint);
+        letter-spacing: 0.1em;
+      }
+
+      .sec {
+        padding: clamp(36px, 6vh, 64px) 0;
+      }
+      .sec-head {
+        margin-bottom: 26px;
+        max-width: 72ch;
+      }
+      .sec-head h2 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+        letter-spacing: -0.015em;
+        line-height: 1.15;
+      }
+      .sec-head .lede {
+        margin-top: 10px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 18px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .panel-head h3 {
+        font-family: var(--disp);
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dots i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dots i:nth-child(1) {
+        background: #f07f4f;
+      }
+      .dots i:nth-child(2) {
+        background: #f2c14e;
+      }
+      .dots i:nth-child(3) {
+        background: #3ecf8e;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.85;
+        overflow-x: auto;
+      }
+      .c-sel {
+        color: #7fe0b0;
+      }
+      .c-prop {
+        color: #8ab4ff;
+      }
+      .c-val {
+        color: #f2c14e;
+      }
+      .c-com {
+        color: #5b6a84;
+      }
+      .grp {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+
+      .pick-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 18px;
+        align-items: stretch;
+      }
+      .stage-wrap {
+        padding: 28px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 360px;
+        gap: 16px;
+        width: 100%;
+      }
+      .side {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .sel-chip {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .sel-chip:hover {
+        color: var(--text);
+        border-color: var(--content-c);
+        transform: translateY(-2px);
+      }
+      .sel-chip.on {
+        color: #0e1017;
+        background: var(--content-c);
+        border-color: var(--content-c);
+        font-weight: 600;
+      }
+      .code-box {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .code-box pre {
+        min-height: 0;
+        font-size: 12px;
+      }
+      .side-note {
+        font-size: 12px;
+        color: var(--faint);
+      }
+      .read {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 14px;
+        text-align: center;
+        width: 100%;
+        max-width: 440px;
+      }
+      .read b {
+        color: var(--text);
+      }
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        outline: none;
+        cursor: pointer;
+        background: linear-gradient(
+          90deg,
+          var(--ac) var(--fill, 50%),
+          #232c40 var(--fill, 50%)
+        );
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        transition: transform 0.15s;
+      }
+      input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.15);
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+      }
+      .ctl {
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 7px 11px;
+        transition: 0.2s;
+      }
+      .ctl:hover {
+        background: #101725;
+        border-color: var(--line);
+      }
+      .ctl-top {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+      .ctl-top label {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text);
+      }
+      .ctl-val {
+        margin-left: auto;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--ac);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 2px 9px;
+      }
+
+      /* hue slider rainbow */
+      .rainbow {
+        background: linear-gradient(
+          90deg,
+          hsl(0, 100%, 50%),
+          hsl(60, 100%, 50%),
+          hsl(120, 100%, 50%),
+          hsl(180, 100%, 50%),
+          hsl(240, 100%, 50%),
+          hsl(300, 100%, 50%),
+          hsl(360, 100%, 50%)
+        ) !important;
+      }
+
+      /* calc stage */
+      .calc-stage {
+        width: 100%;
+        max-width: 440px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .calc-bar {
+        position: relative;
+        height: 34px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+      }
+      .calc-result {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        background: linear-gradient(90deg, var(--content-c), var(--padding-c));
+        border-radius: 7px;
+        display: grid;
+        place-items: flex-end;
+        justify-content: flex-end;
+        padding: 0 10px;
+        font: 700 10px var(--mono);
+        color: #0e1017;
+        transition: width 0.2s;
+        min-width: 46px;
+      }
+      .calc-ghost {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        border: 1px dashed var(--line2);
+        border-radius: 7px;
+        transition: width 0.2s;
+      }
+
+      /* min/max/clamp bars */
+      .mm-rows {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+        max-width: 440px;
+      }
+      .mm-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .mm-lab {
+        width: 110px;
+        flex: none;
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--muted);
+      }
+      .mm-track {
+        flex: 1;
+        height: 26px;
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        position: relative;
+        overflow: hidden;
+      }
+      .mm-bar {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        border-radius: 6px;
+        transition: width 0.15s;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 0 8px;
+        font: 9px var(--mono);
+        font-weight: 700;
+        color: #0e1017;
+        min-width: 32px;
+        white-space: nowrap;
+      }
+      .mm-a {
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+        color: #a7cdff;
+        justify-content: flex-start;
+        padding: 0 8px;
+      }
+      .mm-b {
+        background: var(--margin-bg);
+        border: 1px solid var(--margin-c);
+        color: #ffc9ae;
+        justify-content: flex-start;
+        padding: 0 8px;
+      }
+      .mm-win {
+        background: var(--border-c);
+        border: none;
+      }
+
+      /* var composition */
+      .var-stage {
+        width: 100%;
+        max-width: 440px;
+        display: grid;
+        gap: 12px;
+      }
+      .var-card {
+        background: var(--panel2);
+        border: 1px solid var(--line2);
+        border-radius: 12px;
+        padding: 14px;
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        transition: 0.2s;
+      }
+      .var-swatch {
+        width: 60px;
+        height: 60px;
+        border-radius: 10px;
+        background: rgb(var(--vr), var(--vg), var(--vb));
+        transition: 0.15s;
+        border: 1px solid var(--line2);
+      }
+      .var-meta {
+        flex: 1;
+        min-width: 0;
+      }
+      .var-meta h5 {
+        font-family: var(--disp);
+        font-size: 13px;
+        color: var(--text);
+        margin-bottom: 3px;
+      }
+      .var-meta p {
+        font: 10.5px var(--mono);
+        color: var(--muted);
+        word-break: break-all;
+      }
+
+      /* rgb swatch */
+      .rgb-stage {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        width: 100%;
+        max-width: 440px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .rgb-swatch {
+        width: 110px;
+        height: 110px;
+        border-radius: 16px;
+        border: 2px solid var(--line2);
+        transition: background 0.15s;
+        display: grid;
+        place-items: center;
+        font: 700 12px var(--mono);
+        color: #0e1017;
+      }
+
+      /* hsl stage */
+      .hsl-stage {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        width: 100%;
+        max-width: 440px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .hsl-swatch {
+        width: 110px;
+        height: 110px;
+        border-radius: 50%;
+        border: 2px solid var(--line2);
+        transition: background 0.15s;
+        display: grid;
+        place-items: center;
+        font: 700 12px var(--mono);
+        color: #0e1017;
+      }
+
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      @media (min-width: 1180px) {
+        .notes-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media (max-width: 640px) {
+        .notes-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .note-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.3s,
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+      .note-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--nc);
+        opacity: 0.85;
+      }
+      .note-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--nc);
+        box-shadow: 0 24px 44px -28px rgba(0, 0, 0, 0.85);
+      }
+      .note-card h3 {
+        font-family: var(--mono);
+        font-size: 15px;
+        color: var(--nc);
+        margin-bottom: 8px;
+      }
+      .note-card p {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .note-tip {
+        margin-top: 12px;
+        font-size: 11px;
+        color: var(--faint);
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+      }
+      .note-demo {
+        height: 104px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        overflow: hidden;
+      }
+      .demo-calc {
+        width: 75%;
+        height: 14px;
+        border-radius: 4px;
+        background: var(--line);
+        position: relative;
+        overflow: hidden;
+      }
+      .demo-calc i {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 50%;
+        background: var(--border-c);
+        border-radius: 4px;
+        transition: 0.4s;
+      }
+      .note-card:hover .demo-calc i {
+        width: 75%;
+      }
+      .demo-mm {
+        width: 70%;
+        height: 14px;
+        border-radius: 4px;
+        background: var(--line);
+        position: relative;
+        overflow: hidden;
+      }
+      .demo-mm i {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 60%;
+        background: var(--padding-c);
+        border-radius: 4px;
+        transition: 0.4s;
+      }
+      .note-card:hover .demo-mm i {
+        width: 40%;
+      }
+      .demo-cl {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--muted);
+        transition: 0.35s;
+      }
+      .note-card:hover .demo-cl {
+        color: var(--border-c);
+        font-size: 14px;
+      }
+      .demo-var {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--muted);
+        transition: 0.3s;
+      }
+      .note-card:hover .demo-var {
+        color: var(--content-c);
+      }
+      .demo-clr {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: hsl(200, 80%, 60%);
+        transition: 0.4s;
+      }
+      .note-card:hover .demo-clr {
+        background: hsl(320, 80%, 60%);
+      }
+
+      .lesson-nav {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px clamp(18px, 3vw, 28px);
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+        align-items: center;
+        margin-top: 40px;
+      }
+      .ln-status {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--padding-c);
+        border: 1px solid rgba(62, 207, 142, 0.45);
+        border-radius: 999px;
+        padding: 3px 10px;
+      }
+      .lesson-nav h3 {
+        font-family: var(--disp);
+        font-size: 17px;
+        margin-top: 8px;
+      }
+      .ln-track {
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .tick {
+        width: 7px;
+        height: 15px;
+        border-radius: 2px;
+        background: #212a3e;
+        transition: 0.2s;
+      }
+      .tick.done {
+        background: var(--padding-c);
+        box-shadow: 0 0 8px rgba(62, 207, 142, 0.55);
+      }
+      .tick:hover {
+        background: var(--line2);
+      }
+      .ln-next {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        text-align: right;
+      }
+      .ln-next span {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .ln-next b {
+        font-family: var(--disp);
+        font-size: 15px;
+        color: var(--text);
+      }
+      footer {
+        border-top: 1px solid var(--line);
+        margin-top: 20px;
+        padding: 30px 0 44px;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+        color: var(--faint);
+        font-size: 12.5px;
+      }
+      footer .mono {
+        font-size: 11.5px;
+      }
+      footer .sp {
+        margin-left: auto;
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+      @media (max-width: 1020px) {
+        .intro {
+          grid-template-columns: 1fr;
+        }
+        .pick-grid {
+          grid-template-columns: 1fr;
+        }
+        .lesson-nav {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .ln-next {
+          align-items: center;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg">
+      <span class="glow g1"></span><span class="glow g2"></span>
+    </div>
+
+    <header class="topbar">
+      <span class="lesson-tag">lesson 33 / 45</span>
+      <nav>
+        <a href="#calc">calc()</a>
+        <a href="#minmax">min() · max()</a>
+        <a href="#clamp">clamp()</a>
+        <a href="#var">var()</a>
+        <a href="#colors">rgb() · hsl()</a>
+        <a href="#notes">cheat-codes</a>
+      </nav>
+    </header>
+
+    <div class="wrap">
+      <!-- ============ intro ============ -->
+      <section class="intro">
+        <div>
+          <p class="eyebrow">lesson 33 · interactive</p>
+          <h1>
+            Functions turn CSS into a
+            <span class="word-style">calculator</span>.
+          </h1>
+          <p class="lede">
+            Everywhere you'd write a static value, a function can
+            <b>compute one</b>: arithmetic with
+            <span class="mono">calc()</span>, comparisons with
+            <span class="mono">min()/max()/clamp()</span>, variable lookup with
+            <span class="mono">var()</span>, color mixing with
+            <span class="mono">rgb()/hsl()</span>. They nest, they compose, they
+            run at render time.
+          </p>
+          <span class="css-full">C · OMPUTE · R · ESOLVE · R · EPEAT</span>
+        </div>
+        <div class="intro-panel">
+          <div class="ix-fn" id="ixFn">calc(100% - 40px)</div>
+          <p class="imode mono">seven functions, one lesson…</p>
+        </div>
+      </section>
+
+      <!-- ============ 01 · calc() ============ -->
+      <section id="calc" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">01 · calc()</p>
+          <h2>Arithmetic inside values</h2>
+          <p class="lede">
+            <span class="mono">calc()</span> lets you do math where CSS normally
+            wants a single number. Mix units freely — <b>100% − 40px</b> is a
+            perfectly legal width. Spaces around operators are required.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>mixed-unit math</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="calc-stage">
+                <div class="calc-bar">
+                  <div
+                    class="calc-ghost"
+                    id="calcGhost"
+                    style="width: 100%"
+                  ></div>
+                  <div class="calc-result" id="calcResult"></div>
+                </div>
+                <p class="read" id="calcRead"></p>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <p class="grp">operator</p>
+            <div class="chips" id="calcOps">
+              <button class="sel-chip on" data-o="-">− subtract</button>
+              <button class="sel-chip" data-o="+">+ add</button>
+              <button class="sel-chip" data-o="*">× multiply</button>
+            </div>
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rPct">percent</label
+                ><output class="ctl-val" id="oPct">100%</output>
+              </div>
+              <input type="range" id="rPct" min="20" max="100" value="100" />
+            </div>
+            <div class="ctl" style="--ac: var(--margin-c)">
+              <div class="ctl-top">
+                <label for="rPx">pixels</label
+                ><output class="ctl-val" id="oPx">40px</output>
+              </div>
+              <input type="range" id="rPx" min="0" max="200" value="40" />
+            </div>
+            <div class="code-box"><pre id="codeCalc"></pre></div>
+            <p class="side-note">
+              Spaces around <span class="mono">+</span> and
+              <span class="mono">−</span> are required (or they parse as a
+              sign). Multiplication needs at least one unitless operand.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 02 · min() / max() ============ -->
+      <section id="minmax" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">02 · min() · max()</p>
+          <h2>Ceilings and floors, live</h2>
+          <p class="lede">
+            <span class="mono">min()</span> returns the smaller argument — a
+            responsive ceiling. <span class="mono">max()</span> returns the
+            larger — a floor that holds when the viewport shrinks. Same
+            viewport, opposite roles.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>two candidates, one winner</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="mm-rows">
+                <div class="mm-row">
+                  <span class="mm-lab">min(60vw, 500px)</span>
+                  <div class="mm-track">
+                    <div class="mm-bar mm-win" id="mnW"></div>
+                  </div>
+                </div>
+                <div class="mm-row">
+                  <span class="mm-lab">max(10vw, 120px)</span>
+                  <div class="mm-track">
+                    <div
+                      class="mm-bar mm-win"
+                      id="mxW"
+                      style="background: var(--padding-c)"
+                    ></div>
+                  </div>
+                </div>
+              </div>
+              <p class="read" id="mmRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--border-c)">
+              <div class="ctl-top">
+                <label for="rMm">viewport width</label
+                ><output class="ctl-val" id="oMm">800px</output>
+              </div>
+              <input type="range" id="rMm" min="320" max="1400" value="800" />
+            </div>
+            <div class="code-box"><pre id="codeMm"></pre></div>
+            <p class="side-note">
+              The crossover point is where the two arguments are equal. For
+              <span class="mono">min(60vw, 500px)</span> that's ~833px — below,
+              60vw wins; above, 500px wins.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 03 · clamp() ============ -->
+      <section id="clamp" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">03 · clamp()</p>
+          <h2>Floor · preferred · ceiling</h2>
+          <p class="lede">
+            Three arguments: <b>minimum, preferred, maximum</b>. The preferred
+            value is returned while it stays inside the guardrails; outside, the
+            nearer rail wins. The one-liner for fluid typography.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>the three zones</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="mm-rows">
+                <div class="mm-row">
+                  <span class="mm-lab" id="clMin">min 16px</span>
+                  <div class="mm-track">
+                    <div
+                      class="mm-bar"
+                      id="clMinB"
+                      style="background: var(--line2); color: var(--faint)"
+                    ></div>
+                  </div>
+                </div>
+                <div class="mm-row">
+                  <span class="mm-lab" id="clPref">5vw preferred</span>
+                  <div class="mm-track">
+                    <div class="mm-bar mm-a" id="clPrefB"></div>
+                  </div>
+                </div>
+                <div class="mm-row">
+                  <span class="mm-lab" id="clMax">max 64px</span>
+                  <div class="mm-track">
+                    <div
+                      class="mm-bar"
+                      id="clMaxB"
+                      style="background: var(--line2); color: var(--faint)"
+                    ></div>
+                  </div>
+                </div>
+                <div class="mm-row">
+                  <span class="mm-lab">clamp() result</span>
+                  <div class="mm-track">
+                    <div class="mm-bar mm-win" id="clW"></div>
+                  </div>
+                </div>
+              </div>
+              <p class="read" id="clRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: var(--padding-c)">
+              <div class="ctl-top">
+                <label for="rClMin">min</label
+                ><output class="ctl-val" id="oClMin">16px</output>
+              </div>
+              <input type="range" id="rClMin" min="8" max="32" value="16" />
+            </div>
+            <div class="ctl" style="--ac: var(--margin-c)">
+              <div class="ctl-top">
+                <label for="rClMax">max</label
+                ><output class="ctl-val" id="oClMax">64px</output>
+              </div>
+              <input type="range" id="rClMax" min="40" max="120" value="64" />
+            </div>
+            <div class="ctl" style="--ac: var(--content-c)">
+              <div class="ctl-top">
+                <label for="rClV">viewport</label
+                ><output class="ctl-val" id="oClV">800px</output>
+              </div>
+              <input type="range" id="rClV" min="320" max="1800" value="800" />
+            </div>
+            <div class="code-box"><pre id="codeCl"></pre></div>
+            <p class="side-note">
+              Read aloud: "at least 16, ideally 5vw, at most 64". That sentence
+              replaces an entire breakpoint block.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 04 · var() ============ -->
+      <section id="var" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">04 · var()</p>
+          <h2>Compose, don't duplicate</h2>
+          <p class="lede">
+            <span class="mono">var()</span> isn't just for standalone values —
+            it composes <b>inside</b> other functions. Below, three RGB channels
+            are each a custom property; the color itself is built from a formula
+            of variables.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>variables inside functions</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="var-stage">
+                <div class="var-card" id="varCard">
+                  <div class="var-swatch"></div>
+                  <div class="var-meta">
+                    <h5>composed color</h5>
+                    <p id="varMeta">rgb(var(--vr), var(--vg), var(--vb))</p>
+                  </div>
+                </div>
+              </div>
+              <p class="read" id="varRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="ctl" style="--ac: #f07f4f">
+              <div class="ctl-top">
+                <label for="rVr">--vr (red)</label
+                ><output class="ctl-val" id="oVr">88</output>
+              </div>
+              <input type="range" id="rVr" min="0" max="255" value="88" />
+            </div>
+            <div class="ctl" style="--ac: #3ecf8e">
+              <div class="ctl-top">
+                <label for="rVg">--vg (green)</label
+                ><output class="ctl-val" id="oVg">166</output>
+              </div>
+              <input type="range" id="rVg" min="0" max="255" value="166" />
+            </div>
+            <div class="ctl" style="--ac: #58a6ff">
+              <div class="ctl-top">
+                <label for="rVb">--vb (blue)</label
+                ><output class="ctl-val" id="oVb">255</output>
+              </div>
+              <input type="range" id="rVb" min="0" max="255" value="255" />
+            </div>
+            <div class="code-box"><pre id="codeVar"></pre></div>
+            <p class="side-note">
+              Variables hold <i>tokens</i>, not full values.
+              <span class="mono">--vr: 88</span> is just a number; only inside
+              <span class="mono">rgb(var(--vr),…)</span> does it become a color
+              channel.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 05 · rgb() & hsl() ============ -->
+      <section id="colors" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">05 · rgb() · hsl()</p>
+          <h2>Two mental models of color</h2>
+          <p class="lede">
+            <span class="mono">rgb(r, g, b)</span> mixes light channels (what
+            screens emit). <span class="mono">hsl(h, s, l)</span> describes
+            color the way humans talk about it: hue around the wheel, saturation
+            (colorfulness), lightness (dark↔light). Pick a model and drag.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>pick a model</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="chips" id="modelChips">
+                <button class="sel-chip on" data-m="rgb">rgb()</button>
+                <button class="sel-chip" data-m="hsl">hsl()</button>
+              </div>
+              <div id="rgbStage" class="rgb-stage">
+                <div class="rgb-swatch" id="rgbSwatch">#58a6ff</div>
+              </div>
+              <div id="hslStage" class="hsl-stage" style="display: none">
+                <div class="hsl-swatch" id="hslSwatch">hsl(210, 100%, 68%)</div>
+              </div>
+              <p class="read" id="colorRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div id="rgbCtrls">
+              <div class="ctl" style="--ac: #f07f4f">
+                <div class="ctl-top">
+                  <label for="rR">red</label
+                  ><output class="ctl-val" id="oR">88</output>
+                </div>
+                <input type="range" id="rR" min="0" max="255" value="88" />
+              </div>
+              <div class="ctl" style="--ac: #3ecf8e">
+                <div class="ctl-top">
+                  <label for="rG">green</label
+                  ><output class="ctl-val" id="oG">166</output>
+                </div>
+                <input type="range" id="rG" min="0" max="255" value="166" />
+              </div>
+              <div class="ctl" style="--ac: #58a6ff">
+                <div class="ctl-top">
+                  <label for="rB">blue</label
+                  ><output class="ctl-val" id="oB">255</output>
+                </div>
+                <input type="range" id="rB" min="0" max="255" value="255" />
+              </div>
+            </div>
+            <div id="hslCtrls" style="display: none">
+              <div class="ctl rainbow">
+                <div class="ctl-top">
+                  <label for="rH">hue</label
+                  ><output class="ctl-val" id="oH">210°</output>
+                </div>
+                <input type="range" id="rH" min="0" max="360" value="210" />
+              </div>
+              <div class="ctl" style="--ac: var(--content-c)">
+                <div class="ctl-top">
+                  <label for="rS">saturation</label
+                  ><output class="ctl-val" id="oS">100%</output>
+                </div>
+                <input type="range" id="rS" min="0" max="100" value="100" />
+              </div>
+              <div class="ctl" style="--ac: var(--border-c)">
+                <div class="ctl-top">
+                  <label for="rL">lightness</label
+                  ><output class="ctl-val" id="oL">68%</output>
+                </div>
+                <input type="range" id="rL" min="0" max="100" value="68" />
+              </div>
+            </div>
+            <div class="code-box"><pre id="codeColor"></pre></div>
+            <p class="side-note">
+              hsl wins for design work: pick a hue, then adjust lightness for
+              tints and shades. rgb is what the screen actually renders — both
+              are valid.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 06 · field notes ============ -->
+      <section id="notes" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">06 · field notes</p>
+          <h2>Cheat codes from lesson 33</h2>
+        </div>
+        <div class="notes-grid">
+          <article class="note-card" style="--nc: var(--content-c)">
+            <div class="note-demo">
+              <div class="demo-calc"><i></i></div>
+            </div>
+            <h3>calc() mixes units</h3>
+            <p>
+              <span class="mono">100% − 40px</span>,
+              <span class="mono">2 * 1rem</span>,
+              <span class="mono">(100vw − 1200px) / 2</span> — arithmetic that
+              browsers compute per element, live.
+            </p>
+            <p class="note-tip mono">↳ hover: the bar recomputes</p>
+          </article>
+          <article class="note-card" style="--nc: var(--padding-c)">
+            <div class="note-demo">
+              <div class="demo-mm"><i></i></div>
+            </div>
+            <h3>min = ceiling, max = floor</h3>
+            <p>
+              Both take multiple arguments and return one.
+              <span class="mono">min</span> caps;
+              <span class="mono">max</span> guarantees. The crossover is where
+              the arguments are equal.
+            </p>
+            <p class="note-tip mono">↳ hover: floor wins at small</p>
+          </article>
+          <article class="note-card" style="--nc: var(--border-c)">
+            <div class="note-demo">
+              <div class="demo-cl">clamp(min, pref, max)</div>
+            </div>
+            <h3>clamp = the default</h3>
+            <p>
+              Three arguments — floor, preferred, ceiling. The one-liner for
+              every fluid heading size. Read it aloud to sanity-check.
+            </p>
+            <p class="note-tip mono">↳ hover: it reads itself</p>
+          </article>
+          <article class="note-card" style="--nc: var(--margin-c)">
+            <div class="note-demo"><div class="demo-clr"></div></div>
+            <h3>functions compose</h3>
+            <p>
+              <span class="mono">hsl(var(--hue), 80%, 60%)</span> — variables
+              inside color functions. Build a theme from tokens, not from hex
+              codes.
+            </p>
+            <p class="note-tip mono">↳ hover: the hue shifts</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ lesson nav ============ -->
+      <div class="lesson-nav reveal">
+        <div>
+          <span class="ln-status">✓ completed</span>
+          <h3>33 — CSS Functions</h3>
+        </div>
+        <div class="ln-track" id="lnTrack"></div>
+        <div class="ln-next">
+          <span>up next</span>
+          <b>34 · Modern CSS Features</b>
+        </div>
+      </div>
+
+      <footer>
+        <span class="mono">drag things, break things, learn things.</span>
+        <span class="sp mono">45 lessons · lesson 33 · css functions</span>
+      </footer>
+    </div>
+    <!-- /wrap -->
+
+    <script>
+      (() => {
+        const $ = (id) => document.getElementById(id);
+        const rule = (sel, decls) =>
+          `<span class="c-sel">${sel}</span> {\n${decls
+            .map((d) => {
+              const i = d.indexOf(":");
+              return `  <span class="c-prop">${d.slice(0, i)}</span>: <span class="c-val">${d.slice(i + 1).trim()}</span>;`;
+            })
+            .join("\n")}\n}`;
+        function range(el, out, fmt, cb) {
+          const f = () => {
+            const v = +el.value;
+            out.textContent = fmt(v);
+            const min = +el.min,
+              max = +el.max;
+            el.style.setProperty(
+              "--fill",
+              ((v - min) / (max - min)) * 100 + "%",
+            );
+            cb(v);
+          };
+          el.addEventListener("input", f);
+          f();
+        }
+        function chipGroup(box, cb) {
+          box.addEventListener("click", (e) => {
+            const c = e.target.closest(".sel-chip");
+            if (!c) return;
+            box
+              .querySelectorAll(".sel-chip")
+              .forEach((x) => x.classList.remove("on"));
+            c.classList.add("on");
+            cb(c.dataset);
+          });
+        }
+
+        /* ---------- intro cycle ---------- */
+        const IX = [
+          "calc(100% - 40px)",
+          "min(60vw, 500px)",
+          "max(10vw, 120px)",
+          "clamp(16px, 5vw, 64px)",
+          "var(--primary, #f07f4f)",
+          "rgb(88, 166, 255)",
+          "hsl(210, 100%, 68%)",
+        ];
+        let ii = 0;
+        setInterval(() => {
+          $("ixFn").textContent = IX[ii];
+          ii = (ii + 1) % IX.length;
+        }, 1700);
+
+        /* ---------- 01 calc ---------- */
+        let calcOp = "-",
+          calcPct = 100,
+          calcPx = 40;
+        const TRACK_PX = 400; // the calc-bar's visual width (approximate, we scale % to it)
+        function renderCalc() {
+          const stageWidth = $("calcGhost").parentElement.clientWidth;
+          const pctPx = (stageWidth * calcPct) / 100;
+          let result, formula;
+          if (calcOp === "-") {
+            result = pctPx - calcPx;
+            formula = `calc(${calcPct}% - ${calcPx}px)`;
+          } else if (calcOp === "+") {
+            result = pctPx + calcPx;
+            formula = `calc(${calcPct}% + ${calcPx}px)`;
+          } else {
+            result = (pctPx * calcPx) / 50;
+            formula = `calc(${calcPct}% * ${(calcPx / 50).toFixed(2)})`;
+          } // scale for visual
+          const displayW = Math.max(46, Math.min(stageWidth, result));
+          $("calcGhost").style.width = pctPx + "px";
+          $("calcResult").style.width = displayW + "px";
+          $("calcResult").textContent = Math.round(result) + "px";
+          $("calcRead").innerHTML =
+            `<b>${formula}</b> = <b>${Math.round(result)}px</b> in a <b>${stageWidth}px</b> container`;
+          $("codeCalc").innerHTML =
+            rule(".box", [`width: ${formula}`]) +
+            `\n<span class="c-com">/* ${Math.round(result)}px computed live */</span>`;
+        }
+        chipGroup($("calcOps"), (d) => {
+          calcOp = d.o;
+          renderCalc();
+        });
+        range(
+          $("rPct"),
+          $("oPct"),
+          (v) => v + "%",
+          (v) => {
+            calcPct = v;
+            renderCalc();
+          },
+        );
+        range(
+          $("rPx"),
+          $("oPx"),
+          (v) => v + "px",
+          (v) => {
+            calcPx = v;
+            renderCalc();
+          },
+        );
+        window.addEventListener("resize", renderCalc);
+        setTimeout(renderCalc, 100);
+
+        /* ---------- 02 min / max ---------- */
+        function renderMm(v) {
+          const a = v * 0.6,
+            b = 500,
+            minW = Math.min(a, b);
+          const c = v * 0.1,
+            d = 120,
+            maxW = Math.max(c, d);
+          const sc = 100 / 600;
+          $("mnW").style.width = Math.max(8, minW * sc) + "%";
+          $("mnW").textContent = Math.round(minW) + "px";
+          $("mxW").style.width = Math.max(8, maxW * sc) + "%";
+          $("mxW").textContent = Math.round(maxW) + "px";
+          const minWin = a < b ? "fluid (60vw)" : "ceiling (500px)";
+          const maxWin = c > d ? "fluid (10vw)" : "floor (120px)";
+          $("mmRead").innerHTML =
+            `min: <b>${Math.round(minW)}px</b> · ${minWin} wins · max: <b>${Math.round(maxW)}px</b> · ${maxWin} wins`;
+          $("codeMm").innerHTML =
+            rule(".ceiling", [
+              `width: min(60vw, 500px)`,
+              `/* = ${Math.round(minW)}px */`,
+            ]) +
+            "\n" +
+            rule(".floor", [
+              `width: max(10vw, 120px)`,
+              `/* = ${Math.round(maxW)}px */`,
+            ]);
+        }
+        range($("rMm"), $("oMm"), (v) => v + "px", renderMm);
+
+        /* ---------- 03 clamp ---------- */
+        function renderCl() {
+          const mn = +$("rClMin").value,
+            mx = +$("rClMax").value,
+            v = +$("rClV").value;
+          const pref = v * 0.05;
+          const win = Math.min(mx, Math.max(mn, pref));
+          const sc = 100 / 150;
+          $("clMin").textContent = `min ${mn}px`;
+          $("clMax").textContent = `max ${mx}px`;
+          $("clMinB").style.width = Math.max(4, mn * sc) + "%";
+          $("clMinB").textContent = mn + "px";
+          $("clPrefB").style.width = Math.max(4, pref * sc) + "%";
+          $("clPrefB").textContent = Math.round(pref) + "px";
+          $("clMaxB").style.width = Math.max(4, mx * sc) + "%";
+          $("clMaxB").textContent = mx + "px";
+          $("clW").style.width = Math.max(4, win * sc) + "%";
+          $("clW").textContent = Math.round(win) + "px";
+          const state =
+            pref < mn
+              ? "clamped to MIN"
+              : pref > mx
+                ? "clamped to MAX"
+                : "fluid (preferred)";
+          $("clRead").innerHTML =
+            `preferred 5vw = <b>${Math.round(pref)}px</b> → result <b>${Math.round(win)}px</b> · ${state}`;
+          $("codeCl").innerHTML = rule("h1", [
+            `font-size: clamp(${mn}px, 5vw, ${mx}px)`,
+            `/* = ${Math.round(win)}px now */`,
+          ]);
+        }
+        range($("rClMin"), $("oClMin"), (v) => v + "px", renderCl);
+        range($("rClMax"), $("oClMax"), (v) => v + "px", renderCl);
+        range($("rClV"), $("oClV"), (v) => v + "px", renderCl);
+
+        /* ---------- 04 var() ---------- */
+        function renderVar() {
+          const r = +$("rVr").value,
+            g = +$("rVg").value,
+            b = +$("rVb").value;
+          const card = $("varCard");
+          card.style.setProperty("--vr", r);
+          card.style.setProperty("--vg", g);
+          card.style.setProperty("--vb", b);
+          const hex =
+            "#" +
+            [r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("");
+          $("varMeta").textContent =
+            `rgb(var(--vr), var(--vg), var(--vb))  /* = ${hex} */`;
+          $("varRead").innerHTML =
+            `--vr: <b>${r}</b> · --vg: <b>${g}</b> · --vb: <b>${b}</b> → swatch is <b>${hex}</b>`;
+          $("codeVar").innerHTML =
+            rule(":root", [`--vr: ${r};`, `--vg: ${g};`, `--vb: ${b};`]) +
+            "\n" +
+            rule(".swatch", [
+              `background: rgb(var(--vr), var(--vg), var(--vb))`,
+              `/* variables composed into a function */`,
+            ]);
+        }
+        range($("rVr"), $("oVr"), (v) => v, renderVar);
+        range($("rVg"), $("oVg"), (v) => v, renderVar);
+        range($("rVb"), $("oVb"), (v) => v, renderVar);
+
+        /* ---------- 05 rgb / hsl ---------- */
+        let model = "rgb";
+        function rgbToHex(r, g, b) {
+          return (
+            "#" + [r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("")
+          );
+        }
+        function renderColor() {
+          if (model === "rgb") {
+            const r = +$("rR").value,
+              g = +$("rG").value,
+              b = +$("rB").value;
+            const hex = rgbToHex(r, g, b);
+            $("rgbSwatch").style.background = `rgb(${r},${g},${b})`;
+            $("rgbSwatch").textContent = hex;
+            const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+            $("rgbSwatch").style.color = lum > 140 ? "#0e1017" : "#fff";
+            $("colorRead").innerHTML =
+              `rgb(<b>${r}</b>, <b>${g}</b>, <b>${b}</b>) → <b>${hex}</b>`;
+            $("codeColor").innerHTML = rule(".el", [
+              `background: rgb(${r}, ${g}, ${b})`,
+              `/* = ${hex} */`,
+            ]);
+          } else {
+            const h = +$("rH").value,
+              s = +$("rS").value,
+              l = +$("rL").value;
+            $("hslSwatch").style.background = `hsl(${h},${s}%,${l}%)`;
+            $("hslSwatch").textContent = `hsl(${h}, ${s}%, ${l}%)`;
+            $("hslSwatch").style.color = l > 55 ? "#0e1017" : "#fff";
+            $("colorRead").innerHTML =
+              `hsl(<b>${h}°</b>, <b>${s}%</b>, <b>${l}%</b>)`;
+            $("codeColor").innerHTML = rule(".el", [
+              `background: hsl(${h}, ${s}%, ${l}%)`,
+            ]);
+          }
+        }
+        chipGroup($("modelChips"), (d) => {
+          model = d.m;
+          $("rgbStage").style.display = model === "rgb" ? "flex" : "none";
+          $("hslStage").style.display = model === "hsl" ? "flex" : "none";
+          $("rgbCtrls").style.display = model === "rgb" ? "block" : "none";
+          $("hslCtrls").style.display = model === "hsl" ? "block" : "none";
+          renderColor();
+        });
+        range($("rR"), $("oR"), (v) => v, renderColor);
+        range($("rG"), $("oG"), (v) => v, renderColor);
+        range($("rB"), $("oB"), (v) => v, renderColor);
+        range($("rH"), $("oH"), (v) => v + "°", renderColor);
+        range($("rS"), $("oS"), (v) => v + "%", renderColor);
+        range($("rL"), $("oL"), (v) => v + "%", renderColor);
+        renderColor();
+
+        /* ---------- lesson track ---------- */
+        const t = $("lnTrack");
+        for (let i = 0; i < 45; i++) {
+          const s = document.createElement("span");
+          s.className = "tick" + (i < 33 ? " done" : "");
+          s.title = "lesson " + (i + 1);
+          t.appendChild(s);
+        }
+
+        /* ---------- reveal ---------- */
+        const io = new IntersectionObserver(
+          (es) =>
+            es.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                io.unobserve(e.target);
+              }
+            }),
+          { threshold: 0.12 },
+        );
+        document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      })();
+    </script>
+  </body>
+</html>
