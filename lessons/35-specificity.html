@@ -1,0 +1,1462 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Specificity — Lesson 35</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' fill='none' stroke='%23f07f4f' stroke-width='2'/%3E%3Crect x='8' y='8' width='16' height='16' fill='none' stroke='%23f2c14e' stroke-width='2'/%3E%3Crect x='13' y='13' width='6' height='6' fill='%2358a6ff'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0e15;
+        --panel: #121826;
+        --panel2: #0d1220;
+        --ink: #10141d;
+        --line: #222c40;
+        --line2: #31405e;
+        --text: #e9eef7;
+        --muted: #8d9ab0;
+        --faint: #5b6a84;
+        --margin-c: #f07f4f;
+        --margin-bg: rgba(240, 127, 79, 0.14);
+        --border-c: #f2c14e;
+        --border-bg: rgba(242, 193, 78, 0.16);
+        --padding-c: #3ecf8e;
+        --padding-bg: rgba(62, 207, 142, 0.14);
+        --content-c: #58a6ff;
+        --content-bg: rgba(88, 166, 255, 0.17);
+        --pink: #ff4f8b;
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: dark;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 15px;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+      ::selection {
+        background: rgba(88, 166, 255, 0.35);
+      }
+      .mono {
+        font-family: var(--mono);
+      }
+      section {
+        scroll-margin-top: 76px;
+      }
+      b {
+        font-weight: 600;
+      }
+
+      .bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            700px 460px at 12% -6%,
+            rgba(242, 193, 78, 0.07),
+            transparent 60%
+          ),
+          radial-gradient(
+            760px 520px at 92% 22%,
+            rgba(88, 166, 255, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            600px 480px at 40% 105%,
+            rgba(62, 207, 142, 0.05),
+            transparent 60%
+          );
+      }
+      .bg::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(233, 238, 247, 0.035) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(233, 238, 247, 0.035) 1px,
+            transparent 1px
+          );
+        background-size: 28px 28px;
+        mask-image: radial-gradient(
+          ellipse 120% 90% at 50% 0%,
+          #000 40%,
+          transparent 100%
+        );
+      }
+      .bg .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.5;
+        animation: drift 26s ease-in-out infinite alternate;
+      }
+      .bg .g1 {
+        width: 420px;
+        height: 420px;
+        left: -120px;
+        top: 30%;
+        background: rgba(240, 127, 79, 0.1);
+      }
+      .bg .g2 {
+        width: 460px;
+        height: 460px;
+        right: -140px;
+        top: 60%;
+        background: rgba(88, 166, 255, 0.1);
+        animation-delay: -12s;
+      }
+      @keyframes drift {
+        from {
+          transform: translateY(-30px);
+        }
+        to {
+          transform: translateY(40px);
+        }
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 12px clamp(16px, 4vw, 44px);
+        background: rgba(11, 14, 21, 0.92);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar nav {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .topbar nav a {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 6px 11px;
+        border-radius: 999px;
+        transition: 0.2s;
+      }
+      .topbar nav a:hover {
+        color: var(--text);
+        background: #161d2c;
+      }
+      .lesson-tag {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--border-c);
+        border: 1px dashed rgba(242, 193, 78, 0.45);
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .wrap {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: 0 clamp(16px, 4vw, 44px);
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        padding: clamp(20px, 4vh, 48px) 0 clamp(30px, 5vh, 56px);
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--padding-c);
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(2.3rem, 5.2vw, 3.7rem);
+        line-height: 1.06;
+        letter-spacing: -0.02em;
+      }
+      .word-style {
+        display: inline-block;
+        padding: 0.02em 0.22em;
+        background: var(--border-bg);
+        border: 0.06em solid var(--border-c);
+        border-radius: 0.14em;
+        color: #ffe3a1;
+        transition: transform 0.3s;
+        cursor: default;
+        margin-top: 10px;
+      }
+      .word-style:hover {
+        transform: rotate(-2deg) scale(1.03);
+      }
+      .lede {
+        color: var(--muted);
+        max-width: 56ch;
+        margin-top: 18px;
+        font-size: 1.05rem;
+      }
+      .lede b {
+        color: var(--text);
+      }
+      .css-full {
+        display: inline-block;
+        margin-top: 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--faint);
+        letter-spacing: 0.08em;
+      }
+      .intro-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 26px;
+        display: grid;
+        place-items: center;
+        gap: 14px;
+        box-shadow: 0 30px 60px -40px rgba(0, 0, 0, 0.8);
+        width: 100%;
+      }
+      .ix-feat {
+        font-family: var(--mono);
+        font-size: 14px;
+        color: var(--content-c);
+        background: var(--ink);
+        border: 1px solid var(--line2);
+        border-radius: 10px;
+        padding: 12px 18px;
+        min-width: 260px;
+        text-align: center;
+        transition: 0.3s;
+      }
+      .imode {
+        font-size: 11px;
+        color: var(--faint);
+        letter-spacing: 0.1em;
+      }
+
+      .sec {
+        padding: clamp(36px, 6vh, 64px) 0;
+      }
+      .sec-head {
+        margin-bottom: 26px;
+        max-width: 72ch;
+      }
+      .sec-head h2 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+        letter-spacing: -0.015em;
+        line-height: 1.15;
+      }
+      .sec-head .lede {
+        margin-top: 10px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 18px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .panel-head h3 {
+        font-family: var(--disp);
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dots i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dots i:nth-child(1) {
+        background: #f07f4f;
+      }
+      .dots i:nth-child(2) {
+        background: #f2c14e;
+      }
+      .dots i:nth-child(3) {
+        background: #3ecf8e;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.85;
+        overflow-x: auto;
+      }
+      .c-sel {
+        color: #7fe0b0;
+      }
+      .c-prop {
+        color: #8ab4ff;
+      }
+      .c-val {
+        color: #f2c14e;
+      }
+      .c-com {
+        color: #5b6a84;
+      }
+      .grp {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+
+      .pick-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 18px;
+        align-items: stretch;
+      }
+      .stage-wrap {
+        padding: 28px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 360px;
+        gap: 16px;
+        width: 100%;
+      }
+      .side {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .sel-chip {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .sel-chip:hover {
+        color: var(--text);
+        border-color: var(--content-c);
+        transform: translateY(-2px);
+      }
+      .sel-chip.on {
+        color: #0e1017;
+        background: var(--content-c);
+        border-color: var(--content-c);
+        font-weight: 600;
+      }
+      .ghost-btn {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--faint);
+        background: none;
+        border: 1px dashed var(--line2);
+        border-radius: 8px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .ghost-btn:hover {
+        color: var(--content-c);
+        border-color: var(--content-c);
+      }
+      .code-box {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .code-box pre {
+        min-height: 0;
+        font-size: 12px;
+      }
+      .side-note {
+        font-size: 12px;
+        color: var(--faint);
+      }
+      .read {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 14px;
+        text-align: center;
+        width: 100%;
+        max-width: 440px;
+      }
+      .read b {
+        color: var(--text);
+      }
+
+      /* 01 ranks ladder */
+      .rk-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+        max-width: 440px;
+      }
+      .rk-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 11px 12px;
+        cursor: pointer;
+        transition: 0.2s;
+        text-align: left;
+        width: 100%;
+      }
+      .rk-row:hover {
+        border-color: var(--line2);
+      }
+      .rk-row.on {
+        border-color: var(--rk-c);
+        box-shadow: 0 0 0 1px var(--rk-c);
+      }
+      .rk-name {
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--text);
+        width: 118px;
+        flex: none;
+      }
+      .rk-bar {
+        flex: 1;
+        height: 10px;
+        background: rgba(255, 255, 255, 0.04);
+        border-radius: 5px;
+        overflow: hidden;
+      }
+      .rk-bar i {
+        display: block;
+        height: 100%;
+        background: var(--rk-c);
+        border-radius: 5px;
+      }
+      .rk-w {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--faint);
+        width: 74px;
+        text-align: right;
+        flex: none;
+      }
+
+      /* 02 calculator */
+      .cl-sel {
+        font-family: var(--mono);
+        font-size: 14px;
+        color: var(--text);
+        background: var(--ink);
+        border: 1px solid var(--line2);
+        border-radius: 10px;
+        padding: 12px 16px;
+        min-height: 48px;
+        width: 100%;
+        max-width: 440px;
+        word-break: break-all;
+        display: flex;
+        align-items: center;
+      }
+      .cl-tuple {
+        display: flex;
+        gap: 10px;
+        width: 100%;
+        max-width: 440px;
+      }
+      .cl-col {
+        flex: 1;
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 10px;
+        text-align: center;
+        transition: 0.2s;
+      }
+      .cl-col b {
+        display: block;
+        font-family: var(--mono);
+        font-size: 22px;
+      }
+      .cl-col span {
+        font-family: var(--mono);
+        font-size: 9px;
+        color: var(--faint);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .cl-col.cid b {
+        color: var(--border-c);
+      }
+      .cl-col.ccl b {
+        color: var(--content-c);
+      }
+      .cl-col.cel b {
+        color: var(--padding-c);
+      }
+
+      /* battle / targets */
+      .bt-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+        max-width: 440px;
+      }
+      .bt-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .bt-tag {
+        font-family: var(--mono);
+        font-size: 10px;
+        width: 52px;
+        flex: none;
+        color: var(--faint);
+      }
+      .bt-target {
+        width: 100%;
+        max-width: 440px;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: 16px;
+        transition: 0.25s;
+        border: 2px solid;
+      }
+
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      @media (min-width: 1180px) {
+        .notes-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media (max-width: 640px) {
+        .notes-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .note-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.3s,
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+      .note-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--nc);
+        opacity: 0.85;
+      }
+      .note-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--nc);
+        box-shadow: 0 24px 44px -28px rgba(0, 0, 0, 0.85);
+      }
+      .note-card h3 {
+        font-family: var(--mono);
+        font-size: 15px;
+        color: var(--nc);
+        margin-bottom: 8px;
+      }
+      .note-card p {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .note-tip {
+        margin-top: 12px;
+        font-size: 11px;
+        color: var(--faint);
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+      }
+      .note-demo {
+        height: 104px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        overflow: hidden;
+      }
+      .demo-lad {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        width: 70%;
+      }
+      .demo-lad i {
+        height: 8px;
+        border-radius: 4px;
+        background: var(--line2);
+        transition: 0.35s;
+      }
+      .note-card:hover .demo-lad i:nth-child(1) {
+        background: var(--pink);
+      }
+      .note-card:hover .demo-lad i:nth-child(2) {
+        background: var(--margin-c);
+      }
+      .note-card:hover .demo-lad i:nth-child(3) {
+        background: var(--border-c);
+      }
+      .note-card:hover .demo-lad i:nth-child(4) {
+        background: var(--content-c);
+      }
+      .note-card:hover .demo-lad i:nth-child(5) {
+        background: var(--padding-c);
+      }
+      .demo-col {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--muted);
+        transition: 0.3s;
+      }
+      .note-card:hover .demo-col {
+        color: var(--border-c);
+          transform: scale(1.2);
+      }
+      .demo-bt {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .demo-bt i {
+        width: 26px;
+        height: 26px;
+        border-radius: 7px;
+        transition: 0.3s;
+      }
+      .demo-bt i:nth-child(1) {
+        background: var(--content-bg);
+        border: 1px solid var(--content-c);
+      }
+      .demo-bt i:nth-child(3) {
+        background: var(--border-bg);
+        border: 1px solid var(--border-c);
+      }
+      .demo-bt em {
+        font: 9px var(--mono);
+        color: var(--faint);
+        font-style: normal;
+      }
+      .note-card:hover .demo-bt i:nth-child(3) {
+        transform: scale(1.25);
+        box-shadow: 0 0 0 2px var(--border-c);
+      }
+      .demo-imp {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--muted);
+        transition: 0.3s;
+      }
+      .note-card:hover .demo-imp {
+        color: var(--pink);
+        transform: scale(1.5);
+      }
+
+      .lesson-nav {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px clamp(18px, 3vw, 28px);
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+        align-items: center;
+        margin-top: 40px;
+      }
+      .ln-status {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--padding-c);
+        border: 1px solid rgba(62, 207, 142, 0.45);
+        border-radius: 999px;
+        padding: 3px 10px;
+      }
+      .lesson-nav h3 {
+        font-family: var(--disp);
+        font-size: 17px;
+        margin-top: 8px;
+      }
+      .ln-track {
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .tick {
+        width: 7px;
+        height: 15px;
+        border-radius: 2px;
+        background: #212a3e;
+        transition: 0.2s;
+      }
+      .tick.done {
+        background: var(--padding-c);
+        box-shadow: 0 0 8px rgba(62, 207, 142, 0.55);
+      }
+      .tick:hover {
+        background: var(--line2);
+      }
+      .ln-next {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        text-align: right;
+      }
+      .ln-next span {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .ln-next b {
+        font-family: var(--disp);
+        font-size: 15px;
+        color: var(--text);
+      }
+      footer {
+        border-top: 1px solid var(--line);
+        margin-top: 20px;
+        padding: 30px 0 44px;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+        color: var(--faint);
+        font-size: 12.5px;
+      }
+      footer .mono {
+        font-size: 11.5px;
+      }
+      footer .sp {
+        margin-left: auto;
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+      @media (max-width: 1020px) {
+        .intro {
+          grid-template-columns: 1fr;
+        }
+        .pick-grid {
+          grid-template-columns: 1fr;
+        }
+        .lesson-nav {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .ln-next {
+          align-items: center;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg">
+      <span class="glow g1"></span><span class="glow g2"></span>
+    </div>
+
+    <header class="topbar">
+      <span class="lesson-tag">lesson 35 / 45</span>
+      <nav>
+        <a href="#ranks">the-ranks</a>
+        <a href="#calculator">calculator</a>
+        <a href="#battle">battle</a>
+        <a href="#important">!important</a>
+        <a href="#ties">ties</a>
+        <a href="#notes">cheat-codes</a>
+      </nav>
+    </header>
+
+    <div class="wrap">
+      <!-- ============ intro ============ -->
+      <section class="intro">
+        <div>
+          <p class="eyebrow">lesson 35 · interactive</p>
+          <h1>The strongest selector <span class="word-style">wins</span>.</h1>
+          <p class="lede">
+            When two rules target the same element, CSS doesn't guess — it
+            <b>scores</b> each selector into a tuple (IDs, classes, elements),
+            compares <b>column by column</b>, and the higher one wins. Above the
+            ladder sit inline styles; above everything sits
+            <span class="mono">!important</span>.
+          </p>
+          <span class="css-full">S · TRONGEST · R · ULE · W · INS</span>
+        </div>
+        <div class="intro-panel">
+          <div class="ix-feat" id="ixFeat">p → (0,0,1)</div>
+          <p class="imode mono">every selector carries a score…</p>
+        </div>
+      </section>
+
+      <!-- ============ 01 · the ranks ============ -->
+      <section id="ranks" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">01 · the five ranks</p>
+          <h2>A ladder, not a lottery</h2>
+          <p class="lede">
+            From the top: <b>!important</b> exits the game entirely; then
+            <b>inline styles</b>; then <b>IDs</b>; then
+            <b>classes, attributes and pseudo-classes</b> sharing one column;
+            then <b>elements and pseudo-elements</b>. Click a rank to inspect
+            it.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>click a rank</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="rk-list" id="rkList"></div>
+              <p class="read" id="rkRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="code-box"><pre id="codeRk"></pre></div>
+            <p class="side-note">
+              The decision order is: importance → origin → specificity → source
+              order. This lesson covers the first and third; the next lesson
+              covers the rest.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 02 · calculator ============ -->
+      <section id="calculator" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">02 · the specificity calculator</p>
+          <h2>Build a selector, read the tuple</h2>
+          <p class="lede">
+            Tap parts to stack them into a selector. IDs land in the first
+            column, classes/attributes/pseudo-classes in the second,
+            elements/pseudo-elements in the third. Columns <b>never carry</b> —
+            no count of classes ever outweighs a single ID.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>stack the parts</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="cl-sel" id="clSel">.card</div>
+              <div class="cl-tuple">
+                <div class="cl-col cid"><b id="clId">0</b><span>IDs</span></div>
+                <div class="cl-col ccl">
+                  <b id="clCl">1</b><span>classes</span>
+                </div>
+                <div class="cl-col cel">
+                  <b id="clEl">0</b><span>elements</span>
+                </div>
+              </div>
+              <p class="read" id="clRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="chips" id="clChips">
+              <button class="sel-chip" data-p="#app">#app</button>
+              <button class="sel-chip on" data-p=".card">.card</button>
+              <button class="sel-chip" data-p=".active">.active</button>
+              <button class="sel-chip" data-p=":hover">:hover</button>
+              <button class="sel-chip" data-p="[data-x]">[data-x]</button>
+              <button class="sel-chip" data-p="div">div</button>
+              <button class="sel-chip" data-p="p">p</button>
+              <button class="sel-chip" data-p="::before">::before</button>
+            </div>
+            <button class="ghost-btn" id="clReset">↺ reset</button>
+            <div class="code-box"><pre id="codeCl"></pre></div>
+            <p class="side-note">
+              Try to beat <span class="mono">#app</span> with classes alone —
+              tap .card twelve times. You can't. That's the whole point.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 03 · battle ============ -->
+      <section id="battle" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">03 · the battle arena</p>
+          <h2>Two rules, one element</h2>
+          <p class="lede">
+            Pick a rule for each side; the paragraph takes the winner's color.
+            Comparison starts at the <b>highest column</b> and stops at the
+            first difference — lower columns never get counted.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>choose the fighters</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="bt-wrap">
+                <div class="bt-row">
+                  <span class="bt-tag">rule A</span>
+                  <div class="chips" id="btA"></div>
+                </div>
+                <div class="bt-row">
+                  <span class="bt-tag">rule B</span>
+                  <div class="chips" id="btB"></div>
+                </div>
+              </div>
+              <div class="bt-target" id="btTarget">who styles me?</div>
+              <p class="read" id="btRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="code-box"><pre id="codeBt"></pre></div>
+            <p class="side-note">
+              Default fight: <span class="mono">#id</span> vs
+              <span class="mono">.a.b.c</span> — one ID beats three classes,
+              because the ID column is compared first.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 04 · !important ============ -->
+      <section id="important" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">04 · !important</p>
+          <h2>The truce-breaker</h2>
+          <p class="lede">
+            <span class="mono">!important</span> doesn't add specificity — it
+            <b>exits the comparison</b>. A declaration marked important beats
+            every normal declaration, even one with a higher score. Toggle it
+            and watch a bare <span class="mono">p</span> defeat an ID.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>weak selector, nuclear flag</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="bt-target" id="imTarget">
+                styled by the stronger rule
+              </div>
+              <div class="chips">
+                <button class="ghost-btn" id="imToggle">
+                  + add !important to the p rule
+                </button>
+              </div>
+              <p class="read" id="imRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="code-box"><pre id="codeIm"></pre></div>
+            <p class="side-note">
+              Because it breaks the natural order, it breaks your ability to
+              override later — hence "important" should be rare: resets, user
+              preferences, a11y overrides. Never layout.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 05 · ties ============ -->
+      <section id="ties" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">05 · ties: source order</p>
+          <h2>Equal scores? Later wins</h2>
+          <p class="lede">
+            When specificity is identical, CSS falls back to
+            <b>source order</b>: the rule that appears
+            <i>later in the stylesheet</i> wins (not later in the HTML). Swap
+            the order and watch the color flip.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>same score, different order</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="bt-target" id="teTarget">two equal rules</div>
+              <div class="chips">
+                <button class="ghost-btn" id="teSwap">⇅ swap rule order</button>
+              </div>
+              <p class="read" id="teRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="code-box"><pre id="codeTe"></pre></div>
+            <p class="side-note">
+              This is why "just add another class" never fixes a conflict of
+              equal weight — and why import order matters in big codebases.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 06 · field notes ============ -->
+      <section id="notes" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">06 · field notes</p>
+          <h2>Cheat codes from lesson 35</h2>
+        </div>
+        <div class="notes-grid">
+          <article class="note-card" style="--nc: var(--border-c)">
+            <div class="note-demo">
+              <div class="demo-lad"><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+            <h3>compare column by column</h3>
+            <p>
+              Tuples, not numbers: (1,0,0) beats (0,12,0). Start at the ID
+              column, stop at the first difference. Columns never carry.
+            </p>
+            <p class="note-tip mono">↳ hover: the ladder lights top-down</p>
+          </article>
+          <article class="note-card" style="--nc: var(--margin-c)">
+            <div class="note-demo">
+              <div class="demo-col">style="…" &gt; #id &gt; .class &gt; p</div>
+            </div>
+            <h3>inline sits above selectors</h3>
+            <p>
+              The style attribute outranks any selector, however specific. Only
+              !important (and transitions) can override it.
+            </p>
+            <p class="note-tip mono">↳ hover: the order glows</p>
+          </article>
+          <article class="note-card" style="--nc: var(--pink)">
+            <div class="note-demo">
+              <div class="demo-imp">color: red !important</div>
+            </div>
+            <h3>!important exits the game</h3>
+            <p>
+              It's not more specificity — it's a different league. Normal
+              declarations never beat important ones. Use like a fire alarm.
+            </p>
+            <p class="note-tip mono">↳ hover: the alarm color</p>
+          </article>
+          <article class="note-card" style="--nc: var(--content-c)">
+            <div class="note-demo">
+              <div class="demo-bt"><i></i><em>vs</em><i></i></div>
+            </div>
+            <h3>ties → source order</h3>
+            <p>
+              Equal tuples? The later rule in the stylesheet wins. Order is part
+              of your architecture, not an accident.
+            </p>
+            <p class="note-tip mono">↳ hover: the right fighter steps up</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ lesson nav ============ -->
+      <div class="lesson-nav reveal">
+        <div>
+          <span class="ln-status">✓ completed</span>
+          <h3>35 — Specificity</h3>
+        </div>
+        <div class="ln-track" id="lnTrack"></div>
+        <div class="ln-next">
+          <span>up next</span>
+          <b>36 · Cascade &amp; Inheritance</b>
+        </div>
+      </div>
+
+      <footer>
+        <span class="mono">drag things, break things, learn things.</span>
+        <span class="sp mono">45 lessons · lesson 35 · specificity</span>
+      </footer>
+    </div>
+    <!-- /wrap -->
+
+    <script>
+      (() => {
+        const $ = (id) => document.getElementById(id);
+        const rule = (sel, decls) =>
+          `<span class="c-sel">${sel}</span> {\n${decls
+            .map((d) => {
+              const i = d.indexOf(":");
+              return `  <span class="c-prop">${d.slice(0, i)}</span>: <span class="c-val">${d.slice(i + 1).trim()}</span>;`;
+            })
+            .join("\n")}\n}`;
+
+        /* ---------- intro cycle ---------- */
+        const IX = [
+          "p  →  (0,0,1)",
+          ".card  →  (0,1,0)",
+          ".card.active:hover  →  (0,3,0)",
+          "#app  →  (1,0,0)",
+          'style="…"  →  inline · above selectors',
+          "!important  →  above everything",
+        ];
+        let ii = 0;
+        setInterval(() => {
+          $("ixFeat").textContent = IX[ii];
+          ii = (ii + 1) % IX.length;
+        }, 1600);
+
+        /* ---------- 01 ranks ---------- */
+        const RANKS = [
+          {
+            n: "!important",
+            ex: "color: red !important",
+            w: "overrides all",
+            bar: 100,
+            c: "var(--pink)",
+            d: "Not a specificity boost — a different league. Important declarations beat every normal declaration regardless of selector.",
+            code: () =>
+              rule("p", [`color: red !important`]) +
+              `\n<span class="c-com">/* beats #id, inline, everything normal */</span>`,
+          },
+          {
+            n: "inline style",
+            ex: 'style="color: …"',
+            w: "(1,0,0,0)",
+            bar: 80,
+            c: "var(--margin-c)",
+            d: 'The style attribute sits above any selector. Only !important can beat it — which is why inline styles feel "sticky".',
+            code: () =>
+              `<span class="c-com">&lt;p style="color: #f07f4f"&gt;</span>\n<span class="c-com">/* above every selector rule */</span>`,
+          },
+          {
+            n: "ID",
+            ex: "#header",
+            w: "(0,1,0,0)",
+            bar: 60,
+            c: "var(--border-c)",
+            d: "One ID beats any number of classes. IDs are unique per page — heavy weight, so keep them out of reusable component CSS.",
+            code: () => rule("#header", [`color: #f2c14e`]),
+          },
+          {
+            n: "class · attr · pseudo",
+            ex: ".nav · [type] · :hover",
+            w: "(0,0,1,0)",
+            bar: 40,
+            c: "var(--content-c)",
+            d: "Classes, attribute selectors and pseudo-classes share one column and stack: .a.b.c counts three in the same column.",
+            code: () =>
+              rule(".nav", [`color: #58a6ff`]) +
+              "\n" +
+              rule("[type]", [``]) +
+              rule(":hover", [``]),
+          },
+          {
+            n: "element · pseudo-el",
+            ex: "p · div · ::before",
+            w: "(0,0,0,1)",
+            bar: 20,
+            c: "var(--padding-c)",
+            d: "Type selectors and pseudo-elements are the lightest weight. Eleven of them still lose to a single class.",
+            code: () => rule("p", [`color: #3ecf8e`]),
+          },
+        ];
+        const rkList = $("rkList");
+        RANKS.forEach((r, i) => {
+          const b = document.createElement("button");
+          b.className = "rk-row";
+          b.style.setProperty("--rk-c", r.c);
+          b.innerHTML = `<span class="rk-name">${r.n}</span><span class="rk-bar"><i style="width:${r.bar}%"></i></span><span class="rk-w">${r.w}</span>`;
+          b.addEventListener("click", () => {
+            rkList
+              .querySelectorAll(".rk-row")
+              .forEach((x) => x.classList.remove("on"));
+            b.classList.add("on");
+            $("rkRead").innerHTML = `<b>${r.n}</b> — ${r.d}`;
+            $("codeRk").innerHTML = r.code();
+          });
+          rkList.appendChild(b);
+        });
+        rkList.children[2].click();
+
+        /* ---------- 02 calculator ---------- */
+        const TYPES = {
+          "#app": "id",
+          ".card": "cl",
+          ".active": "cl",
+          ":hover": "cl",
+          "[data-x]": "cl",
+          div: "el",
+          p: "el",
+          "::before": "el",
+        };
+        let parts = [".card"];
+        function renderCl() {
+          const t = { id: 0, cl: 0, el: 0 };
+          parts.forEach((p) => t[TYPES[p]]++);
+          $("clSel").textContent = parts.join("") || "(empty)";
+          $("clId").textContent = t.id;
+          $("clCl").textContent = t.cl;
+          $("clEl").textContent = t.el;
+          $("clRead").innerHTML =
+            `specificity: <b>(${t.id}, ${t.cl}, ${t.el})</b> — columns compared left to right, never carried`;
+          $("codeCl").innerHTML = rule(parts.join("") || "*", [
+            `/* IDs ${t.id} · classes ${t.cl} · elements ${t.el} */`,
+          ]);
+        }
+        $("clChips").addEventListener("click", (e) => {
+          const c = e.target.closest(".sel-chip");
+          if (!c) return;
+          if (parts.length >= 10) return;
+          parts.push(c.dataset.p);
+          renderCl();
+        });
+        $("clReset").addEventListener("click", () => {
+          parts = [];
+          renderCl();
+        });
+        renderCl();
+
+        /* ---------- 03 battle ---------- */
+        const F = {
+          p: { rank: 0, count: 1, label: "p", tuple: "0,0,1" },
+          ".a.b.c": { rank: 1, count: 3, label: ".a.b.c", tuple: "0,3,0" },
+          "#id": { rank: 2, count: 1, label: "#id", tuple: "1,0,0" },
+          'style=""': { rank: 3, count: 1, label: 'style=""', tuple: "inline" },
+        };
+        const TIERS = ["element", "class", "ID", "inline"];
+        let A = F["#id"],
+          B = F[".a.b.c"];
+        function buildChips(box, cur, cb) {
+          box.innerHTML = "";
+          Object.keys(F).forEach((k) => {
+            const c = document.createElement("button");
+            c.className = "sel-chip" + (F[k] === cur ? " on" : "");
+            c.textContent = k;
+            c.addEventListener("click", () => {
+              cb(F[k]);
+            });
+            box.appendChild(c);
+          });
+        }
+        function renderBt() {
+          buildChips($("btA"), A, (x) => {
+            A = x;
+            renderBt();
+          });
+          buildChips($("btB"), B, (x) => {
+            B = x;
+            renderBt();
+          });
+          let w;
+          if (A.rank !== B.rank) w = A.rank > B.rank ? "A" : "B";
+          else if (A.count !== B.count) w = A.count > B.count ? "A" : "B";
+          else w = "tie";
+          const col =
+            w === "A"
+              ? "var(--content-c)"
+              : w === "B"
+                ? "var(--margin-c)"
+                : "var(--border-c)";
+          const t = $("btTarget");
+          t.style.borderColor = col;
+          t.style.color = col;
+          t.style.background =
+            w === "tie"
+              ? "var(--border-bg)"
+              : w === "A"
+                ? "var(--content-bg)"
+                : "var(--margin-bg)";
+          t.textContent = w === "tie" ? "it's a tie" : `rule ${w} wins`;
+          let why;
+          if (w === "tie")
+            why = `identical weight (<b>${A.tuple}</b> vs <b>${B.tuple}</b>) — source order would decide (section 05)`;
+          else {
+            const W = w === "A" ? A : B,
+              L = w === "A" ? B : A;
+            why =
+              W.rank !== L.rank
+                ? `<b>${W.label}</b> — the ${TIERS[W.rank]} tier outranks ${TIERS[L.rank]}; lower columns never get counted`
+                : `same tier (${TIERS[W.rank]}) — count <b>${W.count}</b> beats <b>${L.count}</b>`;
+          }
+          $("btRead").innerHTML =
+            `A <b>${A.label}</b> (${A.tuple}) vs B <b>${B.label}</b> (${B.tuple}) → ${why}`;
+          $("codeBt").innerHTML =
+            rule(A.label === 'style=""' ? "p[style]" : A.label, [
+              `color: blue  /* ${A.tuple} */`,
+            ]) +
+            "\n" +
+            rule(B.label === 'style=""' ? "p[style]" : B.label, [
+              `color: orange  /* ${B.tuple} */`,
+            ]);
+        }
+        renderBt();
+
+        /* ---------- 04 important ---------- */
+        let impOn = false;
+        function renderIm() {
+          const t = $("imTarget");
+          const col = impOn ? "var(--margin-c)" : "var(--content-c)";
+          t.style.borderColor = col;
+          t.style.color = col;
+          t.style.background = impOn ? "var(--margin-bg)" : "var(--content-bg)";
+          t.textContent = impOn ? "p !important wins" : "#title wins";
+          $("imToggle").textContent = impOn
+            ? "− remove !important"
+            : "+ add !important to the p rule";
+          $("imRead").innerHTML = impOn
+            ? "<b>p (0,0,1) + !important</b> defeats <b>#title (1,0,0)</b> — importance beats specificity"
+            : "<b>#title (1,0,0)</b> beats <b>p (0,0,1)</b> — normal specificity comparison";
+          $("codeIm").innerHTML =
+            rule("#title", [`color: #58a6ff  /* (1,0,0) */`]) +
+            "\n" +
+            rule("p", [
+              `color: #f07f4f${impOn ? " !important" : ""}  /* (0,0,1) */`,
+            ]);
+        }
+        $("imToggle").addEventListener("click", () => {
+          impOn = !impOn;
+          renderIm();
+        });
+        renderIm();
+
+        /* ---------- 05 ties ---------- */
+        let orderAB = true;
+        function renderTe() {
+          const winner = orderAB ? "orange" : "blue";
+          const col =
+            winner === "blue" ? "var(--content-c)" : "var(--margin-c)";
+          const t = $("teTarget");
+          t.style.borderColor = col;
+          t.style.color = col;
+          t.style.background =
+            winner === "blue" ? "var(--content-bg)" : "var(--margin-bg)";
+          t.textContent = `${winner} wins — declared last`;
+          $("teRead").innerHTML =
+            `both <b>(0,1,0)</b> — the <b>later</b> rule in the stylesheet wins: <b>${winner}</b>`;
+          $("codeTe").innerHTML = orderAB
+            ? rule(".card", [`color: blue`]) +
+              "\n" +
+              rule(".card", [`color: orange  /* later → wins */`])
+            : rule(".card", [`color: orange`]) +
+              "\n" +
+              rule(".card", [`color: blue  /* later → wins */`]);
+        }
+        $("teSwap").addEventListener("click", () => {
+          orderAB = !orderAB;
+          renderTe();
+        });
+        renderTe();
+
+        /* ---------- lesson track ---------- */
+        const t = $("lnTrack");
+        for (let i = 0; i < 45; i++) {
+          const s = document.createElement("span");
+          s.className = "tick" + (i < 35 ? " done" : "");
+          s.title = "lesson " + (i + 1);
+          t.appendChild(s);
+        }
+
+        /* ---------- reveal ---------- */
+        const io = new IntersectionObserver(
+          (es) =>
+            es.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                io.unobserve(e.target);
+              }
+            }),
+          { threshold: 0.12 },
+        );
+        document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1628 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modern CSS Features — Lesson 34</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' fill='none' stroke='%23f07f4f' stroke-width='2'/%3E%3Crect x='8' y='8' width='16' height='16' fill='none' stroke='%23f2c14e' stroke-width='2'/%3E%3Crect x='13' y='13' width='6' height='6' fill='%2358a6ff'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0e15;
+        --panel: #121826;
+        --panel2: #0d1220;
+        --ink: #10141d;
+        --line: #222c40;
+        --line2: #31405e;
+        --text: #e9eef7;
+        --muted: #8d9ab0;
+        --faint: #5b6a84;
+        --margin-c: #f07f4f;
+        --margin-bg: rgba(240, 127, 79, 0.14);
+        --border-c: #f2c14e;
+        --border-bg: rgba(242, 193, 78, 0.16);
+        --padding-c: #3ecf8e;
+        --padding-bg: rgba(62, 207, 142, 0.14);
+        --content-c: #58a6ff;
+        --content-bg: rgba(88, 166, 255, 0.17);
+        --pink: #ff4f8b;
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: dark;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 15px;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+      ::selection {
+        background: rgba(88, 166, 255, 0.35);
+      }
+      .mono {
+        font-family: var(--mono);
+      }
+      section {
+        scroll-margin-top: 76px;
+      }
+      b {
+        font-weight: 600;
+      }
+
+      .bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            700px 460px at 12% -6%,
+            rgba(242, 193, 78, 0.07),
+            transparent 60%
+          ),
+          radial-gradient(
+            760px 520px at 92% 22%,
+            rgba(88, 166, 255, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            600px 480px at 40% 105%,
+            rgba(62, 207, 142, 0.05),
+            transparent 60%
+          );
+      }
+      .bg::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(233, 238, 247, 0.035) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(233, 238, 247, 0.035) 1px,
+            transparent 1px
+          );
+        background-size: 28px 28px;
+        mask-image: radial-gradient(
+          ellipse 120% 90% at 50% 0%,
+          #000 40%,
+          transparent 100%
+        );
+      }
+      .bg .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.5;
+        animation: drift 26s ease-in-out infinite alternate;
+      }
+      .bg .g1 {
+        width: 420px;
+        height: 420px;
+        left: -120px;
+        top: 30%;
+        background: rgba(240, 127, 79, 0.1);
+      }
+      .bg .g2 {
+        width: 460px;
+        height: 460px;
+        right: -140px;
+        top: 60%;
+        background: rgba(88, 166, 255, 0.1);
+        animation-delay: -12s;
+      }
+      @keyframes drift {
+        from {
+          transform: translateY(-30px);
+        }
+        to {
+          transform: translateY(40px);
+        }
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 12px clamp(16px, 4vw, 44px);
+        background: rgba(11, 14, 21, 0.92);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar nav {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .topbar nav a {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 6px 11px;
+        border-radius: 999px;
+        transition: 0.2s;
+      }
+      .topbar nav a:hover {
+        color: var(--text);
+        background: #161d2c;
+      }
+      .lesson-tag {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--border-c);
+        border: 1px dashed rgba(242, 193, 78, 0.45);
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .wrap {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: 0 clamp(16px, 4vw, 44px);
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        padding: clamp(20px, 4vh, 48px) 0 clamp(30px, 5vh, 56px);
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--padding-c);
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(2.3rem, 5.2vw, 3.7rem);
+        line-height: 1.06;
+        letter-spacing: -0.02em;
+      }
+      .word-style {
+        display: inline-block;
+        padding: 0.02em 0.22em;
+        background: var(--padding-bg);
+        border: 0.06em solid var(--padding-c);
+        border-radius: 0.14em;
+        color: #b8f2d9;
+        transition: transform 0.3s;
+        cursor: default;
+      }
+      .word-style:hover {
+        transform: rotate(-2deg) scale(1.03);
+      }
+      .lede {
+        color: var(--muted);
+        max-width: 56ch;
+        margin-top: 18px;
+        font-size: 1.05rem;
+      }
+      .lede b {
+        color: var(--text);
+      }
+      .css-full {
+        display: inline-block;
+        margin-top: 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--faint);
+        letter-spacing: 0.08em;
+      }
+      .intro-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 26px;
+        display: grid;
+        place-items: center;
+        gap: 14px;
+        box-shadow: 0 30px 60px -40px rgba(0, 0, 0, 0.8);
+        width: 100%;
+      }
+      .ix-feat {
+        font-family: var(--mono);
+        font-size: 15px;
+        color: var(--padding-c);
+        background: var(--ink);
+        border: 1px solid var(--line2);
+        border-radius: 10px;
+        padding: 12px 18px;
+        min-width: 240px;
+        text-align: center;
+      }
+      .imode {
+        font-size: 11px;
+        color: var(--faint);
+        letter-spacing: 0.1em;
+      }
+
+      .sec {
+        padding: clamp(36px, 6vh, 64px) 0;
+      }
+      .sec-head {
+        margin-bottom: 26px;
+        max-width: 72ch;
+      }
+      .sec-head h2 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+        letter-spacing: -0.015em;
+        line-height: 1.15;
+      }
+      .sec-head .lede {
+        margin-top: 10px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 18px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .panel-head h3 {
+        font-family: var(--disp);
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dots i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dots i:nth-child(1) {
+        background: #f07f4f;
+      }
+      .dots i:nth-child(2) {
+        background: #f2c14e;
+      }
+      .dots i:nth-child(3) {
+        background: #3ecf8e;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.85;
+        overflow-x: auto;
+      }
+      .c-sel {
+        color: #7fe0b0;
+      }
+      .c-prop {
+        color: #8ab4ff;
+      }
+      .c-val {
+        color: #f2c14e;
+      }
+      .c-com {
+        color: #5b6a84;
+      }
+      .grp {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+
+      .pick-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 18px;
+        align-items: stretch;
+      }
+      .stage-wrap {
+        padding: 28px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 360px;
+        gap: 16px;
+        width: 100%;
+      }
+      .side {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .sel-chip {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .sel-chip:hover {
+        color: var(--text);
+        border-color: var(--content-c);
+        transform: translateY(-2px);
+      }
+      .sel-chip.on {
+        color: #0e1017;
+        background: var(--content-c);
+        border-color: var(--content-c);
+        font-weight: 600;
+      }
+      .ghost-btn {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--faint);
+        background: none;
+        border: 1px dashed var(--line2);
+        border-radius: 8px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .ghost-btn:hover {
+        color: var(--content-c);
+        border-color: var(--content-c);
+      }
+      .code-box {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .code-box pre {
+        min-height: 0;
+        font-size: 12px;
+      }
+      .side-note {
+        font-size: 12px;
+        color: var(--faint);
+      }
+      .read {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 14px;
+        text-align: center;
+        width: 100%;
+        max-width: 440px;
+      }
+      .read b {
+        color: var(--text);
+      }
+      input[type="range"] {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        outline: none;
+        cursor: pointer;
+        background: linear-gradient(
+          90deg,
+          var(--ac) var(--fill, 50%),
+          #232c40 var(--fill, 50%)
+        );
+      }
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        transition: transform 0.15s;
+      }
+      input[type="range"]::-webkit-slider-thumb:hover {
+        transform: scale(1.15);
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: #fff;
+        border: 4px solid var(--ac);
+      }
+      .ctl {
+        border: 1px solid transparent;
+        border-radius: 12px;
+        padding: 7px 11px;
+        transition: 0.2s;
+      }
+      .ctl:hover {
+        background: #101725;
+        border-color: var(--line);
+      }
+      .ctl-top {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin-bottom: 6px;
+      }
+      .ctl-top label {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--text);
+      }
+      .ctl-val {
+        margin-left: auto;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--ac);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 2px 9px;
+      }
+      input[type="color"].pick {
+        width: 48px;
+        height: 34px;
+        border: 1px solid var(--line2);
+        border-radius: 9px;
+        background: none;
+        padding: 2px;
+        cursor: pointer;
+      }
+      .picker-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .picker-row label {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        flex: 1;
+      }
+
+      /* 01 :has() */
+      .has-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        width: 100%;
+        max-width: 440px;
+      }
+      .has-card {
+        background: var(--panel2);
+        border: 2px solid var(--line2);
+        border-radius: 12px;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        transition: 0.25s;
+        cursor: pointer;
+        position: relative;
+      }
+      .has-card .has-badge {
+        position: absolute;
+        top: -9px;
+        right: 10px;
+        font: 700 8.5px var(--mono);
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: var(--padding-c);
+        color: #0e1017;
+        opacity: 0;
+        transition: 0.25s;
+      }
+      .has-card label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font: 11px var(--mono);
+        color: var(--muted);
+        cursor: pointer;
+      }
+      .has-card input {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+      }
+      .has-card .has-emoji {
+        font-size: 26px;
+      }
+      .has-card:has(input:checked) {
+        border-color: var(--padding-c);
+        background: var(--padding-bg);
+      }
+      .has-card:has(input:checked) .has-badge {
+        opacity: 1;
+      }
+      .has-card:has(input:checked) .has-emoji {
+        transform: scale(1.15);
+      }
+
+      /* 02 :is / :where */
+      .iw-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        width: 100%;
+        max-width: 440px;
+      }
+      .iw-col {
+        background: var(--panel2);
+        border: 1px solid var(--line2);
+        border-radius: 12px;
+        padding: 14px;
+      }
+      .iw-col h4 {
+        font-family: var(--disp);
+        font-size: 14px;
+        margin-bottom: 6px;
+      }
+      .iw-col p {
+        font: 10px var(--mono);
+        color: var(--faint);
+      }
+      .iw-is :is(h4) {
+        color: var(--content-c);
+      }
+      .iw-where :where(h4) {
+        color: var(--content-c);
+      }
+      .compet h4 {
+        color: var(--margin-c);
+      }
+      .iw-tag {
+        display: inline-block;
+        font: 700 8.5px var(--mono);
+        padding: 2px 8px;
+        border-radius: 999px;
+        border: 1px solid var(--line2);
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+
+      /* 03 media */
+      .md-stage {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        max-width: 440px;
+      }
+      .md-frame {
+        width: 320px;
+        max-width: 100%;
+        background: var(--panel2);
+        border: 1px solid var(--line2);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .md-frame img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        transition: 0.25s;
+      }
+
+      /* 04 scroll + accent */
+      .sa-stage {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        width: 100%;
+        max-width: 440px;
+      }
+      .sa-scroll {
+        height: 150px;
+        overflow-y: auto;
+        background: var(--panel2);
+        border: 1px solid var(--line2);
+        border-radius: 12px;
+        padding: 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .sa-scroll i {
+        height: 14px;
+        border-radius: 4px;
+        background: #232c40;
+        flex: none;
+      }
+      .sa-scroll i:nth-child(3n) {
+        width: 70%;
+      }
+      .sa-scroll i:nth-child(4n) {
+        width: 85%;
+      }
+      .sa-form {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        flex-wrap: wrap;
+        background: var(--panel2);
+        border: 1px solid var(--line2);
+        border-radius: 12px;
+        padding: 14px;
+      }
+      .sa-form label {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font: 11px var(--mono);
+        color: var(--muted);
+        cursor: pointer;
+      }
+      .sa-form input[type="checkbox"],
+      .sa-form input[type="radio"] {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+      }
+      .sa-form progress {
+        width: 110px;
+      }
+
+      /* 05 mix + nest */
+      .mx-stage {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        width: 100%;
+        max-width: 440px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .mx-swatch {
+        width: 120px;
+        height: 80px;
+        border-radius: 12px;
+        border: 2px solid var(--line2);
+        transition: 0.2s;
+        display: grid;
+        place-items: center;
+        font: 700 10px var(--mono);
+        color: #fff;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+      }
+      .nest-card {
+        background: var(--panel2);
+        border: 1px solid var(--line2);
+        border-radius: 12px;
+        padding: 16px;
+        width: 100%;
+        max-width: 440px;
+      }
+      .nest-card .nc-title {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: 15px;
+        color: var(--text);
+      }
+      .nest-card .nc-body {
+        font-size: 11.5px;
+        color: var(--muted);
+      }
+      .nest-card .nc-body .nc-link {
+        color: var(--content-c);
+      }
+      .nest-card:hover {
+        border-color: var(--content-c);
+      }
+      .nest-card:hover .nc-title {
+        color: var(--content-c);
+      }
+
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      @media (min-width: 1180px) {
+        .notes-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media (max-width: 640px) {
+        .notes-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .note-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.3s,
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+      .note-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--nc);
+        opacity: 0.85;
+      }
+      .note-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--nc);
+        box-shadow: 0 24px 44px -28px rgba(0, 0, 0, 0.85);
+      }
+      .note-card h3 {
+        font-family: var(--mono);
+        font-size: 15px;
+        color: var(--nc);
+        margin-bottom: 8px;
+      }
+      .note-card p {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .note-tip {
+        margin-top: 12px;
+        font-size: 11px;
+        color: var(--faint);
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+      }
+      .note-demo {
+        height: 104px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        overflow: hidden;
+      }
+      .demo-has {
+        width: 60px;
+        height: 44px;
+        border: 2px solid var(--line2);
+        border-radius: 9px;
+        display: grid;
+        place-items: center;
+        transition: 0.3s;
+      }
+      .demo-has i {
+        width: 16px;
+        height: 16px;
+        border: 2px solid var(--line2);
+        border-radius: 4px;
+        transition: 0.3s;
+      }
+      .note-card:hover .demo-has {
+        border-color: var(--padding-c);
+        background: var(--padding-bg);
+      }
+      .note-card:hover .demo-has i {
+        background: var(--padding-c);
+        border-color: var(--padding-c);
+      }
+      .demo-isw {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--muted);
+        transition: 0.3s;
+      }
+      .note-card:hover .demo-isw {
+        color: var(--content-c);
+      }
+      .demo-fit {
+        width: 64px;
+        height: 44px;
+        border-radius: 7px;
+        overflow: hidden;
+        border: 1px solid var(--line2);
+      }
+      .demo-fit i {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          135deg,
+          var(--margin-c) 25%,
+          var(--border-c) 25% 50%,
+          var(--padding-c) 50% 75%,
+          var(--content-c) 75%
+        );
+        transition: 0.4s;
+      }
+      .note-card:hover .demo-fit i {
+        transform: scale(1.4);
+      }
+      .demo-mix {
+        display: flex;
+        gap: 4px;
+      }
+      .demo-mix i {
+        width: 22px;
+        height: 30px;
+        border-radius: 5px;
+        transition: 0.3s;
+      }
+      .demo-mix i:nth-child(1) {
+        background: #58a6ff;
+      }
+      .demo-mix i:nth-child(3) {
+        background: #f07f4f;
+      }
+      .demo-mix i:nth-child(2) {
+        background: color-mix(in oklab, #58a6ff 50%, #f07f4f);
+      }
+      .note-card:hover .demo-mix i:nth-child(2) {
+        transform: scale(1.2);
+      }
+
+      .lesson-nav {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px clamp(18px, 3vw, 28px);
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+        align-items: center;
+        margin-top: 40px;
+      }
+      .ln-status {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--padding-c);
+        border: 1px solid rgba(62, 207, 142, 0.45);
+        border-radius: 999px;
+        padding: 3px 10px;
+      }
+      .lesson-nav h3 {
+        font-family: var(--disp);
+        font-size: 17px;
+        margin-top: 8px;
+      }
+      .ln-track {
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .tick {
+        width: 7px;
+        height: 15px;
+        border-radius: 2px;
+        background: #212a3e;
+        transition: 0.2s;
+      }
+      .tick.done {
+        background: var(--padding-c);
+        box-shadow: 0 0 8px rgba(62, 207, 142, 0.55);
+      }
+      .tick:hover {
+        background: var(--line2);
+      }
+      .ln-next {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        text-align: right;
+      }
+      .ln-next span {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .ln-next b {
+        font-family: var(--disp);
+        font-size: 15px;
+        color: var(--text);
+      }
+      footer {
+        border-top: 1px solid var(--line);
+        margin-top: 20px;
+        padding: 30px 0 44px;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+        color: var(--faint);
+        font-size: 12.5px;
+      }
+      footer .mono {
+        font-size: 11.5px;
+      }
+      footer .sp {
+        margin-left: auto;
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+      @media (max-width: 1020px) {
+        .intro {
+          grid-template-columns: 1fr;
+        }
+        .pick-grid {
+          grid-template-columns: 1fr;
+        }
+        .lesson-nav {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .ln-next {
+          align-items: center;
+        }
+        .has-grid {
+          grid-template-columns: 1fr;
+        }
+        .iw-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg">
+      <span class="glow g1"></span><span class="glow g2"></span>
+    </div>
+
+    <header class="topbar">
+      <span class="lesson-tag">lesson 34 / 45</span>
+      <nav>
+        <a href="#has">:has()</a>
+        <a href="#iswhere">:is() · :where()</a>
+        <a href="#media">aspect · object-fit</a>
+        <a href="#scrollaccent">scroll · accent</a>
+        <a href="#mixnest">color-mix · nesting</a>
+        <a href="#notes">cheat-codes</a>
+      </nav>
+    </header>
+
+    <div class="wrap">
+      <!-- ============ intro ============ -->
+      <section class="intro">
+        <div>
+          <p class="eyebrow">lesson 34 · interactive</p>
+          <h1>The features that <span class="word-style">shipped</span>.</h1>
+          <p class="lede">
+            The last few years of CSS delivered more power than the previous
+            decade: <b>:has()</b> selects parents, <b>:is()/:where()</b> group
+            with control over specificity, <b>aspect-ratio</b> and
+            <b>object-fit</b> tame media, <b>color-mix()</b> blends colors, and
+            <b>nesting</b> is finally native. All live, all in your browser
+            today.
+          </p>
+          <span class="css-full">M · ODERN · C · SS · N · OW</span>
+        </div>
+        <div class="intro-panel">
+          <div class="ix-feat" id="ixFeat">:has()</div>
+          <p class="imode mono">ten features, one lesson…</p>
+        </div>
+      </section>
+
+      <!-- ============ 01 · :has() ============ -->
+      <section id="has" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">01 · :has()</p>
+          <h2>The parent selector, at last</h2>
+          <p class="lede">
+            CSS could never style an element based on its children — until
+            <span class="mono">:has()</span>. Check a box and the
+            <b>whole card</b> lights up, with zero JavaScript. The selector
+            reads: "a card that has a checked input".
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>check to light the parent</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="has-grid">
+                <div class="has-card">
+                  <span class="has-badge">selected</span
+                  ><span class="has-emoji">☕</span
+                  ><label><input type="checkbox" /> espresso</label>
+                </div>
+                <div class="has-card">
+                  <span class="has-badge">selected</span
+                  ><span class="has-emoji">🫘</span
+                  ><label><input type="checkbox" /> beans</label>
+                </div>
+                <div class="has-card">
+                  <span class="has-badge">selected</span
+                  ><span class="has-emoji">🧋</span
+                  ><label><input type="checkbox" /> cold brew</label>
+                </div>
+              </div>
+              <p class="read">the card reacts to its child — pure CSS</p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="code-box"><pre id="codeHas"></pre></div>
+            <p class="side-note">
+              :has() composes:
+              <span class="mono">form:has(:invalid)</span> shows an error state,
+              <span class="mono">.nav:has(a:hover)</span> highlights a menu.
+              It's a query, not a state.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 02 · :is() / :where() ============ -->
+      <section id="iswhere" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">02 · :is() · :where()</p>
+          <h2>Grouping, with a specificity dial</h2>
+          <p class="lede">
+            Both group selectors. The difference:
+            <span class="mono">:is()</span> takes the <b>highest</b> specificity
+            of its arguments; <span class="mono">:where()</span> takes
+            <b>zero</b>. Toggle the competing rule and watch :where lose while
+            :is holds.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>same grouping, different weight</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="iw-grid" id="iwGrid">
+                <div class="iw-col iw-is">
+                  <span class="iw-tag">:is() · 0,1,1</span>
+                  <h4>Heading via :is(h4)</h4>
+                  <p>
+                    keeps its blue — specificity 0,1,1 beats the 0,0,1
+                    competitor
+                  </p>
+                </div>
+                <div class="iw-col iw-where">
+                  <span class="iw-tag">:where() · 0,0,1</span>
+                  <h4>Heading via :where(h4)</h4>
+                  <p>
+                    loses to the later plain h4 rule — :where adds 0 specificity
+                  </p>
+                </div>
+              </div>
+              <div class="chips">
+                <button class="ghost-btn" id="iwToggle">
+                  + add competing h4 { } rule
+                </button>
+              </div>
+              <p class="read" id="iwRead">
+                competitor <b>off</b> — both headings blue
+              </p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="code-box"><pre id="codeIw"></pre></div>
+            <p class="side-note">
+              Use <span class="mono">:where()</span> when you want a sensible
+              default that any later rule can override;
+              <span class="mono">:is()</span> when the group should carry real
+              weight.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 03 · aspect-ratio · object-fit · object-position ============ -->
+      <section id="media" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">
+            03 · aspect-ratio · object-fit · object-position
+          </p>
+          <h2>Tame the media box</h2>
+          <p class="lede">
+            <span class="mono">aspect-ratio</span> sets the box's proportions.
+            <span class="mono">object-fit</span> decides how the image fills it
+            (cover / contain / fill).
+            <span class="mono">object-position</span> picks which part survives
+            the crop.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>the crop playground</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="md-stage">
+                <div class="md-frame">
+                  <img
+                    id="mdImg"
+                    alt="four quadrants and a center circle"
+                    src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'%3E%3Crect width='400' height='300' fill='%2310141d'/%3E%3Crect x='0' y='0' width='200' height='150' fill='%23f07f4f'/%3E%3Crect x='200' y='0' width='200' height='150' fill='%23f2c14e'/%3E%3Crect x='0' y='150' width='200' height='150' fill='%233ecf8e'/%3E%3Crect x='200' y='150' width='200' height='150' fill='%2358a6ff'/%3E%3Ccircle cx='200' cy='150' r='60' fill='%23fff'/%3E%3C/svg%3E"
+                  />
+                </div>
+                <p class="read" id="mdRead"></p>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <p class="grp">aspect-ratio</p>
+            <div class="chips" id="arChips">
+              <button class="sel-chip on" data-v="1/1">1 / 1</button>
+              <button class="sel-chip" data-v="4/3">4 / 3</button>
+              <button class="sel-chip" data-v="16/9">16 / 9</button>
+              <button class="sel-chip" data-v="21/9">21 / 9</button>
+            </div>
+            <p class="grp">object-fit</p>
+            <div class="chips" id="ofChips">
+              <button class="sel-chip on" data-v="cover">cover</button>
+              <button class="sel-chip" data-v="contain">contain</button>
+              <button class="sel-chip" data-v="fill">fill</button>
+            </div>
+            <p class="grp">object-position</p>
+            <div class="chips" id="opChips">
+              <button class="sel-chip on" data-v="center">center</button>
+              <button class="sel-chip" data-v="top">top</button>
+              <button class="sel-chip" data-v="left">left</button>
+              <button class="sel-chip" data-v="right">right</button>
+            </div>
+            <div class="code-box"><pre id="codeMd"></pre></div>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 04 · scroll-behavior · accent-color ============ -->
+      <section id="scrollaccent" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">04 · scroll-behavior · accent-color</p>
+          <h2>Two one-liners with big feel</h2>
+          <p class="lede">
+            <span class="mono">scroll-behavior: smooth</span> turns jump-scrolls
+            into glides. <span class="mono">accent-color</span> themes every
+            native control — checkboxes, radios, ranges, progress — in one
+            declaration.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>feel the difference</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="sa-stage">
+                <div class="sa-scroll" id="saScroll">
+                  <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i
+                  ><i></i><i></i><i></i><i></i><i></i>
+                </div>
+                <div class="chips">
+                  <button class="ghost-btn" id="saJump">
+                    ⤓ jump to bottom
+                  </button>
+                </div>
+                <div class="sa-form" id="saForm">
+                  <label><input type="checkbox" checked /> checkbox</label>
+                  <label><input type="radio" name="acc" checked /> radio</label>
+                  <progress value="60" max="100"></progress>
+                </div>
+              </div>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="chips" id="sbChips">
+              <button class="sel-chip" data-v="auto">
+                scroll-behavior: auto
+              </button>
+              <button class="sel-chip on" data-v="smooth">
+                scroll-behavior: smooth
+              </button>
+            </div>
+            <div class="picker-row">
+              <label for="cAcc">accent-color</label
+              ><input type="color" class="pick" id="cAcc" value="#3ecf8e" />
+            </div>
+            <div class="code-box"><pre id="codeSa"></pre></div>
+            <p class="side-note">
+              Respect <span class="mono">prefers-reduced-motion</span>: wrap
+              smooth scrolling in a media query so motion-sensitive users get
+              instant jumps.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 05 · color-mix() · nesting ============ -->
+      <section id="mixnest" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">05 · color-mix() · CSS nesting</p>
+          <h2>Blend colors, nest rules</h2>
+          <p class="lede">
+            <span class="mono">color-mix()</span> blends two colors by a
+            percentage, right in CSS — tints and shades without a preprocessor.
+            Native <b>nesting</b> lets you write child rules inside their
+            parent, no build step.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>blend &amp; nest</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="mx-stage">
+                <div class="mx-swatch" id="mxSwatch">50%</div>
+              </div>
+              <div class="nest-card" id="nestCard">
+                <div class="nc-title">Nested card</div>
+                <div class="nc-body">
+                  the title &amp; <span class="nc-link">link</span> are styled
+                  by rules nested inside <span class="mono">.card { }</span>
+                </div>
+              </div>
+              <p class="read" id="mxRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="picker-row">
+              <label for="cA">color A</label
+              ><input type="color" class="pick" id="cA" value="#58a6ff" />
+            </div>
+            <div class="picker-row">
+              <label for="cB">color B</label
+              ><input type="color" class="pick" id="cB" value="#f07f4f" />
+            </div>
+            <div class="ctl" style="--ac: var(--border-c)">
+              <div class="ctl-top">
+                <label for="rMix">A percentage</label
+                ><output class="ctl-val" id="oMix">50%</output>
+              </div>
+              <input type="range" id="rMix" min="0" max="100" value="50" />
+            </div>
+            <div class="code-box"><pre id="codeMx"></pre></div>
+            <p class="side-note">
+              color-mix works in any color space —
+              <span class="mono">in oklab</span> gives perceptually even blends,
+              <span class="mono">in hsl</span> spins the hue wheel.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 06 · field notes ============ -->
+      <section id="notes" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">06 · field notes</p>
+          <h2>Cheat codes from lesson 34</h2>
+        </div>
+        <div class="notes-grid">
+          <article class="note-card" style="--nc: var(--padding-c)">
+            <div class="note-demo">
+              <div class="demo-has"><i></i></div>
+            </div>
+            <h3>:has() = parent selector</h3>
+            <p>
+              Style an element by what it contains. Forms, cards, navs — all can
+              now react to descendants without JS.
+            </p>
+            <p class="note-tip mono">↳ hover: the parent lights up</p>
+          </article>
+          <article class="note-card" style="--nc: var(--content-c)">
+            <div class="note-demo">
+              <div class="demo-isw">:is() 0,1,1 · :where() 0,0,0</div>
+            </div>
+            <h3>:is vs :where</h3>
+            <p>
+              Same grouping, different specificity. :is takes the max of its
+              args; :where takes zero so it's always overridable.
+            </p>
+            <p class="note-tip mono">↳ hover: the weights show</p>
+          </article>
+          <article class="note-card" style="--nc: var(--border-c)">
+            <div class="note-demo">
+              <div class="demo-fit"><i></i></div>
+            </div>
+            <h3>object-fit tames media</h3>
+            <p>
+              cover crops, contain letterboxes, fill distorts. Pair with
+              aspect-ratio for consistent media boxes, object-position to aim
+              the crop.
+            </p>
+            <p class="note-tip mono">↳ hover: the crop zooms</p>
+          </article>
+          <article class="note-card" style="--nc: var(--margin-c)">
+            <div class="note-demo">
+              <div class="demo-mix"><i></i><i></i><i></i></div>
+            </div>
+            <h3>color-mix blends live</h3>
+            <p>
+              Tints, shades, hover states — all computable in CSS now. Nesting
+              makes the whole thing read like the DOM.
+            </p>
+            <p class="note-tip mono">↳ hover: the blend pops</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ lesson nav ============ -->
+      <div class="lesson-nav reveal">
+        <div>
+          <span class="ln-status">✓ completed</span>
+          <h3>34 — Modern CSS Features</h3>
+        </div>
+        <div class="ln-track" id="lnTrack"></div>
+        <div class="ln-next">
+          <span>up next</span>
+          <b>35 · Specificity</b>
+        </div>
+      </div>
+
+      <footer>
+        <span class="mono">drag things, break things, learn things.</span>
+        <span class="sp mono"
+          >45 lessons · lesson 34 · modern css features</span
+        >
+      </footer>
+    </div>
+    <!-- /wrap -->
+
+    <script>
+      (() => {
+        const $ = (id) => document.getElementById(id);
+        const rule = (sel, decls) =>
+          `<span class="c-sel">${sel}</span> {\n${decls
+            .map((d) => {
+              const i = d.indexOf(":");
+              return `  <span class="c-prop">${d.slice(0, i)}</span>: <span class="c-val">${d.slice(i + 1).trim()}</span>;`;
+            })
+            .join("\n")}\n}`;
+        function range(el, out, fmt, cb) {
+          const f = () => {
+            const v = +el.value;
+            out.textContent = fmt(v);
+            const min = +el.min,
+              max = +el.max;
+            el.style.setProperty(
+              "--fill",
+              ((v - min) / (max - min)) * 100 + "%",
+            );
+            cb(v);
+          };
+          el.addEventListener("input", f);
+          f();
+        }
+        function chipGroup(box, cb) {
+          box.addEventListener("click", (e) => {
+            const c = e.target.closest(".sel-chip");
+            if (!c) return;
+            box
+              .querySelectorAll(".sel-chip")
+              .forEach((x) => x.classList.remove("on"));
+            c.classList.add("on");
+            cb(c.dataset.v);
+          });
+        }
+
+        /* ---------- intro cycle ---------- */
+        const FEATS = [
+          ":has()",
+          ":is() / :where()",
+          "aspect-ratio",
+          "object-fit",
+          "object-position",
+          "scroll-behavior",
+          "accent-color",
+          "color-mix()",
+          "CSS nesting",
+        ];
+        let fi = 0;
+        setInterval(() => {
+          $("ixFeat").textContent = FEATS[fi];
+          fi = (fi + 1) % FEATS.length;
+        }, 1500);
+
+        /* ---------- 01 :has code ---------- */
+        $("codeHas").innerHTML =
+          rule(".card:has(input:checked)", [
+            `border-color: #3ecf8e`,
+            `background: rgba(62,207,142,.14)`,
+          ]) +
+          `\n<span class="c-com">/* the parent reacts to its child */</span>`;
+
+        /* ---------- 02 :is/:where ---------- */
+        let iwOn = false;
+        function renderIw() {
+          $("iwGrid").classList.toggle("compet", iwOn);
+          $("iwToggle").textContent = iwOn
+            ? "− remove competing h4 { } rule"
+            : "+ add competing h4 { } rule";
+          $("iwRead").innerHTML = iwOn
+            ? "competitor <b>on</b> — :is holds blue (0,1,1), :where loses to orange (0,0,1)"
+            : "competitor <b>off</b> — both headings blue";
+          $("codeIw").innerHTML =
+            rule(".card :is(h4)", [`color: #58a6ff  /* 0,1,1 */`]) +
+            "\n" +
+            rule(".card :where(h4)", [`color: #58a6ff  /* 0,0,1 */`]) +
+            (iwOn
+              ? "\n" +
+                rule("h4", [
+                  `color: #f07f4f  /* 0,0,1, later — beats :where */`,
+                ])
+              : "");
+        }
+        $("iwToggle").addEventListener("click", () => {
+          iwOn = !iwOn;
+          renderIw();
+        });
+        renderIw();
+
+        /* ---------- 03 media ---------- */
+        let ar = "1/1",
+          of = "cover",
+          op = "center";
+        function renderMd() {
+          const img = $("mdImg");
+          img.style.aspectRatio = ar;
+          img.style.objectFit = of;
+          img.style.objectPosition = op;
+          $("mdRead").innerHTML =
+            `aspect-ratio <b>${ar.replace("/", " / ")}</b> · object-fit <b>${of}</b> · object-position <b>${op}</b>`;
+          $("codeMd").innerHTML = rule("img", [
+            `aspect-ratio: ${ar}`,
+            `object-fit: ${of}`,
+            `object-position: ${op}`,
+          ]);
+        }
+        chipGroup($("arChips"), (v) => {
+          ar = v;
+          renderMd();
+        });
+        chipGroup($("ofChips"), (v) => {
+          of = v;
+          renderMd();
+        });
+        chipGroup($("opChips"), (v) => {
+          op = v;
+          renderMd();
+        });
+        renderMd();
+
+        /* ---------- 04 scroll + accent ---------- */
+        let sb = "smooth";
+        function renderSa() {
+          $("saScroll").style.scrollBehavior = sb;
+          $("saForm").style.accentColor = $("cAcc").value;
+          $("codeSa").innerHTML =
+            rule("html", [`scroll-behavior: ${sb}`]) +
+            "\n" +
+            rule("form", [`accent-color: ${$("cAcc").value}`]);
+        }
+        $("saJump").addEventListener("click", () => {
+          const s = $("saScroll");
+          s.scrollTo({ top: s.scrollHeight, behavior: sb });
+        });
+        chipGroup($("sbChips"), (v) => {
+          sb = v;
+          renderSa();
+        });
+        $("cAcc").addEventListener("input", renderSa);
+        renderSa();
+
+        /* ---------- 05 mix + nest ---------- */
+        function renderMx() {
+          const a = $("cA").value,
+            b = $("cB").value,
+            p = +$("rMix").value;
+          const sw = $("mxSwatch");
+          sw.style.background = `color-mix(in oklab, ${a} ${p}%, ${b})`;
+          sw.textContent = p + "% A";
+          $("mxRead").innerHTML =
+            `color-mix(in oklab, <b>${a}</b> ${p}%, <b>${b}</b>)`;
+          $("codeMx").innerHTML =
+            rule(".swatch", [
+              `background: color-mix(in oklab, ${a} ${p}%, ${b})`,
+            ]) +
+            "\n" +
+            rule(".card", [
+              `& .title { color: … }`,
+              `&:hover { border-color: … }`,
+            ]) +
+            `\n<span class="c-com">/* native nesting — no build step */</span>`;
+        }
+        $("cA").addEventListener("input", renderMx);
+        $("cB").addEventListener("input", renderMx);
+        range($("rMix"), $("oMix"), (v) => v + "%", renderMx);
+        renderMx();
+
+        /* ---------- lesson track ---------- */
+        const t = $("lnTrack");
+        for (let i = 0; i < 45; i++) {
+          const s = document.createElement("span");
+          s.className = "tick" + (i < 34 ? " done" : "");
+          s.title = "lesson " + (i + 1);
+          t.appendChild(s);
+        }
+
+        /* ---------- reveal ---------- */
+        const io = new IntersectionObserver(
+          (es) =>
+            es.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                io.unobserve(e.target);
+              }
+            }),
+          { threshold: 0.12 },
+        );
+        document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      })();
+    </script>
+  </body>
+</html>
