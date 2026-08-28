@@ -1,0 +1,1295 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dark Mode — Lesson 40</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' fill='none' stroke='%23f07f4f' stroke-width='2'/%3E%3Crect x='8' y='8' width='16' height='16' fill='none' stroke='%23f2c14e' stroke-width='2'/%3E%3Crect x='13' y='13' width='6' height='6' fill='%2358a6ff'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0e15;
+        --panel: #121826;
+        --panel2: #0d1220;
+        --ink: #10141d;
+        --line: #222c40;
+        --line2: #31405e;
+        --text: #e9eef7;
+        --muted: #8d9ab0;
+        --faint: #5b6a84;
+        --margin-c: #f07f4f;
+        --margin-bg: rgba(240, 127, 79, 0.14);
+        --border-c: #f2c14e;
+        --border-bg: rgba(242, 193, 78, 0.16);
+        --padding-c: #3ecf8e;
+        --padding-bg: rgba(62, 207, 142, 0.14);
+        --content-c: #58a6ff;
+        --content-bg: rgba(88, 166, 255, 0.17);
+        --pink: #ff4f8b;
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: dark;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 15px;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+      ::selection {
+        background: rgba(88, 166, 255, 0.35);
+      }
+      .mono {
+        font-family: var(--mono);
+      }
+      section {
+        scroll-margin-top: 76px;
+      }
+      b {
+        font-weight: 600;
+      }
+
+      .bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            700px 460px at 12% -6%,
+            rgba(242, 193, 78, 0.07),
+            transparent 60%
+          ),
+          radial-gradient(
+            760px 520px at 92% 22%,
+            rgba(88, 166, 255, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            600px 480px at 40% 105%,
+            rgba(62, 207, 142, 0.05),
+            transparent 60%
+          );
+      }
+      .bg::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(233, 238, 247, 0.035) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(233, 238, 247, 0.035) 1px,
+            transparent 1px
+          );
+        background-size: 28px 28px;
+        mask-image: radial-gradient(
+          ellipse 120% 90% at 50% 0%,
+          #000 40%,
+          transparent 100%
+        );
+      }
+      .bg .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.5;
+        animation: drift 26s ease-in-out infinite alternate;
+      }
+      .bg .g1 {
+        width: 420px;
+        height: 420px;
+        left: -120px;
+        top: 30%;
+        background: rgba(240, 127, 79, 0.1);
+      }
+      .bg .g2 {
+        width: 460px;
+        height: 460px;
+        right: -140px;
+        top: 60%;
+        background: rgba(88, 166, 255, 0.1);
+        animation-delay: -12s;
+      }
+      @keyframes drift {
+        from {
+          transform: translateY(-30px);
+        }
+        to {
+          transform: translateY(40px);
+        }
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 12px clamp(16px, 4vw, 44px);
+        background: rgba(11, 14, 21, 0.92);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar nav {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .topbar nav a {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 6px 11px;
+        border-radius: 999px;
+        transition: 0.2s;
+      }
+      .topbar nav a:hover {
+        color: var(--text);
+        background: #161d2c;
+      }
+      .lesson-tag {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--border-c);
+        border: 1px dashed rgba(242, 193, 78, 0.45);
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .wrap {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: 0 clamp(16px, 4vw, 44px);
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        padding: clamp(20px, 4vh, 48px) 0 clamp(30px, 5vh, 56px);
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--padding-c);
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(2.3rem, 5.2vw, 3.7rem);
+        line-height: 1.06;
+        letter-spacing: -0.02em;
+      }
+      .word-style {
+        display: inline-block;
+        padding: 0.02em 0.22em;
+        background: var(--border-bg);
+        border: 0.06em solid var(--border-c);
+        border-radius: 0.14em;
+        color: #ffe3a1;
+        transition: transform 0.3s;
+        cursor: default;
+      }
+      .word-style:hover {
+        transform: rotate(-2deg) scale(1.03);
+      }
+      .lede {
+        color: var(--muted);
+        max-width: 56ch;
+        margin-top: 18px;
+        font-size: 1.05rem;
+      }
+      .lede b {
+        color: var(--text);
+      }
+      .css-full {
+        display: inline-block;
+        margin-top: 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--faint);
+        letter-spacing: 0.08em;
+      }
+      .intro-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 26px;
+        display: grid;
+        place-items: center;
+        gap: 14px;
+        box-shadow: 0 30px 60px -40px rgba(0, 0, 0, 0.8);
+        width: 100%;
+      }
+      .ix-moon {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        background: var(--border-c);
+        position: relative;
+        overflow: hidden;
+        transition: 0.5s;
+      }
+      .ix-moon::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        background: var(--panel);
+        transform: translateX(60%);
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .ix-moon.night::after {
+        transform: translateX(22%);
+      }
+      .imode {
+        font-size: 11px;
+        color: var(--faint);
+        letter-spacing: 0.1em;
+      }
+
+      .sec {
+        padding: clamp(36px, 6vh, 64px) 0;
+      }
+      .sec-head {
+        margin-bottom: 26px;
+        max-width: 72ch;
+      }
+      .sec-head h2 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+        letter-spacing: -0.015em;
+        line-height: 1.15;
+      }
+      .sec-head .lede {
+        margin-top: 10px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 18px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .panel-head h3 {
+        font-family: var(--disp);
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dots i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dots i:nth-child(1) {
+        background: #f07f4f;
+      }
+      .dots i:nth-child(2) {
+        background: #f2c14e;
+      }
+      .dots i:nth-child(3) {
+        background: #3ecf8e;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.85;
+        overflow-x: auto;
+      }
+      .c-sel {
+        color: #7fe0b0;
+      }
+      .c-prop {
+        color: #8ab4ff;
+      }
+      .c-val {
+        color: #f2c14e;
+      }
+      .c-com {
+        color: #5b6a84;
+      }
+      .grp {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+
+      .pick-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 18px;
+        align-items: stretch;
+      }
+      .stage-wrap {
+        padding: 28px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 360px;
+        gap: 16px;
+        width: 100%;
+      }
+      .side {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .sel-chip {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .sel-chip:hover {
+        color: var(--text);
+        border-color: var(--content-c);
+        transform: translateY(-2px);
+      }
+      .sel-chip.on {
+        color: #0e1017;
+        background: var(--content-c);
+        border-color: var(--content-c);
+        font-weight: 600;
+      }
+      .ghost-btn {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--faint);
+        background: none;
+        border: 1px dashed var(--line2);
+        border-radius: 8px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .ghost-btn:hover {
+        color: var(--content-c);
+        border-color: var(--content-c);
+      }
+      .code-box {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .code-box pre {
+        min-height: 0;
+        font-size: 12px;
+      }
+      .side-note {
+        font-size: 12px;
+        color: var(--faint);
+      }
+      .read {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 14px;
+        text-align: center;
+        width: 100%;
+        max-width: 440px;
+      }
+      .read b {
+        color: var(--text);
+      }
+      .segmented {
+        position: relative;
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: 1fr;
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 11px;
+        padding: 3px;
+      }
+      .segmented button {
+        position: relative;
+        z-index: 1;
+        background: none;
+        border: 0;
+        font-family: var(--mono);
+        font-size: 11.5px;
+        color: var(--muted);
+        padding: 8px 4px;
+        cursor: pointer;
+        transition: color 0.25s;
+        border-radius: 8px;
+      }
+      .segmented button:hover {
+        color: var(--text);
+      }
+      .segmented button.active {
+        color: #fff;
+      }
+      .seg-thumb {
+        position: absolute;
+        top: 3px;
+        bottom: 3px;
+        left: 3px;
+        width: calc((100% - 6px) / 3);
+        background: #26334c;
+        border-radius: 8px;
+        transition:
+          transform 0.28s cubic-bezier(0.4, 0, 0.2, 1),
+          width 0.28s;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      }
+
+      /* ===== theme tokens (scoped) ===== */
+      [data-theme="light"] {
+        --t-bg: #f7f4ee;
+        --t-surface: #ffffff;
+        --t-text: #1c1f26;
+        --t-muted: #6b7280;
+        --t-line: #dcd7cc;
+        --t-accent: #1273c4;
+        --t-on-accent: #ffffff;
+      }
+      [data-theme="dark"] {
+        --t-bg: #0b0e15;
+        --t-surface: #121826;
+        --t-text: #e9eef7;
+        --t-muted: #8d9ab0;
+        --t-line: #222c40;
+        --t-accent: #58a6ff;
+        --t-on-accent: #0e1017;
+      }
+      .theme-scope {
+        width: 100%;
+        max-width: 440px;
+        background: var(--t-bg);
+        border: 1px solid var(--t-line);
+        border-radius: 14px;
+        padding: 18px;
+        transition: 0.3s;
+      }
+      .app {
+        background: var(--t-surface);
+        border: 1px solid var(--t-line);
+        border-radius: 12px;
+        padding: 16px;
+        color: var(--t-text);
+        transition: 0.3s;
+      }
+      .app .a-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .app .a-logo {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: 14px;
+      }
+      .app .a-badge {
+        font: 700 9px var(--mono);
+        background: var(--t-accent);
+        color: var(--t-on-accent);
+        padding: 3px 8px;
+        border-radius: 999px;
+      }
+      .app .a-text {
+        color: var(--t-muted);
+        font-size: 12px;
+        margin-bottom: 12px;
+      }
+      .app .a-btn {
+        background: var(--t-accent);
+        color: var(--t-on-accent);
+        border: none;
+        border-radius: 8px;
+        padding: 9px 16px;
+        font: 700 11px var(--mono);
+        cursor: pointer;
+      }
+      .twin {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        width: 100%;
+        max-width: 440px;
+      }
+
+      /* 01 real OS media query sample */
+      .os-sample {
+        width: 100%;
+        max-width: 440px;
+        border-radius: 12px;
+        padding: 18px;
+        background: #f7f4ee;
+        color: #1c1f26;
+        border: 1px solid #dcd7cc;
+        transition: 0.3s;
+      }
+      .os-sample .os-t {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: 14px;
+        margin-bottom: 6px;
+      }
+      .os-sample .os-s {
+        font-size: 12px;
+        color: #6b7280;
+      }
+      @media (prefers-color-scheme: dark) {
+        .os-sample {
+          background: #0b0e15;
+          color: #e9eef7;
+          border-color: #222c40;
+        }
+        .os-sample .os-s {
+          color: #8d9ab0;
+        }
+      }
+
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      @media (min-width: 1180px) {
+        .notes-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media (max-width: 640px) {
+        .notes-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .note-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.3s,
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+      .note-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--nc);
+        opacity: 0.85;
+      }
+      .note-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--nc);
+        box-shadow: 0 24px 44px -28px rgba(0, 0, 0, 0.85);
+      }
+      .note-card h3 {
+        font-family: var(--mono);
+        font-size: 15px;
+        color: var(--nc);
+        margin-bottom: 8px;
+      }
+      .note-card p {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .note-tip {
+        margin-top: 12px;
+        font-size: 11px;
+        color: var(--faint);
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+      }
+      .note-demo {
+        height: 104px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        overflow: hidden;
+      }
+      .demo-os {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--muted);
+        transition: 0.3s;
+      }
+      .note-card:hover .demo-os {
+        color: var(--border-c);
+      }
+      .demo-tok {
+        display: flex;
+        gap: 6px;
+      }
+      .demo-tok i {
+        width: 20px;
+        height: 26px;
+        border-radius: 5px;
+        transition: 0.3s;
+      }
+      .demo-tok i:nth-child(1) {
+        background: #f7f4ee;
+        border: 1px solid #dcd7cc;
+      }
+      .demo-tok i:nth-child(2) {
+        background: #1273c4;
+      }
+      .demo-tok i:nth-child(3) {
+        background: #0b0e15;
+        border: 1px solid #222c40;
+      }
+      .demo-tok i:nth-child(4) {
+        background: #58a6ff;
+      }
+      .note-card:hover .demo-tok i {
+        transform: translateY(-4px);
+      }
+      .demo-man {
+        width: 60px;
+        height: 40px;
+        border-radius: 9px;
+        background: #f7f4ee;
+        border: 1px solid #dcd7cc;
+        position: relative;
+        overflow: hidden;
+        transition: 0.4s;
+      }
+      .demo-man::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: #0b0e15;
+        transform: translateX(100%);
+        transition: 0.4s;
+      }
+      .note-card:hover .demo-man::after {
+        transform: translateX(0);
+      }
+      .demo-auto {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--muted);
+        transition: 0.3s;
+      }
+      .note-card:hover .demo-auto {
+        color: var(--padding-c);
+      }
+
+      .lesson-nav {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px clamp(18px, 3vw, 28px);
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+        align-items: center;
+        margin-top: 40px;
+      }
+      .ln-status {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--padding-c);
+        border: 1px solid rgba(62, 207, 142, 0.45);
+        border-radius: 999px;
+        padding: 3px 10px;
+      }
+      .lesson-nav h3 {
+        font-family: var(--disp);
+        font-size: 17px;
+        margin-top: 8px;
+      }
+      .ln-track {
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .tick {
+        width: 7px;
+        height: 15px;
+        border-radius: 2px;
+        background: #212a3e;
+        transition: 0.2s;
+      }
+      .tick.done {
+        background: var(--padding-c);
+        box-shadow: 0 0 8px rgba(62, 207, 142, 0.55);
+      }
+      .tick:hover {
+        background: var(--line2);
+      }
+      .ln-next {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        text-align: right;
+      }
+      .ln-next span {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .ln-next b {
+        font-family: var(--disp);
+        font-size: 15px;
+        color: var(--text);
+      }
+      footer {
+        border-top: 1px solid var(--line);
+        margin-top: 20px;
+        padding: 30px 0 44px;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+        color: var(--faint);
+        font-size: 12.5px;
+      }
+      footer .mono {
+        font-size: 11.5px;
+      }
+      footer .sp {
+        margin-left: auto;
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+      @media (max-width: 1020px) {
+        .intro {
+          grid-template-columns: 1fr;
+        }
+        .pick-grid {
+          grid-template-columns: 1fr;
+        }
+        .lesson-nav {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .ln-next {
+          align-items: center;
+        }
+        .twin {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg">
+      <span class="glow g1"></span><span class="glow g2"></span>
+    </div>
+
+    <header class="topbar">
+      <span class="lesson-tag">lesson 40 / 45</span>
+      <nav>
+        <a href="#scheme">prefers-color-scheme</a>
+        <a href="#tokens">theme-tokens</a>
+        <a href="#manual">manual-switch</a>
+        <a href="#auto">auto+override</a>
+        <a href="#notes">cheat-codes</a>
+      </nav>
+    </header>
+
+    <div class="wrap">
+      <!-- ============ intro ============ -->
+      <section class="intro">
+        <div>
+          <p class="eyebrow">lesson 40 · interactive</p>
+          <h1>Dark mode is a <span class="word-style">token swap</span>.</h1>
+          <p class="lede">
+            Done right, dark mode is never "restyle every selector." You define
+            <b>semantic tokens</b> once, components read the tokens, and a theme
+            is just a different set of token values — applied automatically via
+            <span class="mono">prefers-color-scheme</span> or manually with a
+            <span class="mono">data-theme</span> attribute.
+          </p>
+          <span class="css-full">O · NE · S · WAP · A · LL · THEMED</span>
+        </div>
+        <div class="intro-panel">
+          <div class="ix-moon" id="ixMoon"></div>
+          <p class="imode mono">the same tokens, two skies…</p>
+        </div>
+      </section>
+
+      <!-- ============ 01 · prefers-color-scheme ============ -->
+      <section id="scheme" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">01 · prefers-color-scheme</p>
+          <h2>The OS tells you first</h2>
+          <p class="lede">
+            The media query reads the user's system preference — no JS needed.
+            The sample below is styled by a <b>real</b>
+            <span class="mono">@media (prefers-color-scheme: dark)</span> rule,
+            so it matches <i>your</i> OS right now.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>follows your OS</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="os-sample">
+                <div class="os-t">Aurora Coffee</div>
+                <div class="os-s">
+                  this card is themed by your operating system's preference.
+                </div>
+              </div>
+              <p class="read" id="osRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="code-box"><pre id="codeOs"></pre></div>
+            <p class="side-note">
+              Also set <span class="mono">color-scheme: light dark</span> on
+              :root so form controls, scrollbars and canvases adapt too — not
+              just your colors.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 02 · theme tokens ============ -->
+      <section id="tokens" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">02 · CSS variables as a theme system</p>
+          <h2>Semantic tokens, not hex soup</h2>
+          <p class="lede">
+            Components never reference raw hex — they read <b>semantic</b> names
+            (<span class="mono">--t-surface</span>,
+            <span class="mono">--t-text</span>). Each theme is just a block that
+            redefines those names. Same markup, two skies.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>same component, two token sets</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="twin">
+                <div class="theme-scope" data-theme="light">
+                  <div class="app">
+                    <div class="a-head">
+                      <span class="a-logo">Aurora</span
+                      ><span class="a-badge">light</span>
+                    </div>
+                    <div class="a-text">semantic tokens, light values.</div>
+                    <button class="a-btn">buy beans</button>
+                  </div>
+                </div>
+                <div class="theme-scope" data-theme="dark">
+                  <div class="app">
+                    <div class="a-head">
+                      <span class="a-logo">Aurora</span
+                      ><span class="a-badge">dark</span>
+                    </div>
+                    <div class="a-text">semantic tokens, dark values.</div>
+                    <button class="a-btn">buy beans</button>
+                  </div>
+                </div>
+              </div>
+              <p class="read">
+                the component markup is identical — only the tokens differ
+              </p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="code-box"><pre id="codeTok"></pre></div>
+            <p class="side-note">
+              Name by role (<span class="mono">--t-text</span>), not color
+              (<span class="mono">--white</span>). Role-names survive any
+              rebrand; color-names become lies.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 03 · manual switching ============ -->
+      <section id="manual" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">03 · manual switching</p>
+          <h2>One attribute flips everything</h2>
+          <p class="lede">
+            Put the theme on a <span class="mono">data-theme</span> attribute
+            and override the tokens under
+            <span class="mono">[data-theme="dark"]</span>. Toggling one
+            attribute re-skins the whole app. Persist it in localStorage.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>flip the attribute</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="theme-scope" id="manScope" data-theme="light">
+                <div class="app">
+                  <div class="a-head">
+                    <span class="a-logo">Aurora</span
+                    ><span class="a-badge" id="manBadge">light</span>
+                  </div>
+                  <div class="a-text">this whole app reads --t-* tokens.</div>
+                  <button class="a-btn">buy beans</button>
+                </div>
+              </div>
+              <div class="chips">
+                <button class="sel-chip on" id="manLight">
+                  data-theme="light"
+                </button>
+                <button class="sel-chip" id="manDark">data-theme="dark"</button>
+              </div>
+              <p class="read" id="manRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="code-box"><pre id="codeMan"></pre></div>
+            <p class="side-note">
+              The JS is one line:
+              <span class="mono">root.dataset.theme = next</span>. Save the
+              choice; on load, read it before first paint to avoid a flash.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 04 · auto + override ============ -->
+      <section id="auto" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">04 · the recommended pattern</p>
+          <h2>Default to the OS, allow override</h2>
+          <p class="lede">
+            Best practice: start on <b>auto</b> (follow the OS), let the user
+            pick light/dark, and remember it. Three states, one attribute. Try
+            all three — auto tracks your OS live.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>auto / light / dark</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="theme-scope" id="autoScope" data-theme="dark">
+                <div class="app">
+                  <div class="a-head">
+                    <span class="a-logo">Aurora</span
+                    ><span class="a-badge" id="autoBadge">auto</span>
+                  </div>
+                  <div class="a-text">
+                    auto follows your OS; light/dark override it.
+                  </div>
+                  <button class="a-btn">buy beans</button>
+                </div>
+              </div>
+              <div
+                class="segmented"
+                id="autoSeg"
+                style="max-width: 440px; width: 100%"
+              >
+                <span class="seg-thumb"></span>
+                <button data-v="auto" class="active">auto (OS)</button>
+                <button data-v="light">light</button>
+                <button data-v="dark">dark</button>
+              </div>
+              <p class="read" id="autoRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="code-box"><pre id="codeAuto"></pre></div>
+            <p class="side-note">
+              Listen to the media query's <span class="mono">change</span> event
+              so "auto" users flip instantly when the OS switches (sunset
+              schedules, etc.).
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 05 · field notes ============ -->
+      <section id="notes" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">05 · field notes</p>
+          <h2>Cheat codes from lesson 40</h2>
+        </div>
+        <div class="notes-grid">
+          <article class="note-card" style="--nc: var(--border-c)">
+            <div class="note-demo">
+              <div class="demo-os">@media (prefers-color-scheme: dark)</div>
+            </div>
+            <h3>read the OS first</h3>
+            <p>
+              The media query gives a zero-JS default that respects the user's
+              system. Add <span class="mono">color-scheme</span> so native
+              controls follow.
+            </p>
+            <p class="note-tip mono">↳ hover: the query glows</p>
+          </article>
+          <article class="note-card" style="--nc: var(--content-c)">
+            <div class="note-demo">
+              <div class="demo-tok"><i></i><i></i><i></i><i></i></div>
+            </div>
+            <h3>tokens, not hex</h3>
+            <p>
+              Components read semantic names; themes redefine the values. A
+              theme becomes a data change, not a rewrite.
+            </p>
+            <p class="note-tip mono">↳ hover: the palette lifts</p>
+          </article>
+          <article class="note-card" style="--nc: var(--padding-c)">
+            <div class="note-demo"><div class="demo-man"></div></div>
+            <h3>one attribute flips all</h3>
+            <p>
+              <span class="mono">[data-theme="dark"]</span> overrides the token
+              block; toggling the attribute re-skins everything. Persist it.
+            </p>
+            <p class="note-tip mono">↳ hover: the flip</p>
+          </article>
+          <article class="note-card" style="--nc: var(--margin-c)">
+            <div class="note-demo">
+              <div class="demo-auto">auto → override → remember</div>
+            </div>
+            <h3>auto, then override</h3>
+            <p>
+              Default to the OS, let users choose, save the choice, and watch
+              the media query's change event for live flips.
+            </p>
+            <p class="note-tip mono">↳ hover: the flow</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ lesson nav ============ -->
+      <div class="lesson-nav reveal">
+        <div>
+          <span class="ln-status">✓ completed</span>
+          <h3>40 — Dark Mode</h3>
+        </div>
+        <div class="ln-track" id="lnTrack"></div>
+        <div class="ln-next">
+          <span>up next</span>
+          <b>41 · Accessibility</b>
+        </div>
+      </div>
+
+      <footer>
+        <span class="mono">drag things, break things, learn things.</span>
+        <span class="sp mono">45 lessons · lesson 40 · dark mode</span>
+      </footer>
+    </div>
+    <!-- /wrap -->
+
+    <script>
+      (() => {
+        const $ = (id) => document.getElementById(id);
+        const rule = (sel, decls) =>
+          `<span class="c-sel">${sel}</span> {\n${decls
+            .map((d) => {
+              const i = d.indexOf(":");
+              return `  <span class="c-prop">${d.slice(0, i)}</span>: <span class="c-val">${d.slice(i + 1).trim()}</span>;`;
+            })
+            .join("\n")}\n}`;
+        const mq = matchMedia("(prefers-color-scheme: dark)");
+
+        /* intro moon */
+        setInterval(() => {
+          $("ixMoon").classList.toggle("night");
+        }, 1600);
+
+        /* 01 OS preference */
+        function renderOs() {
+          $("osRead").innerHTML =
+            `your OS prefers: <b>${mq.matches ? "dark" : "light"}</b> — the sample above matches it`;
+        }
+        mq.addEventListener?.("change", renderOs);
+        renderOs();
+        $("codeOs").innerHTML =
+          rule(":root", [`color-scheme: light dark`]) +
+          "\n" +
+          rule(".card", [`background: #f7f4ee; color: #1c1f26`]) +
+          "\n" +
+          rule("@media (prefers-color-scheme: dark)", [
+            `.card { background: #0b0e15; color: #e9eef7 }`,
+          ]);
+
+        /* 02 tokens */
+        $("codeTok").innerHTML =
+          rule('[data-theme="light"]', [
+            `--t-surface: #fff`,
+            `--t-text: #1c1f26`,
+            `--t-accent: #1273c4`,
+          ]) +
+          "\n" +
+          rule('[data-theme="dark"]', [
+            `--t-surface: #121826`,
+            `--t-text: #e9eef7`,
+            `--t-accent: #58a6ff`,
+          ]) +
+          "\n" +
+          rule(".btn", [`background: var(--t-accent)  /* reads tokens */`]);
+
+        /* 03 manual */
+        function setMan(mode) {
+          $("manScope").setAttribute("data-theme", mode);
+          $("manBadge").textContent = mode;
+          $("manLight").classList.toggle("on", mode === "light");
+          $("manDark").classList.toggle("on", mode === "dark");
+          $("manRead").innerHTML =
+            `data-theme="<b>${mode}</b>" — every --t-* token re-resolved`;
+          $("codeMan").innerHTML =
+            rule(`[data-theme="${mode}"]`, [
+              `/* overrides the token block */`,
+            ]) +
+            "\n" +
+            `<span class="c-com">// js: root.dataset.theme = "${mode}"</span>`;
+        }
+        $("manLight").addEventListener("click", () => setMan("light"));
+        $("manDark").addEventListener("click", () => setMan("dark"));
+        setMan("light");
+
+        /* 04 auto + override */
+        let autoMode = "auto";
+        function applyAuto() {
+          const resolved =
+            autoMode === "auto" ? (mq.matches ? "dark" : "light") : autoMode;
+          $("autoScope").setAttribute("data-theme", resolved);
+          $("autoBadge").textContent =
+            autoMode === "auto" ? `auto→${resolved}` : autoMode;
+          $("autoRead").innerHTML =
+            `mode: <b>${autoMode}</b> → resolved to <b>${resolved}</b>`;
+          $("codeAuto").innerHTML =
+            rule(":root", [`color-scheme: light dark`]) +
+            "\n" +
+            `<span class="c-com">// default: follow OS; else saved choice</span>\n` +
+            `<span class="c-com">// mq.addEventListener('change', apply)</span>`;
+        }
+        const autoBtns = [...$("autoSeg").querySelectorAll("button")];
+        function setAutoSeg(i) {
+          autoBtns.forEach((b, j) => b.classList.toggle("active", i === j));
+          const th = $("autoSeg").querySelector(".seg-thumb");
+          th.style.width = `calc((100% - 6px)/3)`;
+          th.style.transform = `translateX(${i * 100}%)`;
+        }
+        autoBtns.forEach((b, i) =>
+          b.addEventListener("click", () => {
+            setAutoSeg(i);
+            autoMode = b.dataset.v;
+            applyAuto();
+          }),
+        );
+        mq.addEventListener?.("change", () => {
+          if (autoMode === "auto") applyAuto();
+        });
+        setAutoSeg(0);
+        applyAuto();
+
+        /* lesson track */
+        const t = $("lnTrack");
+        for (let i = 0; i < 45; i++) {
+          const s = document.createElement("span");
+          s.className = "tick" + (i < 40 ? " done" : "");
+          s.title = "lesson " + (i + 1);
+          t.appendChild(s);
+        }
+
+        /* reveal */
+        const io = new IntersectionObserver(
+          (es) =>
+            es.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                io.unobserve(e.target);
+              }
+            }),
+          { threshold: 0.12 },
+        );
+        document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      })();
+    </script>
+  </body>
+</html>
