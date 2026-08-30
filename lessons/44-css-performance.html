@@ -1,0 +1,1402 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CSS Performance — Lesson 44</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' fill='none' stroke='%23f07f4f' stroke-width='2'/%3E%3Crect x='8' y='8' width='16' height='16' fill='none' stroke='%23f2c14e' stroke-width='2'/%3E%3Crect x='13' y='13' width='6' height='6' fill='%2358a6ff'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0b0e15;
+        --panel: #121826;
+        --panel2: #0d1220;
+        --ink: #10141d;
+        --line: #222c40;
+        --line2: #31405e;
+        --text: #e9eef7;
+        --muted: #8d9ab0;
+        --faint: #5b6a84;
+        --margin-c: #f07f4f;
+        --margin-bg: rgba(240, 127, 79, 0.14);
+        --border-c: #f2c14e;
+        --border-bg: rgba(242, 193, 78, 0.16);
+        --padding-c: #3ecf8e;
+        --padding-bg: rgba(62, 207, 142, 0.14);
+        --content-c: #58a6ff;
+        --content-bg: rgba(88, 166, 255, 0.17);
+        --pink: #ff4f8b;
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: dark;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 15px;
+        line-height: 1.6;
+        overflow-x: hidden;
+      }
+      ::selection {
+        background: rgba(88, 166, 255, 0.35);
+      }
+      .mono {
+        font-family: var(--mono);
+      }
+      section {
+        scroll-margin-top: 76px;
+      }
+      b {
+        font-weight: 600;
+      }
+
+      .bg {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            700px 460px at 12% -6%,
+            rgba(242, 193, 78, 0.07),
+            transparent 60%
+          ),
+          radial-gradient(
+            760px 520px at 92% 22%,
+            rgba(88, 166, 255, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            600px 480px at 40% 105%,
+            rgba(62, 207, 142, 0.05),
+            transparent 60%
+          );
+      }
+      .bg::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image:
+          linear-gradient(rgba(233, 238, 247, 0.035) 1px, transparent 1px),
+          linear-gradient(
+            90deg,
+            rgba(233, 238, 247, 0.035) 1px,
+            transparent 1px
+          );
+        background-size: 28px 28px;
+        mask-image: radial-gradient(
+          ellipse 120% 90% at 50% 0%,
+          #000 40%,
+          transparent 100%
+        );
+      }
+      .bg .glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(90px);
+        opacity: 0.5;
+        animation: drift 26s ease-in-out infinite alternate;
+      }
+      .bg .g1 {
+        width: 420px;
+        height: 420px;
+        left: -120px;
+        top: 30%;
+        background: rgba(240, 127, 79, 0.1);
+      }
+      .bg .g2 {
+        width: 460px;
+        height: 460px;
+        right: -140px;
+        top: 60%;
+        background: rgba(88, 166, 255, 0.1);
+        animation-delay: -12s;
+      }
+      @keyframes drift {
+        from {
+          transform: translateY(-30px);
+        }
+        to {
+          transform: translateY(40px);
+        }
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        padding: 12px clamp(16px, 4vw, 44px);
+        background: rgba(11, 14, 21, 0.92);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar nav {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+      .topbar nav a {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        text-decoration: none;
+        padding: 6px 11px;
+        border-radius: 999px;
+        transition: 0.2s;
+      }
+      .topbar nav a:hover {
+        color: var(--text);
+        background: #161d2c;
+      }
+      .lesson-tag {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--border-c);
+        border: 1px dashed rgba(242, 193, 78, 0.45);
+        padding: 4px 10px;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      .wrap {
+        max-width: 1220px;
+        margin: 0 auto;
+        padding: 0 clamp(16px, 4vw, 44px);
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: clamp(28px, 5vw, 64px);
+        align-items: center;
+        padding: clamp(20px, 4vh, 48px) 0 clamp(30px, 5vh, 56px);
+      }
+      .eyebrow {
+        font-family: var(--mono);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--padding-c);
+        margin-bottom: 14px;
+      }
+      h1 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(2.3rem, 5.2vw, 3.7rem);
+        line-height: 1.06;
+        letter-spacing: -0.02em;
+      }
+      .word-style {
+        display: inline-block;
+        padding: 0.02em 0.22em;
+        background: var(--content-bg);
+        border: 0.06em solid var(--content-c);
+        border-radius: 0.14em;
+        color: #bcd8ff;
+        transition: transform 0.3s;
+        cursor: default;
+      }
+      .word-style:hover {
+        transform: rotate(-2deg) scale(1.03);
+      }
+      .lede {
+        color: var(--muted);
+        max-width: 56ch;
+        margin-top: 18px;
+        font-size: 1.05rem;
+      }
+      .lede b {
+        color: var(--text);
+      }
+      .css-full {
+        display: inline-block;
+        margin-top: 14px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--faint);
+        letter-spacing: 0.08em;
+      }
+      .intro-panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 26px;
+        display: grid;
+        place-items: center;
+        gap: 14px;
+        box-shadow: 0 30px 60px -40px rgba(0, 0, 0, 0.8);
+        width: 100%;
+      }
+      .ix-bar {
+        width: 100%;
+        height: 14px;
+        border-radius: 7px;
+        background: var(--line);
+        overflow: hidden;
+        display: flex;
+      }
+      .ix-bar i {
+        height: 100%;
+        transition: width 0.6s;
+      }
+      .ix-bar .used {
+        background: var(--padding-c);
+      }
+      .ix-bar .waste {
+        background: var(--margin-c);
+      }
+      .imode {
+        font-size: 11px;
+        color: var(--faint);
+        letter-spacing: 0.1em;
+      }
+
+      .sec {
+        padding: clamp(36px, 6vh, 64px) 0;
+      }
+      .sec-head {
+        margin-bottom: 26px;
+        max-width: 72ch;
+      }
+      .sec-head h2 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+        letter-spacing: -0.015em;
+        line-height: 1.15;
+      }
+      .sec-head .lede {
+        margin-top: 10px;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 13px 18px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+      }
+      .panel-head h3 {
+        font-family: var(--disp);
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .dots {
+        display: flex;
+        gap: 6px;
+      }
+      .dots i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+      .dots i:nth-child(1) {
+        background: #f07f4f;
+      }
+      .dots i:nth-child(2) {
+        background: #f2c14e;
+      }
+      .dots i:nth-child(3) {
+        background: #3ecf8e;
+      }
+      pre {
+        font-family: var(--mono);
+        font-size: 13px;
+        line-height: 1.85;
+        overflow-x: auto;
+      }
+      .c-sel {
+        color: #7fe0b0;
+      }
+      .c-prop {
+        color: #8ab4ff;
+      }
+      .c-val {
+        color: #f2c14e;
+      }
+      .c-com {
+        color: #5b6a84;
+      }
+      .grp {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+
+      .pick-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 340px;
+        gap: 18px;
+        align-items: stretch;
+      }
+      .stage-wrap {
+        padding: 28px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 360px;
+        gap: 16px;
+        width: 100%;
+      }
+      .side {
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .sel-chip {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .sel-chip:hover {
+        color: var(--text);
+        border-color: var(--content-c);
+        transform: translateY(-2px);
+      }
+      .sel-chip.on {
+        color: #0e1017;
+        background: var(--content-c);
+        border-color: var(--content-c);
+        font-weight: 600;
+      }
+      .ghost-btn {
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--faint);
+        background: none;
+        border: 1px dashed var(--line2);
+        border-radius: 8px;
+        padding: 8px 14px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+      .ghost-btn:hover {
+        color: var(--content-c);
+        border-color: var(--content-c);
+      }
+      .code-box {
+        background: var(--panel2);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      .code-box pre {
+        min-height: 0;
+        font-size: 12px;
+      }
+      .side-note {
+        font-size: 12px;
+        color: var(--faint);
+      }
+      .read {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+        background: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 8px 14px;
+        text-align: center;
+        width: 100%;
+        max-width: 440px;
+      }
+      .read b {
+        color: var(--text);
+      }
+      .pill {
+        display: inline-block;
+        font-family: var(--mono);
+        font-size: 10px;
+        padding: 3px 10px;
+        border-radius: 999px;
+        border: 1px solid;
+        margin-left: 6px;
+      }
+      .pill-ok {
+        color: var(--padding-c);
+        border-color: rgba(62, 207, 142, 0.5);
+      }
+      .pill-warn {
+        color: var(--border-c);
+        border-color: rgba(242, 193, 78, 0.5);
+      }
+      .pill-no {
+        color: var(--margin-c);
+        border-color: rgba(240, 127, 79, 0.5);
+      }
+
+      /* 01 unused */
+      .un-bar {
+        width: 100%;
+        max-width: 440px;
+        height: 22px;
+        border-radius: 8px;
+        background: var(--line);
+        overflow: hidden;
+        display: flex;
+      }
+      .un-bar i {
+        height: 100%;
+        transition: width 0.5s;
+      }
+      .un-bar .u {
+        background: var(--padding-c);
+      }
+      .un-bar .w {
+        background: var(--margin-c);
+      }
+
+      /* 02 minify */
+      .min-pre {
+        width: 100%;
+        max-width: 440px;
+        background: var(--panel2);
+        border: 1px solid var(--line2);
+        border-radius: 10px;
+        padding: 14px;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--muted);
+        white-space: pre-wrap;
+        word-break: break-all;
+        max-height: 180px;
+        overflow: auto;
+      }
+
+      /* 03 critical */
+      .cr-page {
+        width: 100%;
+        max-width: 440px;
+        background: var(--panel2);
+        border: 1px solid var(--line2);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .cr-fold {
+        padding: 16px;
+        background: var(--content-bg);
+      }
+      .cr-fold .t {
+        font-family: var(--disp);
+        font-weight: 700;
+        color: var(--text);
+        font-size: 14px;
+      }
+      .cr-below {
+        padding: 16px;
+        opacity: 0.4;
+      }
+      .cr-tl {
+        width: 100%;
+        max-width: 440px;
+        height: 12px;
+        border-radius: 6px;
+        background: var(--line);
+        position: relative;
+        overflow: hidden;
+      }
+      .cr-tl i {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        background: var(--padding-c);
+        transition: width 0.8s;
+      }
+      .cr-tl .fp {
+        position: absolute;
+        top: -3px;
+        bottom: -3px;
+        width: 2px;
+        background: var(--border-c);
+      }
+
+      /* 04 expensive */
+      .ex-track {
+        width: 100%;
+        max-width: 440px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .ex-row {
+        position: relative;
+        height: 44px;
+        background: var(--panel2);
+        border: 1px solid var(--line2);
+        border-radius: 10px;
+      }
+      .ex-dot {
+        position: absolute;
+        top: 8px;
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+      }
+      .ex-dot.layout {
+        background: var(--margin-c);
+        animation: exLeft 2s ease-in-out infinite;
+      }
+      .ex-dot.comp {
+        background: var(--padding-c);
+        animation: exTransform 2s ease-in-out infinite;
+      }
+      @keyframes exLeft {
+        0%,
+        100% {
+          left: 6px;
+        }
+        50% {
+          left: calc(100% - 34px);
+        }
+      }
+      @keyframes exTransform {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        50% {
+          transform: translateX(calc(440px - 68px));
+        }
+      }
+      .ex-row .lab {
+        position: absolute;
+        right: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        font: 9px var(--mono);
+        color: var(--faint);
+      }
+
+      /* 05 transform/opacity */
+      .tp-stage {
+        width: 100%;
+        max-width: 440px;
+        height: 120px;
+        background: var(--panel2);
+        border: 1px solid var(--line2);
+        border-radius: 12px;
+        position: relative;
+        overflow: hidden;
+      }
+      .tp-dot {
+        position: absolute;
+        left: 10px;
+        top: 44px;
+        width: 32px;
+        height: 32px;
+        border-radius: 9px;
+        background: var(--content-c);
+      }
+      .tp-dot.anim-transform {
+        animation: tpT 1.6s ease-in-out infinite;
+      }
+      .tp-dot.anim-opacity {
+        animation: tpO 1.6s ease-in-out infinite;
+      }
+      .tp-dot.anim-width {
+        animation: tpW 1.6s ease-in-out infinite;
+      }
+      .tp-dot.anim-top {
+        animation: tpTop 1.6s ease-in-out infinite;
+      }
+      @keyframes tpT {
+        50% {
+          transform: translateX(360px) scale(1.2);
+        }
+      }
+      @keyframes tpO {
+        50% {
+          opacity: 0.15;
+        }
+      }
+      @keyframes tpW {
+        50% {
+          width: 120px;
+        }
+      }
+      @keyframes tpTop {
+        50% {
+          top: 10px;
+        }
+      }
+
+      .notes-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+      }
+      @media (min-width: 1180px) {
+        .notes-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media (max-width: 640px) {
+        .notes-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      .note-card {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.3s,
+          border-color 0.3s,
+          box-shadow 0.3s;
+      }
+      .note-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--nc);
+        opacity: 0.85;
+      }
+      .note-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--nc);
+        box-shadow: 0 24px 44px -28px rgba(0, 0, 0, 0.85);
+      }
+      .note-card h3 {
+        font-family: var(--mono);
+        font-size: 15px;
+        color: var(--nc);
+        margin-bottom: 8px;
+      }
+      .note-card p {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .note-tip {
+        margin-top: 12px;
+        font-size: 11px;
+        color: var(--faint);
+        border-top: 1px dashed var(--line);
+        padding-top: 10px;
+      }
+      .note-demo {
+        height: 104px;
+        display: grid;
+        place-items: center;
+        margin-bottom: 12px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        overflow: hidden;
+      }
+      .demo-un {
+        width: 70%;
+        height: 14px;
+        border-radius: 6px;
+        background: var(--line);
+        overflow: hidden;
+        display: flex;
+      }
+      .demo-un i {
+        height: 100%;
+      }
+      .demo-un i:first-child {
+        width: 40%;
+        background: var(--padding-c);
+      }
+      .demo-un i:last-child {
+        width: 60%;
+        background: var(--margin-c);
+        transition: 0.4s;
+      }
+      .note-card:hover .demo-un i:last-child {
+        width: 10%;
+      }
+      .demo-min {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--muted);
+        transition: 0.3s;
+      }
+      .note-card:hover .demo-min {
+        color: var(--padding-c);
+        letter-spacing: -0.5px;
+      }
+      .demo-cr {
+        width: 70%;
+        height: 40px;
+        border-radius: 7px;
+        background: var(--line);
+        position: relative;
+        overflow: hidden;
+      }
+      .demo-cr i {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 30%;
+        background: var(--padding-c);
+        transition: 0.5s;
+      }
+      .note-card:hover .demo-cr i {
+        width: 100%;
+      }
+      .demo-tp {
+        width: 34px;
+        height: 34px;
+        border-radius: 9px;
+        background: var(--content-c);
+        transition: 0.4s;
+      }
+      .note-card:hover .demo-tp {
+        transform: translateX(40px) scale(1.1);
+      }
+
+      .lesson-nav {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 22px clamp(18px, 3vw, 28px);
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 24px;
+        align-items: center;
+        margin-top: 40px;
+      }
+      .ln-status {
+        font-family: var(--mono);
+        font-size: 10.5px;
+        color: var(--padding-c);
+        border: 1px solid rgba(62, 207, 142, 0.45);
+        border-radius: 999px;
+        padding: 3px 10px;
+      }
+      .lesson-nav h3 {
+        font-family: var(--disp);
+        font-size: 17px;
+        margin-top: 8px;
+      }
+      .ln-track {
+        display: flex;
+        gap: 3px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .tick {
+        width: 7px;
+        height: 15px;
+        border-radius: 2px;
+        background: #212a3e;
+        transition: 0.2s;
+      }
+      .tick.done {
+        background: var(--padding-c);
+        box-shadow: 0 0 8px rgba(62, 207, 142, 0.55);
+      }
+      .tick:hover {
+        background: var(--line2);
+      }
+      .ln-next {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+        text-align: right;
+      }
+      .ln-next span {
+        font-family: var(--mono);
+        font-size: 10px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .ln-next b {
+        font-family: var(--disp);
+        font-size: 15px;
+        color: var(--text);
+      }
+      footer {
+        border-top: 1px solid var(--line);
+        margin-top: 20px;
+        padding: 30px 0 44px;
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        align-items: center;
+        color: var(--faint);
+        font-size: 12.5px;
+      }
+      footer .mono {
+        font-size: 11.5px;
+      }
+      footer .sp {
+        margin-left: auto;
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.in {
+        opacity: 1;
+        transform: none;
+      }
+      @media (max-width: 1020px) {
+        .intro {
+          grid-template-columns: 1fr;
+        }
+        .pick-grid {
+          grid-template-columns: 1fr;
+        }
+        .lesson-nav {
+          grid-template-columns: 1fr;
+          text-align: center;
+        }
+        .ln-next {
+          align-items: center;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="bg">
+      <span class="glow g1"></span><span class="glow g2"></span>
+    </div>
+
+    <header class="topbar">
+      <span class="lesson-tag">lesson 44 / 45</span>
+      <nav>
+        <a href="#unused">unused-css</a>
+        <a href="#minify">minification</a>
+        <a href="#critical">critical-css</a>
+        <a href="#expensive">expensive-anims</a>
+        <a href="#transform">transform·opacity</a>
+        <a href="#notes">cheat-codes</a>
+      </nav>
+    </header>
+
+    <div class="wrap">
+      <!-- ============ intro ============ -->
+      <section class="intro">
+        <div>
+          <p class="eyebrow">lesson 44 · interactive</p>
+          <h1>Fast CSS is <span class="word-style">less</span> CSS.</h1>
+          <p class="lede">
+            Performance is mostly subtraction: ship less unused CSS, minify what
+            remains, inline the critical path, and animate only what the
+            compositor can handle — <b>transform</b> and <b>opacity</b>. Five
+            habits, each measurable.
+          </p>
+          <span class="css-full">S · HIP · L · ESS · R · UN · FASTER</span>
+        </div>
+        <div class="intro-panel">
+          <div class="ix-bar">
+            <i class="used" id="ixUsed" style="width: 35%"></i
+            ><i class="waste" id="ixWaste" style="width: 65%"></i>
+          </div>
+          <p class="imode mono">most stylesheets are mostly waste…</p>
+        </div>
+      </section>
+
+      <!-- ============ 01 · unused CSS ============ -->
+      <section id="unused" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">01 · reduce unused CSS</p>
+          <h2>Ship what the page uses</h2>
+          <p class="lede">
+            A typical stylesheet is mostly rules the current page never matches
+            — dead weight parsed on every load. Audit it, purge the unused, and
+            watch the payload drop.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>audit &amp; purge</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="un-bar">
+                <i class="u" id="unUsed"></i><i class="w" id="unWaste"></i>
+              </div>
+              <div class="chips">
+                <button class="ghost-btn" id="unPurge">purge unused CSS</button>
+              </div>
+              <p class="read" id="unRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="code-box"><pre id="codeUn"></pre></div>
+            <p class="side-note">
+              DevTools Coverage tab shows exactly which bytes ran. Purge
+              per-page (or code-split) so each route ships only its own CSS.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 02 · minification ============ -->
+      <section id="minify" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">02 · minification</p>
+          <h2>Strip the whitespace</h2>
+          <p class="lede">
+            Comments, spaces and newlines are for humans; the parser doesn't
+            need them. Minify at build time. The byte counter below is computed
+            live from the two strings.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>readable vs minified</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="min-pre" id="minPre"></div>
+              <div class="chips">
+                <button class="sel-chip on" id="minRead">readable</button>
+                <button class="sel-chip" id="minMin">minified</button>
+              </div>
+              <p class="read" id="minReadOut"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="code-box"><pre id="codeMin"></pre></div>
+            <p class="side-note">
+              Minify + gzip/brotli together. Keep the readable source in your
+              repo; ship only the minified artifact.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 03 · critical CSS ============ -->
+      <section id="critical" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">03 · critical CSS basics</p>
+          <h2>Inline the first paint</h2>
+          <p class="lede">
+            The browser blocks rendering on CSS. Inline the above-the-fold rules
+            so the first paint happens immediately, and load the rest async.
+            Toggle and watch first paint move.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>first paint timeline</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="cr-page">
+                <div class="cr-fold"><div class="t">above the fold</div></div>
+                <div class="cr-below">below the fold…</div>
+              </div>
+              <div class="cr-tl">
+                <i id="crFill"></i
+                ><span class="fp" id="crFp" style="left: 80%"></span>
+              </div>
+              <div class="chips">
+                <button class="ghost-btn" id="crToggle">
+                  inline critical CSS
+                </button>
+              </div>
+              <p class="read" id="crRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="code-box"><pre id="codeCr"></pre></div>
+            <p class="side-note">
+              Critical = the selectors needed for the initial viewport.
+              Everything else goes to a non-blocking
+              <span class="mono">&lt;link&gt;</span>.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 04 · expensive animations ============ -->
+      <section id="expensive" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">04 · avoid expensive animations</p>
+          <h2>Layout vs composite</h2>
+          <p class="lede">
+            Animating <span class="mono">left</span> forces layout every frame;
+            animating <span class="mono">transform</span> stays on the
+            compositor. Same motion, very different cost.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>same motion, different cost</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="ex-track">
+                <div class="ex-row">
+                  <div class="ex-dot layout"></div>
+                  <span class="lab">left → layout every frame</span>
+                </div>
+                <div class="ex-row">
+                  <div class="ex-dot comp"></div>
+                  <span class="lab">transform → compositor only</span>
+                </div>
+              </div>
+              <p class="read">
+                both move identically — one reflows the page 60×/sec
+              </p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="code-box"><pre id="codeEx"></pre></div>
+            <p class="side-note">
+              Anything that changes geometry (width, top, left, margin) triggers
+              layout. Prefer transform for movement, and keep animated subtrees
+              small.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 05 · transform & opacity ============ -->
+      <section id="transform" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">05 · transform &amp; opacity</p>
+          <h2>The compositor's two favorites</h2>
+          <p class="lede">
+            <span class="mono">transform</span> and
+            <span class="mono">opacity</span> skip layout and paint — the GPU
+            just recomposites. Pick a property and see its cost class.
+          </p>
+        </div>
+        <div class="pick-grid">
+          <div class="panel">
+            <div class="panel-head">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <h3>pick the property</h3>
+            </div>
+            <div class="stage-wrap">
+              <div class="tp-stage">
+                <div class="tp-dot anim-transform" id="tpDot"></div>
+              </div>
+              <div class="chips" id="tpChips">
+                <button class="sel-chip on" data-p="transform">
+                  transform
+                </button>
+                <button class="sel-chip" data-p="opacity">opacity</button>
+                <button class="sel-chip" data-p="width">width</button>
+                <button class="sel-chip" data-p="top">top</button>
+              </div>
+              <p class="read" id="tpRead"></p>
+            </div>
+          </div>
+          <aside class="panel side">
+            <div class="code-box"><pre id="codeTp"></pre></div>
+            <p class="side-note">
+              box-shadow &amp; colors are paint (medium). width/top/left are
+              layout (expensive). transform/opacity are composite (cheap) —
+              reach for those first.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <!-- ============ 06 · field notes ============ -->
+      <section id="notes" class="sec reveal">
+        <div class="sec-head">
+          <p class="eyebrow">06 · field notes</p>
+          <h2>Cheat codes from lesson 44</h2>
+        </div>
+        <div class="notes-grid">
+          <article class="note-card" style="--nc: var(--padding-c)">
+            <div class="note-demo">
+              <div class="demo-un"><i></i><i></i></div>
+            </div>
+            <h3>purge the dead weight</h3>
+            <p>
+              Coverage tab tells you what ran. Ship per-page CSS; unused rules
+              are parsed on every load for no reason.
+            </p>
+            <p class="note-tip mono">↳ hover: the waste shrinks</p>
+          </article>
+          <article class="note-card" style="--nc: var(--content-c)">
+            <div class="note-demo">
+              <div class="demo-min">.a{color:#fff}</div>
+            </div>
+            <h3>minify at build</h3>
+            <p>
+              Whitespace is for humans. Keep readable source, ship minified +
+              compressed artifacts.
+            </p>
+            <p class="note-tip mono">↳ hover: it tightens</p>
+          </article>
+          <article class="note-card" style="--nc: var(--border-c)">
+            <div class="note-demo">
+              <div class="demo-cr"><i></i></div>
+            </div>
+            <h3>inline the first paint</h3>
+            <p>
+              Critical CSS in the head, the rest async. First paint stops
+              waiting on the whole stylesheet.
+            </p>
+            <p class="note-tip mono">↳ hover: the bar fills</p>
+          </article>
+          <article class="note-card" style="--nc: var(--margin-c)">
+            <div class="note-demo"><div class="demo-tp"></div></div>
+            <h3>transform + opacity</h3>
+            <p>
+              The only two properties that skip layout and paint. Movement and
+              fades belong on the compositor.
+            </p>
+            <p class="note-tip mono">↳ hover: it glides</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ lesson nav ============ -->
+      <div class="lesson-nav reveal">
+        <div>
+          <span class="ln-status">✓ completed</span>
+          <h3>44 — CSS Performance</h3>
+        </div>
+        <div class="ln-track" id="lnTrack"></div>
+        <div class="ln-next">
+          <span>up next</span>
+          <b>45 · Browser Compatibility</b>
+        </div>
+      </div>
+
+      <footer>
+        <span class="mono">drag things, break things, learn things.</span>
+        <span class="sp mono">45 lessons · lesson 44 · css performance</span>
+      </footer>
+    </div>
+    <!-- /wrap -->
+
+    <script>
+      (() => {
+        const $ = (id) => document.getElementById(id);
+        const rule = (sel, decls) =>
+          `<span class="c-sel">${sel}</span> {\n${decls
+            .map((d) => {
+              const i = d.indexOf(":");
+              return `  <span class="c-prop">${d.slice(0, i)}</span>: <span class="c-val">${d.slice(i + 1).trim()}</span>;`;
+            })
+            .join("\n")}\n}`;
+
+        /* intro waste bar */
+        setInterval(() => {
+          const used = 20 + Math.random() * 30;
+          $("ixUsed").style.width = used + "%";
+          $("ixWaste").style.width = 100 - used + "%";
+        }, 1800);
+
+        /* 01 unused */
+        const RULES = [
+          [".nav", 340, 1],
+          [".card", 520, 1],
+          [".btn", 280, 1],
+          [".legacy-ie7", 610, 0],
+          [".old-promo", 720, 0],
+          [".unused-modal", 540, 0],
+          [".footer", 300, 1],
+        ];
+        let purged = false;
+        function renderUn() {
+          const used = RULES.filter((r) => r[2]).reduce((a, r) => a + r[1], 0);
+          const waste = purged
+            ? 0
+            : RULES.filter((r) => !r[2]).reduce((a, r) => a + r[1], 0);
+          const total = used + waste;
+          $("unUsed").style.width = (used / total) * 100 + "%";
+          $("unWaste").style.width = (waste / total) * 100 + "%";
+          $("unPurge").textContent = purged
+            ? "restore unused CSS"
+            : "purge unused CSS";
+          $("unRead").innerHTML = purged
+            ? `after purge: <b>${used} B</b> used · saved <b>${Math.round((waste / (used + waste)) * 100)}%</b>`
+            : `<b>${used} B</b> used · <b>${waste} B</b> unused on this page`;
+          $("codeUn").innerHTML = rule("/* coverage */", [
+            `/* used ${used} B · unused ${waste} B */`,
+          ]);
+        }
+        $("unPurge").addEventListener("click", () => {
+          purged = !purged;
+          renderUn();
+        });
+        renderUn();
+
+        /* 02 minify */
+        const READABLE = `/* card component */\n.card {\n  display: flex;\n  gap: 16px;\n  padding: 24px;\n  border-radius: 12px;\n}`;
+        const MINIFIED = `.card{display:flex;gap:16px;padding:24px;border-radius:12px}`;
+        let minOn = false;
+        function renderMin() {
+          const str = minOn ? MINIFIED : READABLE;
+          $("minPre").textContent = str;
+          const save = Math.round(
+            (1 - MINIFIED.length / READABLE.length) * 100,
+          );
+          $("minReadOut").innerHTML =
+            `<b>${str.length}</b> bytes · ${minOn ? `saved <b>${save}%</b> vs readable` : `minify saves <b>${save}%</b>`}`;
+          $("minRead").classList.toggle("on", !minOn);
+          $("minMin").classList.toggle("on", minOn);
+          $("codeMin").innerHTML = rule(".card", [
+            `display: flex`,
+            `gap: 16px`,
+            `padding: 24px`,
+            `border-radius: 12px`,
+          ]);
+        }
+        $("minRead").addEventListener("click", () => {
+          minOn = false;
+          renderMin();
+        });
+        $("minMin").addEventListener("click", () => {
+          minOn = true;
+          renderMin();
+        });
+        renderMin();
+
+        /* 03 critical */
+        let crOn = false;
+        function renderCr() {
+          $("crFill").style.width = crOn ? "100%" : "100%";
+          $("crFp").style.left = crOn ? "30%" : "80%";
+          $("crToggle").textContent = crOn
+            ? "load full CSS (block)"
+            : "inline critical CSS";
+          $("crRead").innerHTML = crOn
+            ? "critical inlined → first paint at <b>~30%</b> of the timeline"
+            : "full CSS blocks → first paint waits until <b>~80%</b>";
+          $("codeCr").innerHTML = crOn
+            ? `<span class="c-com">&lt;style&gt; /* critical, inlined */ &lt;/style&gt;</span>\n<span class="c-com">&lt;link rel="preload" … media="print" onload="…"&gt;</span>`
+            : `<span class="c-com">&lt;link rel="stylesheet" href="all.css"&gt;  <!-- blocks --></span>`;
+        }
+        $("crToggle").addEventListener("click", () => {
+          crOn = !crOn;
+          renderCr();
+        });
+        renderCr();
+
+        /* 04 expensive */
+        $("codeEx").innerHTML =
+          rule(".a", [
+            `animation: move 2s infinite`,
+            `/* animates left → layout */`,
+          ]) +
+          "\n" +
+          rule(".b", [
+            `animation: move 2s infinite`,
+            `/* animates transform → composite */`,
+          ]);
+
+        /* 05 transform/opacity */
+        const COST = {
+          transform: ["composite", "pill-ok"],
+          opacity: ["composite", "pill-ok"],
+          width: ["layout", "pill-no"],
+          top: ["layout", "pill-no"],
+        };
+        function renderTp(p) {
+          const d = $("tpDot");
+          d.className = "tp-dot anim-" + p;
+          $("tpRead").innerHTML =
+            `animating <b>${p}</b> → <span class="pill ${COST[p][1]}">${COST[p][0]}</span>`;
+          $("codeTp").innerHTML = rule(".el", [
+            `animation: …`,
+            `/* ${p}: ${COST[p][0]} cost */`,
+          ]);
+        }
+        document.querySelectorAll("#tpChips .sel-chip").forEach((c) =>
+          c.addEventListener("click", () => {
+            document
+              .querySelectorAll("#tpChips .sel-chip")
+              .forEach((x) => x.classList.remove("on"));
+            c.classList.add("on");
+            renderTp(c.dataset.p);
+          }),
+        );
+        renderTp("transform");
+
+        /* lesson track */
+        const t = $("lnTrack");
+        for (let i = 0; i < 45; i++) {
+          const s = document.createElement("span");
+          s.className = "tick" + (i < 44 ? " done" : "");
+          s.title = "lesson " + (i + 1);
+          t.appendChild(s);
+        }
+
+        /* reveal */
+        const io = new IntersectionObserver(
+          (es) =>
+            es.forEach((e) => {
+              if (e.isIntersecting) {
+                e.target.classList.add("in");
+                io.unobserve(e.target);
+              }
+            }),
+          { threshold: 0.12 },
+        );
+        document.querySelectorAll(".reveal").forEach((el) => io.observe(el));
+      })();
+    </script>
+  </body>
+</html>
