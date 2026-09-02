@@ -1,0 +1,582 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pouya — Front-end Developer · Profile</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%235eead4'/%3E%3Ctext x='16' y='21' font-size='14' text-anchor='middle' fill='%230d1117' font-family='monospace' font-weight='bold'%3EP%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* =========================================================
+   PROJECT 1 · PERSONAL PROFILE · HTML + CSS ONLY
+   Concepts demonstrated:
+   [TYPO]  typography & hierarchy
+   [BOX]   box model (padding / border / margin / radius)
+   [COL]   color palette via custom properties
+   [SPACE] consistent spacing scale
+   [LAY]   basic layout (flex + grid, mobile-first)
+   ========================================================= */
+
+      /* ---- [COL] palette + [SPACE] spacing scale ---- */
+      :root {
+        --bg: #0d1117;
+        --surface: #161b26;
+        --surface-2: #1c2333;
+        --line: #273044;
+        --text: #e8ecf4;
+        --muted: #9aa5b8;
+        --faint: #66718a;
+        --accent: #5eead4; /* teal  */
+        --accent-2: #fbbf24; /* amber */
+        --accent-3: #818cf8; /* indigo*/
+        --accent-soft: rgba(94, 234, 212, 0.12);
+
+        /* spacing scale — used everywhere, never a magic number */
+        --s1: 4px;
+        --s2: 8px;
+        --s3: 12px;
+        --s4: 16px;
+        --s5: 24px;
+        --s6: 32px;
+        --s7: 48px;
+        --s8: 64px;
+
+        --r-sm: 8px;
+        --r-md: 14px;
+        --r-lg: 22px;
+
+        --disp: "Space Grotesk", sans-serif; /* [TYPO] display face  */
+        --body: "IBM Plex Sans", system-ui, sans-serif; /* [TYPO] body face */
+        --mono: "JetBrains Mono", monospace; /* [TYPO] labels/meta   */
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      } /* [BOX] predictable sizing */
+      html {
+        color-scheme: dark;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 16px; /* [TYPO] readable base */
+        line-height: 1.65;
+      }
+      ::selection {
+        background: rgba(94, 234, 212, 0.3);
+      }
+      img {
+        max-width: 100%;
+        display: block;
+      }
+      a {
+        color: var(--accent);
+      }
+      a:focus-visible,
+      button:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 4px;
+      }
+
+      /* subtle layered background */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            600px 400px at 85% -10%,
+            rgba(94, 234, 212, 0.08),
+            transparent 60%
+          ),
+          radial-gradient(
+            700px 500px at -10% 30%,
+            rgba(129, 140, 248, 0.08),
+            transparent 60%
+          );
+      }
+
+      /* ---- [LAY] page frame: mobile-first single column ---- */
+      .wrap {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 0 var(--s5);
+      }
+
+      /* ================= header / hero ================= */
+      .hero {
+        display: flex;
+        flex-direction: column;
+        gap: var(--s5);
+        padding: var(--s8) 0 var(--s7);
+      }
+      .avatar {
+        /* [BOX] border + radius + padding ring */
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, var(--accent), var(--accent-3));
+        color: var(--bg);
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: 40px;
+        box-shadow:
+          0 0 0 4px var(--bg),
+          0 0 0 6px var(--accent);
+      }
+      .hero h1 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(2.2rem, 6vw, 3.4rem); /* [TYPO] fluid display size */
+        line-height: 1.05;
+        letter-spacing: -0.02em;
+      }
+      .hero .role {
+        font-family: var(--mono);
+        font-size: 0.85rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+      .hero .tag {
+        color: var(--muted);
+        max-width: 52ch;
+        font-size: 1.05rem;
+      }
+      .hero .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--s3);
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        color: var(--faint);
+      }
+      .hero .meta span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--accent);
+      }
+      .hero .cta {
+        display: flex;
+        gap: var(--s3);
+        flex-wrap: wrap;
+        margin-top: 10px;
+      }
+      .btn {
+        /* [BOX] padding + radius + border; [COL] color */
+        display: inline-block;
+        padding: var(--s3) var(--s5);
+        border-radius: var(--r-sm);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease,
+          background 0.2s;
+      }
+      .btn-solid {
+        background: var(--accent);
+        color: var(--bg);
+      }
+      .btn-ghost {
+        border: 1px solid var(--line);
+        color: var(--text);
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px -12px rgba(94, 234, 212, 0.5);
+      }
+
+      /* ================= stats band [LAY][SPACE] ================= */
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--s4);
+      }
+      .stat {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        padding: var(--s5);
+        text-align: center;
+      }
+      .stat b {
+        display: block;
+        font-family: var(--disp);
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--accent);
+      }
+      .stat span {
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+
+      /* ================= sections [TYPO] hierarchy ================= */
+      section {
+        padding: var(--s7) 0;
+      }
+      h2 {
+        font-family: var(--disp);
+        font-weight: 600;
+        font-size: 1.5rem;
+        letter-spacing: -0.01em;
+        margin-bottom: var(--s4);
+        display: flex;
+        align-items: center;
+        gap: var(--s3);
+      }
+      h2::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--line);
+      } /* [BOX] decorative rule */
+      h2 .idx {
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        color: var(--accent);
+      }
+
+      /* about [TYPO] */
+      .about p {
+        color: var(--muted);
+        margin-bottom: var(--s4);
+        max-width: 62ch;
+      }
+      .about p b {
+        color: var(--text);
+      }
+      blockquote {
+        /* [BOX] left border + padding; [COL] tinted bg */
+        border-left: 3px solid var(--accent);
+        background: var(--accent-soft);
+        padding: var(--s4) var(--s5);
+        border-radius: 0 var(--r-sm) var(--r-sm) 0;
+        color: var(--text);
+        font-style: italic;
+      }
+
+      /* skills [SPACE][COL] chips */
+      .skill-group {
+        margin-bottom: var(--s5);
+      }
+      .skill-group h3 {
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--faint);
+        margin-bottom: var(--s3);
+      }
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--s2);
+      }
+      .tag-chip {
+        padding: var(--s2) var(--s4);
+        border-radius: 999px;
+        font-size: 0.85rem;
+        background: var(--surface-2);
+        border: 1px solid var(--line);
+        color: var(--muted);
+        transition: 0.2s;
+      }
+      .tag-chip:hover {
+        color: var(--text);
+        border-color: var(--accent);
+        transform: translateY(-2px);
+      }
+
+      /* projects [LAY] grid, mobile-first */
+      .projects {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--s5);
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        padding: var(--s5);
+        position: relative;
+        overflow: hidden;
+        transition:
+          transform 0.25s ease,
+          border-color 0.25s ease,
+          box-shadow 0.25s ease;
+      }
+      .card::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 3px;
+        background: var(--pc, var(--accent));
+      }
+      .card:hover {
+        transform: translateY(-5px);
+        border-color: var(--pc, var(--accent));
+        box-shadow: 0 20px 40px -24px rgba(0, 0, 0, 0.7);
+      }
+      .card h3 {
+        font-family: var(--disp);
+        font-size: 1.15rem;
+        margin-bottom: var(--s2);
+      }
+      .card p {
+        color: var(--muted);
+        font-size: 0.95rem;
+        margin-bottom: var(--s4);
+      }
+      .card .tags .tag-chip {
+        font-size: 0.75rem;
+      }
+
+      /* contact [LAY][BOX] */
+      .contact {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-lg);
+        padding: var(--s7) var(--s5);
+        text-align: center;
+      }
+      .contact p {
+        color: var(--muted);
+        max-width: 46ch;
+        margin: 0 auto var(--s5);
+      }
+      .contact .cta {
+        display: flex;
+        gap: var(--s3);
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      footer {
+        border-top: 1px solid var(--line);
+        padding: var(--s5) 0 var(--s7);
+        display: flex;
+        justify-content: space-between;
+        gap: var(--s4);
+        flex-wrap: wrap;
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        color: var(--faint);
+      }
+
+      /* ---- [LAY] responsive: enhance at wider widths ---- */
+      @media (min-width: 720px) {
+        .hero {
+          flex-direction: row;
+          align-items: center;
+        }
+        .hero .avatar {
+          flex: none;
+        }
+        .stats {
+          grid-template-columns: repeat(4, 1fr);
+        }
+        .projects {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+          animation: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <!-- ============ hero ============ -->
+      <header class="hero">
+        <div class="avatar" aria-hidden="true">P</div>
+        <div>
+          <p class="role">Front-end Developer</p>
+          <h1>Pouya</h1>
+          <p class="tag">
+            I build fast, accessible interfaces with clean CSS. Currently
+            turning coffee into components and caring about every pixel of
+            spacing.
+          </p>
+          <p class="meta">
+            <span><span class="dot"></span> available for work</span>
+            <span>📍 remote · UTC+3:30</span>
+            <span>☕ powered by espresso</span>
+          </p>
+          <div class="cta">
+            <a class="btn btn-solid" href="#contact">Get in touch</a>
+            <a class="btn btn-ghost" href="#projects">View work</a>
+          </div>
+        </div>
+      </header>
+
+      <!-- ============ stats ============ -->
+      <div class="stats">
+        <div class="stat"><b>4+</b><span>years coding</span></div>
+        <div class="stat"><b>27</b><span>projects shipped</span></div>
+        <div class="stat"><b>45</b><span>css lessons done</span></div>
+        <div class="stat"><b>∞</b><span>curiosity</span></div>
+      </div>
+
+      <!-- ============ about ============ -->
+      <section class="about" id="about">
+        <h2><span class="idx">01</span> About</h2>
+        <p>
+          I'm a front-end developer who believes the <b>box model</b> is a
+          superpower, not a chore. I care about typography that reads, spacing
+          that breathes, and color that means something.
+        </p>
+        <p>
+          Most of my time goes into design systems and layout — turning fuzzy
+          mockups into resilient, responsive CSS that the next developer can
+          actually read.
+        </p>
+        <blockquote>
+          "Good CSS is invisible when it's right and obvious when it's wrong."
+        </blockquote>
+      </section>
+
+      <!-- ============ skills ============ -->
+      <section id="skills">
+        <h2><span class="idx">02</span> Skills</h2>
+        <div class="skill-group">
+          <h3>core</h3>
+          <div class="tags">
+            <span class="tag-chip">HTML</span><span class="tag-chip">CSS</span
+            ><span class="tag-chip">Flexbox</span
+            ><span class="tag-chip">Grid</span
+            ><span class="tag-chip">Custom Properties</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <h3>craft</h3>
+          <div class="tags">
+            <span class="tag-chip">Typography</span
+            ><span class="tag-chip">Spacing systems</span
+            ><span class="tag-chip">Color</span
+            ><span class="tag-chip">Responsive design</span
+            ><span class="tag-chip">Accessibility</span>
+          </div>
+        </div>
+        <div class="skill-group">
+          <h3>tooling</h3>
+          <div class="tags">
+            <span class="tag-chip">DevTools</span
+            ><span class="tag-chip">Git</span
+            ><span class="tag-chip">Performance</span
+            ><span class="tag-chip">Debugging</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ projects ============ -->
+      <section id="projects">
+        <h2><span class="idx">03</span> Selected work</h2>
+        <div class="projects">
+          <article class="card" style="--pc: var(--accent)">
+            <h3>Design-token starter</h3>
+            <p>
+              A tiny CSS architecture built on custom properties — one swap
+              re-themes the whole app.
+            </p>
+            <div class="tags">
+              <span class="tag-chip">tokens</span
+              ><span class="tag-chip">theming</span>
+            </div>
+          </article>
+          <article class="card" style="--pc: var(--accent-2)">
+            <h3>Responsive dashboard</h3>
+            <p>
+              Grid-based shell with a collapsing sidebar, fluid type, and
+              container-aware cards.
+            </p>
+            <div class="tags">
+              <span class="tag-chip">grid</span
+              ><span class="tag-chip">responsive</span>
+            </div>
+          </article>
+          <article class="card" style="--pc: var(--accent-3)">
+            <h3>Accessible component kit</h3>
+            <p>
+              Buttons, forms and focus states that pass contrast and keyboard
+              checks by default.
+            </p>
+            <div class="tags">
+              <span class="tag-chip">a11y</span
+              ><span class="tag-chip">components</span>
+            </div>
+          </article>
+          <article class="card" style="--pc: var(--accent)">
+            <h3>Performance audit kit</h3>
+            <p>
+              Checklist + tooling notes for shipping less CSS and animating only
+              transform/opacity.
+            </p>
+            <div class="tags">
+              <span class="tag-chip">performance</span
+              ><span class="tag-chip">animation</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ contact ============ -->
+      <section id="contact">
+        <div class="contact">
+          <h2 style="justify-content: center">
+            <span class="idx">04</span> Let's build something
+          </h2>
+          <p>
+            Have a layout that misbehaves or a design that needs a spine? My
+            inbox is open.
+          </p>
+          <div class="cta">
+            <a class="btn btn-solid" href="mailto:hello@pouya.dev"
+              >hello@pouya.dev</a
+            >
+            <a class="btn btn-ghost" href="#">GitHub</a>
+            <a class="btn btn-ghost" href="#">LinkedIn</a>
+          </div>
+        </div>
+      </section>
+
+      <footer>
+        <span>© 2024 Pouya</span>
+        <span>built with HTML + CSS only · no JS harmed</span>
+      </footer>
+    </div>
+  </body>
+</html>
