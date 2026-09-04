@@ -1,0 +1,973 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aurora Coffee — Small-batch, delivered</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23e8a34c'/%3E%3Cpath d='M11 11c0 6 2 9 5 10 3-1 5-4 5-10' fill='none' stroke='%230f0c0a' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ============================================================
+   PROJECT 2 · LANDING PAGE · HTML + CSS ONLY
+   [FLEX] flexbox   [GRID] grid   [RESP] responsive
+   [HERO] hero      [BTN] buttons
+   ============================================================ */
+      :root {
+        --bg: #0f0c0a;
+        --surface: #161210;
+        --surface-2: #1e1814;
+        --line: #2c241d;
+        --text: #f3ede4;
+        --muted: #a89b8c;
+        --faint: #6f6355;
+        --accent: #e8a34c;
+        --accent-2: #c96f3b;
+        --accent-soft: rgba(232, 163, 76, 0.12);
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+        --s1: 4px;
+        --s2: 8px;
+        --s3: 12px;
+        --s4: 16px;
+        --s5: 24px;
+        --s6: 32px;
+        --s7: 48px;
+        --s8: 72px;
+        --r-sm: 9px;
+        --r-md: 14px;
+        --r-lg: 22px;
+        --maxw: 1100px;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: dark;
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 16px;
+        line-height: 1.6;
+      }
+      ::selection {
+        background: rgba(232, 163, 76, 0.3);
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      a:focus-visible,
+      .btn:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 3px;
+      }
+      img {
+        max-width: 100%;
+        display: block;
+      }
+      .wrap {
+        max-width: var(--maxw);
+        margin: 0 auto;
+        padding: 0 var(--s5);
+      }
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        background:
+          radial-gradient(
+            700px 420px at 80% -10%,
+            rgba(232, 163, 76, 0.1),
+            transparent 60%
+          ),
+          radial-gradient(
+            600px 420px at -10% 40%,
+            rgba(201, 111, 59, 0.08),
+            transparent 60%
+          );
+      }
+
+      /* ---------- [BTN] button system ---------- */
+      .btn {
+        display: inline-block;
+        padding: var(--s3) var(--s5);
+        border-radius: var(--r-sm);
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s,
+          background 0.2s,
+          border-color 0.2s;
+        white-space: nowrap;
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: #1a120a;
+      }
+      .btn-primary:hover {
+        box-shadow: 0 12px 26px -12px rgba(232, 163, 76, 0.6);
+      }
+      .btn-ghost {
+        border: 1px solid var(--line);
+        color: var(--text);
+      }
+      .btn-ghost:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .btn-lg {
+        padding: var(--s4) var(--s6);
+        font-size: 1.05rem;
+      }
+
+      /* ---------- [FLEX] sticky nav + pure-CSS mobile toggle ---------- */
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: rgba(15, 12, 10, 0.85);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--line);
+      }
+      .nav-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--s4) 0;
+        position: relative;
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: var(--s3);
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: 1.15rem;
+      }
+      .logo-mark {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        display: grid;
+        place-items: center;
+        color: #1a120a;
+        font-weight: 700;
+      }
+      .nav-check {
+        display: none;
+      }
+      .hamburger {
+        display: none;
+        font-size: 22px;
+        cursor: pointer;
+        color: var(--text);
+        line-height: 1;
+        padding: var(--s2);
+      }
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: var(--s5);
+      }
+      .nav-links a:not(.btn) {
+        color: var(--muted);
+        font-size: 0.95rem;
+        transition: color 0.2s;
+      }
+      .nav-links a:not(.btn):hover {
+        color: var(--accent);
+      }
+
+      /* ---------- [HERO] ---------- */
+      .hero {
+        padding: var(--s8) 0;
+        display: grid;
+        gap: var(--s7);
+        align-items: center;
+      }
+      .hero .kicker {
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: var(--s4);
+      }
+      .hero h1 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(2.4rem, 6vw, 4rem);
+        line-height: 1.05;
+        letter-spacing: -0.02em;
+        margin-bottom: var(--s4);
+      }
+      .hero h1 em {
+        font-style: normal;
+        color: var(--accent);
+      }
+      .hero .sub {
+        color: var(--muted);
+        font-size: 1.1rem;
+        max-width: 54ch;
+        margin-bottom: var(--s6);
+      }
+      .hero .cta {
+        display: flex;
+        gap: var(--s4);
+        flex-wrap: wrap;
+      } /* [FLEX] */
+      .hero .stats {
+        display: flex;
+        gap: var(--s6);
+        flex-wrap: wrap;
+        margin-top: var(--s6);
+      } /* [FLEX] */
+      .hero .stats div b {
+        display: block;
+        font-family: var(--disp);
+        font-size: 1.5rem;
+        color: var(--accent);
+      }
+      .hero .stats div span {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+      .hero-visual {
+        position: relative;
+        display: grid;
+        place-items: center;
+      }
+      .hero-card {
+        width: 100%;
+        max-width: 340px;
+        background: linear-gradient(160deg, var(--surface-2), var(--surface));
+        border: 1px solid var(--line);
+        border-radius: var(--r-lg);
+        padding: var(--s6);
+        position: relative;
+        box-shadow: 0 40px 80px -40px rgba(0, 0, 0, 0.7);
+      }
+      .hero-card .cup {
+        width: 90px;
+        height: 90px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 35% 35%, #5a4636, #2a2118);
+        display: grid;
+        place-items: center;
+        margin-bottom: var(--s5);
+        box-shadow:
+          inset 0 0 0 6px var(--surface-2),
+          0 14px 30px -12px rgba(0, 0, 0, 0.6);
+      }
+      .hero-card .cup::after {
+        content: "☕";
+        font-size: 40px;
+      }
+      .hero-card h3 {
+        font-family: var(--disp);
+        font-size: 1.2rem;
+        margin-bottom: var(--s2);
+      }
+      .hero-card p {
+        color: var(--muted);
+        font-size: 0.95rem;
+        margin-bottom: var(--s5);
+      }
+      .hero-card .price {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .hero-card .price b {
+        font-family: var(--disp);
+        font-size: 1.4rem;
+        color: var(--accent);
+      }
+      .hero-card .badge {
+        position: absolute;
+        top: -12px;
+        right: 20px;
+        background: var(--accent-2);
+        color: #fff;
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 5px 10px;
+        border-radius: 999px;
+      }
+
+      /* ---------- trust strip [FLEX] ---------- */
+      .trust {
+        padding: var(--s6) 0;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+      }
+      .trust-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--s5);
+        flex-wrap: wrap;
+      }
+      .trust-row span {
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--faint);
+      }
+
+      /* ---------- sections ---------- */
+      section {
+        padding: var(--s8) 0;
+      }
+      .sec-head {
+        text-align: center;
+        max-width: 60ch;
+        margin: 0 auto var(--s7);
+      }
+      .sec-head .kicker {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+      .sec-head h2 {
+        font-family: var(--disp);
+        font-weight: 600;
+        font-size: clamp(1.7rem, 4vw, 2.4rem);
+        letter-spacing: -0.01em;
+        margin: var(--s3) 0 var(--s3);
+      }
+      .sec-head p {
+        color: var(--muted);
+      }
+
+      /* ---------- features [GRID] ---------- */
+      .features {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--s5);
+      }
+      .feature {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        padding: var(--s5);
+        transition:
+          transform 0.25s,
+          border-color 0.25s,
+          box-shadow 0.25s;
+      }
+      .feature:hover {
+        transform: translateY(-5px);
+        border-color: var(--accent);
+        box-shadow: 0 22px 44px -26px rgba(0, 0, 0, 0.7);
+      }
+      .feature .icon {
+        width: 44px;
+        height: 44px;
+        border-radius: var(--r-sm);
+        background: var(--accent-soft);
+        display: grid;
+        place-items: center;
+        font-size: 20px;
+        margin-bottom: var(--s4);
+      }
+      .feature h3 {
+        font-family: var(--disp);
+        font-size: 1.1rem;
+        margin-bottom: var(--s2);
+      }
+      .feature p {
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      /* ---------- split section [GRID][RESP] ---------- */
+      .split {
+        display: grid;
+        gap: var(--s6);
+        align-items: center;
+      }
+      .split .visual {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-lg);
+        padding: var(--s6);
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--s4);
+      }
+      .split .visual i {
+        height: 70px;
+        border-radius: var(--r-sm);
+        background: linear-gradient(
+          135deg,
+          var(--surface-2),
+          var(--accent-soft)
+        );
+        border: 1px solid var(--line);
+      }
+      .split h3 {
+        font-family: var(--disp);
+        font-size: 1.6rem;
+        margin-bottom: var(--s3);
+      }
+      .split p {
+        color: var(--muted);
+        margin-bottom: var(--s5);
+      }
+      .split ul {
+        list-style: none;
+        display: grid;
+        gap: var(--s3);
+      }
+      .split li {
+        display: flex;
+        gap: var(--s3);
+        align-items: flex-start;
+        color: var(--muted);
+      }
+      .split li::before {
+        content: "✓";
+        color: var(--accent);
+        font-weight: 700;
+        flex: none;
+      }
+
+      /* ---------- pricing [GRID] ---------- */
+      .pricing {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--s5);
+      }
+      .plan {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        padding: var(--s6);
+        display: flex;
+        flex-direction: column;
+        gap: var(--s4);
+        position: relative;
+        transition:
+          transform 0.25s,
+          border-color 0.25s;
+      }
+      .plan:hover {
+        transform: translateY(-5px);
+        border-color: var(--accent);
+      }
+      .plan.popular {
+        border-color: var(--accent);
+        background: linear-gradient(180deg, var(--accent-soft), var(--surface));
+      }
+      .plan .tag {
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--accent);
+        color: #1a120a;
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 5px 12px;
+        border-radius: 999px;
+      }
+      .plan h3 {
+        font-family: var(--disp);
+        font-size: 1.15rem;
+      }
+      .plan .price {
+        font-family: var(--disp);
+        font-size: 2.2rem;
+        color: var(--accent);
+      }
+      .plan .price small {
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+      .plan ul {
+        list-style: none;
+        display: grid;
+        gap: var(--s2);
+        color: var(--muted);
+        font-size: 0.95rem;
+        flex: 1;
+      }
+      .plan li::before {
+        content: "✓ ";
+        color: var(--accent);
+      }
+
+      /* ---------- testimonials [GRID] ---------- */
+      .testis {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--s5);
+      }
+      .testi {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        padding: var(--s5);
+      }
+      .testi p {
+        color: var(--muted);
+        font-style: italic;
+        margin-bottom: var(--s4);
+      }
+      .testi .who {
+        display: flex;
+        align-items: center;
+        gap: var(--s3);
+      }
+      .testi .av {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--accent), var(--accent-2));
+        display: grid;
+        place-items: center;
+        color: #1a120a;
+        font-weight: 700;
+      }
+      .testi .who b {
+        font-size: 0.9rem;
+      }
+      .testi .who span {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--faint);
+      }
+
+      /* ---------- CTA banner [HERO-lite] ---------- */
+      .cta-banner {
+        background: linear-gradient(135deg, var(--accent-2), var(--accent));
+        border-radius: var(--r-lg);
+        padding: var(--s7);
+        text-align: center;
+        color: #1a120a;
+      }
+      .cta-banner h2 {
+        font-family: var(--disp);
+        font-size: clamp(1.6rem, 4vw, 2.2rem);
+        margin-bottom: var(--s3);
+      }
+      .cta-banner p {
+        opacity: 0.85;
+        margin-bottom: var(--s5);
+      }
+      .cta-banner .btn {
+        background: #1a120a;
+        color: var(--accent);
+      }
+      .cta-banner .btn:hover {
+        box-shadow: 0 14px 30px -12px rgba(0, 0, 0, 0.5);
+      }
+
+      /* ---------- footer [GRID][FLEX] ---------- */
+      footer {
+        border-top: 1px solid var(--line);
+        padding: var(--s7) 0 var(--s6);
+      }
+      .foot-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--s5);
+        margin-bottom: var(--s6);
+      }
+      .foot-grid h4 {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--faint);
+        margin-bottom: var(--s3);
+      }
+      .foot-grid a {
+        display: block;
+        color: var(--muted);
+        font-size: 0.95rem;
+        padding: var(--s1) 0;
+      }
+      .foot-grid a:hover {
+        color: var(--accent);
+      }
+      .foot-bottom {
+        display: flex;
+        justify-content: space-between;
+        gap: var(--s4);
+        flex-wrap: wrap;
+        border-top: 1px solid var(--line);
+        padding-top: var(--s5);
+        color: var(--faint);
+        font-size: 0.85rem;
+      }
+
+      /* ---------- [RESP] mobile-first breakpoints ---------- */
+      @media (min-width: 720px) {
+        .features {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .pricing {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .testis {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .foot-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+        .split {
+          grid-template-columns: 1fr 1fr;
+        }
+        .split.rev .visual {
+          order: 2;
+        }
+      }
+      @media (min-width: 900px) {
+        .features {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .hero {
+          grid-template-columns: 1.1fr 0.9fr;
+        } /* [HERO] two-column on desktop */
+      }
+      @media (max-width: 820px) {
+        .hamburger {
+          display: flex;
+        }
+        .nav-links {
+          display: none;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          flex-direction: column;
+          align-items: flex-start;
+          background: var(--surface);
+          border-bottom: 1px solid var(--line);
+          padding: var(--s5);
+          gap: var(--s4);
+        }
+        .nav-check:checked ~ .nav-links {
+          display: flex;
+        }
+        .nav-links .btn {
+          width: 100%;
+          text-align: center;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ============ [FLEX][RESP] nav ============ -->
+    <nav class="nav">
+      <div class="wrap nav-inner">
+        <a class="logo" href="#"><span class="logo-mark">☕</span> Aurora</a>
+        <input type="checkbox" id="nav-toggle" class="nav-check" />
+        <label for="nav-toggle" class="hamburger" aria-label="menu">☰</label>
+        <div class="nav-links">
+          <a href="#features">Features</a>
+          <a href="#roasts">Roasts</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#reviews">Reviews</a>
+          <a class="btn btn-primary" href="#cta">Start a subscription</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ============ [HERO] ============ -->
+    <header class="hero wrap">
+      <div>
+        <p class="kicker">small-batch · roasted weekly</p>
+        <h1>Coffee that tastes like it was <em>meant for you</em>.</h1>
+        <p class="sub">
+          Single-origin beans, roasted the day they ship and delivered to your
+          door in 24 hours. No subscriptions you can't cancel, ever.
+        </p>
+        <div class="cta">
+          <a class="btn btn-primary btn-lg" href="#cta">Get your first bag →</a>
+          <a class="btn btn-ghost btn-lg" href="#roasts">Browse roasts</a>
+        </div>
+        <div class="stats">
+          <div><b>12k+</b><span>happy drinkers</span></div>
+          <div><b>4.9★</b><span>average rating</span></div>
+          <div><b>24h</b><span>roast → door</span></div>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-card">
+          <span class="badge">this week</span>
+          <div class="cup"></div>
+          <h3>Ethiopia · Yirgacheffe</h3>
+          <p>
+            Florals, bergamot and a honeyed finish. Light roast, washed process.
+          </p>
+          <div class="price">
+            <b>$19</b><a class="btn btn-primary" href="#cta">Add to bag</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- ============ trust strip [FLEX] ============ -->
+    <div class="trust">
+      <div class="wrap trust-row">
+        <span>as sipped at</span><span>NOMAD</span><span>The Daily</span
+        ><span>Kettle &amp; Co</span><span>Studio 9</span
+        ><span>Field Notes</span>
+      </div>
+    </div>
+
+    <!-- ============ features [GRID] ============ -->
+    <section id="features">
+      <div class="wrap">
+        <div class="sec-head">
+          <p class="kicker">why aurora</p>
+          <h2>Built around the bean, not the brand</h2>
+          <p>
+            Everything we do is in service of a better cup, from farm to filter.
+          </p>
+        </div>
+        <div class="features">
+          <div class="feature">
+            <div class="icon">🌱</div>
+            <h3>Ethically sourced</h3>
+            <p>
+              Direct-trade relationships with 14 farms across three continents.
+            </p>
+          </div>
+          <div class="feature">
+            <div class="icon">🔥</div>
+            <h3>Roasted fresh</h3>
+            <p>
+              Every order is roasted the day it ships — never sitting on a
+              shelf.
+            </p>
+          </div>
+          <div class="feature">
+            <div class="icon">🚚</div>
+            <h3>24h delivery</h3>
+            <p>
+              From roaster to your doorstep in a day, in compostable packaging.
+            </p>
+          </div>
+          <div class="feature">
+            <div class="icon">🧭</div>
+            <h3>Brew guides</h3>
+            <p>
+              Every bag ships with grind size, ratio and temperature for your
+              brewer.
+            </p>
+          </div>
+          <div class="feature">
+            <div class="icon">🔄</div>
+            <h3>Cancel anytime</h3>
+            <p>
+              Pause or cancel your subscription in one click. No hoops, no
+              calls.
+            </p>
+          </div>
+          <div class="feature">
+            <div class="icon">🎁</div>
+            <h3>Gift-ready</h3>
+            <p>
+              Beautifully boxed and hand-written notes for the coffee person in
+              your life.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ split section [GRID][RESP] ============ -->
+    <section id="roasts">
+      <div class="wrap split">
+        <div class="visual"><i></i><i></i><i></i><i></i></div>
+        <div>
+          <h3>Roasted to order, every week</h3>
+          <p>
+            We roast in small batches so nothing goes stale. Pick a profile and
+            we'll match you to this week's best lots.
+          </p>
+          <ul>
+            <li>Light &amp; bright — florals, citrus, tea-like</li>
+            <li>Balanced — caramel, stone fruit, round body</li>
+            <li>Dark &amp; bold — cocoa, molasses, syrupy</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ pricing [GRID] ============ -->
+    <section id="pricing">
+      <div class="wrap">
+        <div class="sec-head">
+          <p class="kicker">pricing</p>
+          <h2>Simple plans, great coffee</h2>
+          <p>
+            Start with one bag or get a bag every week. Pause or cancel anytime.
+          </p>
+        </div>
+        <div class="pricing">
+          <div class="plan">
+            <h3>One-off</h3>
+            <div class="price">$19<small>/bag</small></div>
+            <ul>
+              <li>Single 250g bag</li>
+              <li>Brew guide included</li>
+              <li>Free shipping over $30</li>
+            </ul>
+            <a class="btn btn-ghost" href="#cta">Buy once</a>
+          </div>
+          <div class="plan popular">
+            <span class="tag">most popular</span>
+            <h3>Weekly</h3>
+            <div class="price">$15<small>/bag · weekly</small></div>
+            <ul>
+              <li>Fresh bag every week</li>
+              <li>Free shipping, always</li>
+              <li>Roaster's notes each drop</li>
+            </ul>
+            <a class="btn btn-primary" href="#cta">Start weekly</a>
+          </div>
+          <div class="plan">
+            <h3>Café</h3>
+            <div class="price">$49<small>/5kg · monthly</small></div>
+            <ul>
+              <li>Bulk for cafés &amp; offices</li>
+              <li>Volume discounts</li>
+              <li>Dedicated roaster</li>
+            </ul>
+            <a class="btn btn-ghost" href="#cta">Talk to us</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ testimonials [GRID] ============ -->
+    <section id="reviews">
+      <div class="wrap">
+        <div class="sec-head">
+          <p class="kicker">reviews</p>
+          <h2>People take their coffee seriously</h2>
+        </div>
+        <div class="testis">
+          <div class="testi">
+            <p>
+              "The Yirgacheffe changed how I think about coffee. It's floral and
+              clean and nothing like supermarket beans."
+            </p>
+            <div class="who">
+              <span class="av">M</span>
+              <div><b>Maya R.</b><span>barista</span></div>
+            </div>
+          </div>
+          <div class="testi">
+            <p>
+              "Weekly plan is a no-brainer. Fresh roast, fast shipping, and the
+              brew guide nails my V60 every time."
+            </p>
+            <div class="who">
+              <span class="av">D</span>
+              <div><b>Daniel K.</b><span>home brewer</span></div>
+            </div>
+          </div>
+          <div class="testi">
+            <p>
+              "We stock Aurora at the café. Customers ask what we're pouring by
+              name. That never happened before."
+            </p>
+            <div class="who">
+              <span class="av">S</span>
+              <div><b>Sana L.</b><span>café owner</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CTA banner ============ -->
+    <section id="cta">
+      <div class="wrap">
+        <div class="cta-banner">
+          <h2>Your first bag ships tomorrow.</h2>
+          <p>
+            Fresh-roasted, free shipping on your first order, cancel anytime.
+          </p>
+          <a class="btn btn-lg" href="#">Get started →</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ footer [GRID][FLEX] ============ -->
+    <footer>
+      <div class="wrap">
+        <div class="foot-grid">
+          <div>
+            <h4>Shop</h4>
+            <a href="#roasts">Roasts</a><a href="#pricing">Subscriptions</a
+            ><a href="#">Gift cards</a>
+          </div>
+          <div>
+            <h4>Learn</h4>
+            <a href="#">Brew guides</a><a href="#">Origins</a
+            ><a href="#">Journal</a>
+          </div>
+          <div>
+            <h4>Company</h4>
+            <a href="#">About</a><a href="#">Sourcing</a><a href="#">Contact</a>
+          </div>
+          <div>
+            <h4>Follow</h4>
+            <a href="#">Instagram</a><a href="#">Twitter</a
+            ><a href="#">Newsletter</a>
+          </div>
+        </div>
+        <div class="foot-bottom">
+          <span>© 2024 Aurora Coffee</span>
+          <span>Roasted with care · no JS required</span>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>
