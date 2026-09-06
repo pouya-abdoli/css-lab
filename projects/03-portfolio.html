@@ -1,0 +1,980 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pouya — Front-end Developer</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' rx='8' fill='%230d9488'/%3E%3Ctext x='16' y='22' font-size='16' text-anchor='middle' fill='%23ffffff' font-family='monospace' font-weight='bold'%3EP%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ============================================================
+   PROJECT 3 · RESPONSIVE PORTFOLIO
+   Navbar · Hero · About · Skills · Projects · Contact · Footer
+   Dark mode via data-theme attribute + CSS custom properties
+   ============================================================ */
+
+      /* ---- Light theme (default) ---- */
+      :root {
+        --bg: #fafaf7;
+        --surface: #ffffff;
+        --surface-2: #f3f0e8;
+        --line: #e6e2d9;
+        --text: #1a1a1a;
+        --muted: #6b6b6b;
+        --faint: #9c9c9c;
+        --accent: #0d9488; /* teal */
+        --accent-soft: rgba(13, 148, 136, 0.1);
+        --accent-ink: #ffffff;
+        --code-bg: #f3f0e8;
+
+        --s1: 4px;
+        --s2: 8px;
+        --s3: 12px;
+        --s4: 16px;
+        --s5: 24px;
+        --s6: 32px;
+        --s7: 48px;
+        --s8: 72px;
+        --s9: 120px;
+        --r-sm: 8px;
+        --r-md: 14px;
+        --r-lg: 22px;
+
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+
+        --maxw: 1100px;
+      }
+
+      /* ---- Dark theme ---- */
+      [data-theme="dark"] {
+        --bg: #0d1117;
+        --surface: #161b22;
+        --surface-2: #1c232d;
+        --line: #30363d;
+        --text: #e6edf3;
+        --muted: #9ba5b0;
+        --faint: #6e7681;
+        --accent: #5eead4;
+        --accent-soft: rgba(94, 234, 212, 0.12);
+        --accent-ink: #0d1117;
+        --code-bg: #1c232d;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: light;
+        scroll-behavior: smooth;
+      }
+      [data-theme="dark"] {
+        color-scheme: dark;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 16px;
+        line-height: 1.6;
+        transition:
+          background 0.25s ease,
+          color 0.25s ease;
+      }
+      ::selection {
+        background: rgba(13, 148, 136, 0.3);
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      a:focus-visible,
+      button:focus-visible,
+      input:focus-visible,
+      textarea:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 4px;
+      }
+      img {
+        max-width: 100%;
+        display: block;
+      }
+      .wrap {
+        max-width: var(--maxw);
+        margin: 0 auto;
+        padding: 0 var(--s5);
+      }
+
+      /* ---- Buttons ---- */
+      .btn {
+        display: inline-block;
+        padding: var(--s3) var(--s5);
+        border-radius: var(--r-sm);
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s,
+          background 0.2s,
+          border-color 0.2s;
+        white-space: nowrap;
+        cursor: pointer;
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: var(--accent-ink);
+      }
+      .btn-primary:hover {
+        box-shadow: 0 12px 26px -12px rgba(13, 148, 136, 0.5);
+      }
+      .btn-ghost {
+        border: 1px solid var(--line);
+        color: var(--text);
+        background: transparent;
+      }
+      .btn-ghost:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .btn-lg {
+        padding: var(--s4) var(--s6);
+        font-size: 1.05rem;
+      }
+
+      /* ---- Navbar ---- */
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: color-mix(in srgb, var(--bg) 85%, transparent);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--line);
+      }
+      .nav-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--s4) 0;
+        position: relative;
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: var(--s3);
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: 1.15rem;
+      }
+      .logo-mark {
+        width: 32px;
+        height: 32px;
+        border-radius: var(--r-sm);
+        background: var(--accent);
+        color: var(--accent-ink);
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        font-family: var(--mono);
+      }
+      .nav-check {
+        display: none;
+      }
+      .hamburger {
+        display: none;
+        font-size: 22px;
+        cursor: pointer;
+        color: var(--text);
+        line-height: 1;
+        padding: var(--s2);
+      }
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: var(--s5);
+      }
+      .nav-links {
+        display: flex;
+        align-items: center;
+        gap: var(--s5);
+      }
+      .nav-links a {
+        color: var(--muted);
+        font-size: 0.95rem;
+        transition: color 0.2s;
+      }
+      .nav-links a:hover {
+        color: var(--accent);
+      }
+
+      /* theme toggle */
+      .theme-toggle {
+        background: transparent;
+        border: 1px solid var(--line);
+        color: var(--text);
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        font-size: 16px;
+        transition:
+          border-color 0.2s,
+          transform 0.2s;
+      }
+      .theme-toggle:hover {
+        border-color: var(--accent);
+        transform: rotate(20deg);
+      }
+      .theme-toggle .sun {
+        display: none;
+      }
+      .theme-toggle .moon {
+        display: block;
+      }
+      [data-theme="dark"] .theme-toggle .sun {
+        display: block;
+      }
+      [data-theme="dark"] .theme-toggle .moon {
+        display: none;
+      }
+
+      /* ---- Hero ---- */
+      .hero {
+        padding: var(--s9) 0 var(--s8);
+      }
+      .hero .kicker {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--s2);
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--accent);
+        background: var(--accent-soft);
+        padding: var(--s2) var(--s4);
+        border-radius: 999px;
+        margin-bottom: var(--s5);
+      }
+      .hero .kicker .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 0 4px var(--accent-soft);
+      }
+      .hero h1 {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: clamp(2.4rem, 7vw, 4.4rem);
+        line-height: 1.02;
+        letter-spacing: -0.025em;
+        margin-bottom: var(--s5);
+        max-width: 18ch;
+      }
+      .hero h1 em {
+        font-style: normal;
+        color: var(--accent);
+      }
+      .hero .sub {
+        color: var(--muted);
+        font-size: 1.15rem;
+        max-width: 56ch;
+        margin-bottom: var(--s6);
+      }
+      .hero .cta {
+        display: flex;
+        gap: var(--s4);
+        flex-wrap: wrap;
+      }
+      .hero .meta {
+        margin-top: var(--s7);
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--s6);
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        color: var(--faint);
+        letter-spacing: 0.06em;
+      }
+      .hero .meta b {
+        color: var(--text);
+        font-weight: 500;
+      }
+
+      /* ---- Sections ---- */
+      section {
+        padding: var(--s8) 0;
+      }
+      .sec-head {
+        margin-bottom: var(--s7);
+      }
+      .sec-head .kicker {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: var(--s3);
+      }
+      .sec-head h2 {
+        font-family: var(--disp);
+        font-weight: 600;
+        font-size: clamp(1.8rem, 4vw, 2.4rem);
+        letter-spacing: -0.015em;
+        margin-bottom: var(--s3);
+      }
+      .sec-head p {
+        color: var(--muted);
+        max-width: 56ch;
+      }
+
+      /* ---- About (split) ---- */
+      .about {
+        display: grid;
+        gap: var(--s7);
+        align-items: center;
+      }
+      .about-photo {
+        aspect-ratio: 4/5;
+        border-radius: var(--r-lg);
+        background: linear-gradient(
+          135deg,
+          var(--accent-soft),
+          var(--surface-2)
+        );
+        border: 1px solid var(--line);
+        display: grid;
+        place-items: center;
+        font-family: var(--disp);
+        font-size: 6rem;
+        color: var(--accent);
+        font-weight: 700;
+        max-width: 360px;
+        width: 100%;
+      }
+      .about-text p {
+        color: var(--muted);
+        margin-bottom: var(--s4);
+        font-size: 1.05rem;
+      }
+      .about-text p b {
+        color: var(--text);
+      }
+      .about-text .sig {
+        margin-top: var(--s5);
+        font-family: var(--disp);
+        font-style: italic;
+        font-size: 1.1rem;
+        color: var(--text);
+      }
+
+      /* ---- Skills ---- */
+      .skills {
+        display: grid;
+        gap: var(--s6);
+      }
+      .skill-group h3 {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--faint);
+        margin-bottom: var(--s3);
+      }
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--s2);
+      }
+      .tag-chip {
+        padding: var(--s2) var(--s4);
+        border-radius: 999px;
+        font-size: 0.9rem;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        color: var(--muted);
+        transition: 0.2s;
+      }
+      .tag-chip:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+        transform: translateY(-2px);
+      }
+
+      /* ---- Projects ---- */
+      .projects {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--s5);
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition:
+          transform 0.25s,
+          border-color 0.25s,
+          box-shadow 0.25s;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+        border-color: var(--accent);
+        box-shadow: 0 24px 50px -28px rgba(0, 0, 0, 0.25);
+      }
+      .card-img {
+        aspect-ratio: 16/10;
+        background: linear-gradient(
+          135deg,
+          var(--accent-soft),
+          var(--surface-2)
+        );
+        display: grid;
+        place-items: center;
+        font-size: 3rem;
+        border-bottom: 1px solid var(--line);
+      }
+      .card-body {
+        padding: var(--s5);
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: var(--s3);
+      }
+      .card-body h3 {
+        font-family: var(--disp);
+        font-size: 1.2rem;
+      }
+      .card-body p {
+        color: var(--muted);
+        font-size: 0.95rem;
+        flex: 1;
+      }
+      .card-foot {
+        padding: 0 var(--s5) var(--s5);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: var(--s3);
+      }
+      .card-foot .tags {
+        gap: var(--s1);
+      }
+      .card-foot .tags .tag-chip {
+        font-size: 0.75rem;
+        padding: 4px 10px;
+      }
+      .card-foot a {
+        color: var(--accent);
+        font-family: var(--mono);
+        font-size: 0.85rem;
+        font-weight: 500;
+      }
+
+      /* ---- Contact ---- */
+      .contact {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-lg);
+        padding: var(--s8) var(--s6);
+        text-align: center;
+      }
+      .contact h2 {
+        font-family: var(--disp);
+        font-weight: 600;
+        font-size: clamp(1.8rem, 4vw, 2.4rem);
+        margin-bottom: var(--s4);
+        letter-spacing: -0.015em;
+      }
+      .contact p {
+        color: var(--muted);
+        max-width: 48ch;
+        margin: 0 auto var(--s6);
+      }
+      .contact .email {
+        display: inline-block;
+        font-family: var(--mono);
+        font-size: 1.15rem;
+        color: var(--accent);
+        margin-bottom: var(--s6);
+        padding: var(--s3) var(--s5);
+        background: var(--accent-soft);
+        border-radius: var(--r-sm);
+        transition: 0.2s;
+      }
+      .contact .email:hover {
+        transform: translateY(-2px);
+      }
+      .contact .socials {
+        display: flex;
+        justify-content: center;
+        gap: var(--s3);
+        flex-wrap: wrap;
+      }
+      .social-link {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--s2);
+        padding: var(--s3) var(--s5);
+        border: 1px solid var(--line);
+        border-radius: var(--r-sm);
+        color: var(--text);
+        font-family: var(--mono);
+        font-size: 0.9rem;
+        transition: 0.2s;
+      }
+      .social-link:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+        transform: translateY(-2px);
+      }
+
+      /* ---- Footer ---- */
+      footer {
+        border-top: 1px solid var(--line);
+        padding: var(--s7) 0 var(--s6);
+      }
+      .foot-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--s6);
+        margin-bottom: var(--s6);
+      }
+      .foot-grid h4 {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--faint);
+        margin-bottom: var(--s3);
+      }
+      .foot-grid a {
+        display: block;
+        color: var(--muted);
+        font-size: 0.95rem;
+        padding: var(--s1) 0;
+        transition: color 0.2s;
+      }
+      .foot-grid a:hover {
+        color: var(--accent);
+      }
+      .foot-bottom {
+        display: flex;
+        justify-content: space-between;
+        gap: var(--s4);
+        flex-wrap: wrap;
+        border-top: 1px solid var(--line);
+        padding-top: var(--s5);
+        color: var(--faint);
+        font-size: 0.85rem;
+      }
+
+      /* ---- Responsive (mobile-first) ---- */
+      @media (min-width: 720px) {
+        .about {
+          grid-template-columns: 2fr 3fr;
+        }
+        .skills {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .projects {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .foot-grid {
+          grid-template-columns: repeat(4, 1fr);
+        }
+      }
+      @media (min-width: 1024px) {
+        .skills {
+          grid-template-columns: repeat(4, 1fr);
+        }
+        .projects {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+      @media (max-width: 820px) {
+        .hamburger {
+          display: flex;
+        }
+        .nav-links {
+          display: none;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          flex-direction: column;
+          align-items: flex-start;
+          background: var(--surface);
+          border-bottom: 1px solid var(--line);
+          padding: var(--s5);
+          gap: var(--s4);
+        }
+        .nav-check:checked ~ .nav-right .nav-links {
+          display: flex;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ============ NAVBAR ============ -->
+    <nav class="nav">
+      <div class="wrap nav-inner">
+        <a class="logo" href="#"><span class="logo-mark">P</span> Pouya</a>
+        <input type="checkbox" id="nav-toggle" class="nav-check" />
+        <label for="nav-toggle" class="hamburger" aria-label="menu">☰</label>
+        <div class="nav-right">
+          <div class="nav-links">
+            <a href="#about">About</a>
+            <a href="#skills">Skills</a>
+            <a href="#projects">Work</a>
+            <a href="#contact">Contact</a>
+          </div>
+          <button
+            class="theme-toggle"
+            id="themeToggle"
+            aria-label="toggle theme"
+          >
+            <span class="sun" aria-hidden="true">☀</span>
+            <span class="moon" aria-hidden="true">☾</span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ============ HERO ============ -->
+    <header class="hero wrap">
+      <span class="kicker"><span class="dot"></span> available for work</span>
+      <h1>Front-end developer who cares about <em>every pixel</em>.</h1>
+      <p class="sub">
+        I build fast, accessible interfaces with clean CSS. Design systems,
+        responsive layouts, and the small details that turn a page into a
+        product.
+      </p>
+      <div class="cta">
+        <a class="btn btn-primary btn-lg" href="#projects">See my work →</a>
+        <a class="btn btn-ghost btn-lg" href="#contact">Get in touch</a>
+      </div>
+      <div class="meta">
+        <span><b>4+ years</b> · front-end</span>
+        <span><b>27 projects</b> shipped</span>
+        <span>📍 remote · UTC+3:30</span>
+      </div>
+    </header>
+
+    <!-- ============ ABOUT ============ -->
+    <section id="about">
+      <div class="wrap">
+        <div class="sec-head">
+          <p class="kicker">about</p>
+          <h2>Hello, I'm Pouya.</h2>
+        </div>
+        <div class="about">
+          <div class="about-photo" aria-hidden="true">P</div>
+          <div class="about-text">
+            <p>
+              I've spent the last few years turning fuzzy mockups into resilient
+              CSS — the kind that works at every width, in every browser,
+              without anyone needing to explain the rules.
+            </p>
+            <p>
+              My craft is mostly <b>layout and typography</b>: flex, grid,
+              custom properties, and spacing systems that scale. I care about
+              the things users feel but rarely see — line-height, focus rings,
+              the weight of a hover state.
+            </p>
+            <p>
+              Outside of code I write about CSS, mentor junior devs, and drink
+              too much espresso. I believe good CSS is invisible when it's right
+              and obvious when it's wrong.
+            </p>
+            <p class="sig">— Pouya</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SKILLS ============ -->
+    <section id="skills">
+      <div class="wrap">
+        <div class="sec-head">
+          <p class="kicker">skills</p>
+          <h2>What I work with</h2>
+          <p>
+            The tools I reach for most days, grouped by how I think about them.
+          </p>
+        </div>
+        <div class="skills">
+          <div class="skill-group">
+            <h3>Core</h3>
+            <div class="tags">
+              <span class="tag-chip">HTML</span
+              ><span class="tag-chip">CSS</span>
+              <span class="tag-chip">Flexbox</span
+              ><span class="tag-chip">Grid</span>
+              <span class="tag-chip">Custom Properties</span>
+            </div>
+          </div>
+          <div class="skill-group">
+            <h3>Craft</h3>
+            <div class="tags">
+              <span class="tag-chip">Typography</span
+              ><span class="tag-chip">Spacing</span>
+              <span class="tag-chip">Color systems</span
+              ><span class="tag-chip">Responsive</span>
+              <span class="tag-chip">Accessibility</span>
+            </div>
+          </div>
+          <div class="skill-group">
+            <h3>Animation</h3>
+            <div class="tags">
+              <span class="tag-chip">Transitions</span
+              ><span class="tag-chip">Keyframes</span>
+              <span class="tag-chip">Transform</span
+              ><span class="tag-chip">Motion UX</span>
+            </div>
+          </div>
+          <div class="skill-group">
+            <h3>Tooling</h3>
+            <div class="tags">
+              <span class="tag-chip">DevTools</span
+              ><span class="tag-chip">Git</span>
+              <span class="tag-chip">Performance</span
+              ><span class="tag-chip">Debugging</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PROJECTS ============ -->
+    <section id="projects">
+      <div class="wrap">
+        <div class="sec-head">
+          <p class="kicker">work</p>
+          <h2>Selected projects</h2>
+          <p>Things I've built, shipped, and learned from.</p>
+        </div>
+        <div class="projects">
+          <article class="card">
+            <div class="card-img">🎨</div>
+            <div class="card-body">
+              <h3>Design-token starter</h3>
+              <p>
+                A tiny CSS architecture built on custom properties — one swap
+                re-themes the whole app.
+              </p>
+            </div>
+            <div class="card-foot">
+              <div class="tags">
+                <span class="tag-chip">tokens</span
+                ><span class="tag-chip">theming</span>
+              </div>
+              <a href="#">View →</a>
+            </div>
+          </article>
+          <article class="card">
+            <div class="card-img">📊</div>
+            <div class="card-body">
+              <h3>Responsive dashboard</h3>
+              <p>
+                Grid-based shell with a collapsing sidebar, fluid type, and
+                container-aware cards.
+              </p>
+            </div>
+            <div class="card-foot">
+              <div class="tags">
+                <span class="tag-chip">grid</span
+                ><span class="tag-chip">responsive</span>
+              </div>
+              <a href="#">View →</a>
+            </div>
+          </article>
+          <article class="card">
+            <div class="card-img">♿</div>
+            <div class="card-body">
+              <h3>Accessible component kit</h3>
+              <p>
+                Buttons, forms and focus states that pass contrast and keyboard
+                checks by default.
+              </p>
+            </div>
+            <div class="card-foot">
+              <div class="tags">
+                <span class="tag-chip">a11y</span
+                ><span class="tag-chip">components</span>
+              </div>
+              <a href="#">View →</a>
+            </div>
+          </article>
+          <article class="card">
+            <div class="card-img">⚡</div>
+            <div class="card-body">
+              <h3>Performance audit kit</h3>
+              <p>
+                Checklist + tooling notes for shipping less CSS and animating
+                only transform/opacity.
+              </p>
+            </div>
+            <div class="card-foot">
+              <div class="tags">
+                <span class="tag-chip">perf</span
+                ><span class="tag-chip">animation</span>
+              </div>
+              <a href="#">View →</a>
+            </div>
+          </article>
+          <article class="card">
+            <div class="card-img">🛒</div>
+            <div class="card-body">
+              <h3>Aurora e-commerce</h3>
+              <p>
+                A full landing page with hero, pricing, and testimonials — HTML
+                + CSS only.
+              </p>
+            </div>
+            <div class="card-foot">
+              <div class="tags">
+                <span class="tag-chip">landing</span
+                ><span class="tag-chip">grid</span>
+              </div>
+              <a href="#">View →</a>
+            </div>
+          </article>
+          <article class="card">
+            <div class="card-img">📱</div>
+            <div class="card-body">
+              <h3>Mobile-first portfolio</h3>
+              <p>
+                This site — built mobile-first, with a proper dark mode and a
+                clean typography system.
+              </p>
+            </div>
+            <div class="card-foot">
+              <div class="tags">
+                <span class="tag-chip">portfolio</span
+                ><span class="tag-chip">dark mode</span>
+              </div>
+              <a href="#">You're on it</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CONTACT ============ -->
+    <section id="contact">
+      <div class="wrap">
+        <div class="contact">
+          <h2>Let's build something.</h2>
+          <p>
+            Have a layout that misbehaves or a design that needs a spine? My
+            inbox is open.
+          </p>
+          <a class="email" href="mailto:hello@pouya.dev">hello@pouya.dev</a>
+          <div class="socials">
+            <a class="social-link" href="#">GitHub →</a>
+            <a class="social-link" href="#">LinkedIn →</a>
+            <a class="social-link" href="#">Twitter →</a>
+            <a class="social-link" href="#">Dribbble →</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ FOOTER ============ -->
+    <footer>
+      <div class="wrap">
+        <div class="foot-grid">
+          <div>
+            <h4>Navigate</h4>
+            <a href="#about">About</a><a href="#skills">Skills</a
+            ><a href="#projects">Work</a><a href="#contact">Contact</a>
+          </div>
+          <div>
+            <h4>Elsewhere</h4>
+            <a href="#">GitHub</a><a href="#">LinkedIn</a
+            ><a href="#">Twitter</a>
+          </div>
+          <div>
+            <h4>Writing</h4>
+            <a href="#">Journal</a><a href="#">CSS notes</a
+            ><a href="#">Bookmarks</a>
+          </div>
+          <div>
+            <h4>Contact</h4>
+            <a href="mailto:hello@pouya.dev">hello@pouya.dev</a
+            ><a href="#">Schedule a call</a>
+          </div>
+        </div>
+        <div class="foot-bottom">
+          <span>© 2024 Pouya</span>
+          <span>Built with HTML, CSS, and one theme toggle.</span>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      (() => {
+        const root = document.documentElement;
+        const btn = document.getElementById("themeToggle");
+        const KEY = "pouya-theme";
+
+        // 1. Respect saved choice, else OS preference, else light
+        const saved = localStorage.getItem(KEY);
+        const prefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)",
+        ).matches;
+        root.setAttribute(
+          "data-theme",
+          saved || (prefersDark ? "dark" : "light"),
+        );
+
+        // 2. Toggle + persist
+        btn.addEventListener("click", () => {
+          const next =
+            root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+          root.setAttribute("data-theme", next);
+          localStorage.setItem(KEY, next);
+        });
+
+        // 3. Follow OS changes when no saved preference
+        window
+          .matchMedia("(prefers-color-scheme: dark)")
+          .addEventListener("change", (e) => {
+            if (!localStorage.getItem(KEY)) {
+              root.setAttribute("data-theme", e.matches ? "dark" : "light");
+            }
+          });
+      })();
+    </script>
+  </body>
+</html>
