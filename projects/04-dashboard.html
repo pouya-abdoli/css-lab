@@ -1,0 +1,816 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aurora — Admin Dashboard</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' rx='7' fill='%235eead4'/%3E%3Cpath d='M8 22V14M14 22V9M20 22v-8M26 22v-5' stroke='%230d1117' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ============================================================
+   PROJECT 4 · RESPONSIVE ADMIN DASHBOARD
+   [GRID] grid shell + panels + stats
+   [FLEX] header, rows, nav, badges
+   Cards · Tables · Sidebar · Responsive layout
+   ============================================================ */
+
+      /* ---- themes ---- */
+      :root {
+        --bg: #0d1117;
+        --surface: #161b22;
+        --surface-2: #1c232d;
+        --line: #30363d;
+        --text: #e6edf3;
+        --muted: #9ba5b0;
+        --faint: #6e7681;
+        --accent: #5eead4;
+        --accent-ink: #0d1117;
+        --accent-soft: rgba(94, 234, 212, 0.12);
+        --blue: #60a5fa;
+        --amber: #fbbf24;
+        --red: #f87171;
+        --green: #34d399;
+        --s1: 4px;
+        --s2: 8px;
+        --s3: 12px;
+        --s4: 16px;
+        --s5: 24px;
+        --s6: 32px;
+        --r-sm: 8px;
+        --r-md: 14px;
+        --r-lg: 20px;
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+        --side-w: 250px;
+      }
+      [data-theme="light"] {
+        --bg: #f5f4f0;
+        --surface: #ffffff;
+        --surface-2: #f3f0e8;
+        --line: #e6e2d9;
+        --text: #1a1a1a;
+        --muted: #6b6b6b;
+        --faint: #9c9c9c;
+        --accent: #0d9488;
+        --accent-ink: #ffffff;
+        --accent-soft: rgba(13, 148, 136, 0.1);
+        --blue: #2563eb;
+        --amber: #d97706;
+        --red: #dc2626;
+        --green: #059669;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: dark;
+        scroll-behavior: smooth;
+      }
+      [data-theme="light"] {
+        color-scheme: light;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 15px;
+        line-height: 1.6;
+        transition:
+          background 0.25s,
+          color 0.25s;
+      }
+      ::selection {
+        background: rgba(94, 234, 212, 0.3);
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      a:focus-visible,
+      button:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 4px;
+      }
+      button {
+        font-family: inherit;
+      }
+
+      /* ============================================================
+   [GRID] APP SHELL — sidebar + main
+   ============================================================ */
+      .app {
+        display: grid;
+        grid-template-columns: var(--side-w) 1fr;
+        min-height: 100vh;
+      }
+
+      /* ---- sidebar ---- */
+      .sidebar {
+        background: var(--surface);
+        border-right: 1px solid var(--line);
+        padding: var(--s5);
+        display: flex;
+        flex-direction: column;
+        gap: var(--s6);
+        position: sticky;
+        top: 0;
+        height: 100vh;
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: var(--s3);
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: 1.1rem;
+      }
+      .logo-mark {
+        width: 32px;
+        height: 32px;
+        border-radius: var(--r-sm);
+        background: var(--accent);
+        color: var(--accent-ink);
+        display: grid;
+        place-items: center;
+        font-family: var(--mono);
+        font-weight: 700;
+      }
+      .nav {
+        display: flex;
+        flex-direction: column;
+        gap: var(--s2);
+      }
+      .nav h4 {
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--faint);
+        margin: var(--s4) 0 var(--s2);
+      }
+      .nav a {
+        display: flex;
+        align-items: center;
+        gap: var(--s3);
+        padding: var(--s3) var(--s4);
+        border-radius: var(--r-sm);
+        color: var(--muted);
+        font-size: 0.95rem;
+        transition: 0.2s;
+      }
+      .nav a:hover {
+        background: var(--surface-2);
+        color: var(--text);
+      }
+      .nav a.active {
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-weight: 600;
+      }
+      .nav a .ic {
+        width: 18px;
+        text-align: center;
+      }
+      .sidebar-foot {
+        margin-top: auto;
+        display: flex;
+        align-items: center;
+        gap: var(--s3);
+        padding-top: var(--s5);
+        border-top: 1px solid var(--line);
+      }
+      .avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--accent), var(--blue));
+        color: var(--accent-ink);
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        font-family: var(--disp);
+      }
+      .sidebar-foot b {
+        font-size: 0.9rem;
+        display: block;
+      }
+      .sidebar-foot span {
+        font-size: 0.75rem;
+        color: var(--faint);
+      }
+
+      /* ---- [GRID] main column ---- */
+      .main {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+
+      /* ---- [FLEX] header ---- */
+      .header {
+        display: flex;
+        align-items: center;
+        gap: var(--s4);
+        flex-wrap: wrap;
+        padding: var(--s4) var(--s5);
+        border-bottom: 1px solid var(--line);
+        position: sticky;
+        top: 0;
+        background: color-mix(in srgb, var(--bg) 90%, transparent);
+        backdrop-filter: blur(10px);
+        z-index: 40;
+      }
+      .header h1 {
+        font-family: var(--disp);
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-right: auto;
+      }
+      .menu-btn {
+        display: none;
+        font-size: 22px;
+        background: transparent;
+        border: none;
+        color: var(--text);
+        cursor: pointer;
+        padding: var(--s2);
+      }
+      .search {
+        display: flex;
+        align-items: center;
+        gap: var(--s2);
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-sm);
+        padding: var(--s2) var(--s3);
+      }
+      .search input {
+        background: transparent;
+        border: none;
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 0.9rem;
+        width: 180px;
+        outline: none;
+      }
+      .search input::placeholder {
+        color: var(--faint);
+      }
+      .icon-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: var(--r-sm);
+        background: var(--surface);
+        border: 1px solid var(--line);
+        color: var(--text);
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        transition: 0.2s;
+        position: relative;
+      }
+      .icon-btn:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .icon-btn .badge-dot {
+        position: absolute;
+        top: 8px;
+        right: 9px;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--red);
+      }
+
+      /* ---- content ---- */
+      .content {
+        padding: var(--s5);
+        display: flex;
+        flex-direction: column;
+        gap: var(--s5);
+      }
+
+      /* ---- [GRID] stats cards ---- */
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: var(--s4);
+      }
+      .stat {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        padding: var(--s5);
+        display: flex;
+        align-items: flex-start;
+        gap: var(--s4);
+      }
+      .stat .tile {
+        width: 44px;
+        height: 44px;
+        border-radius: var(--r-sm);
+        display: grid;
+        place-items: center;
+        font-size: 20px;
+        flex: none;
+      }
+      .stat .tile.t1 {
+        background: var(--accent-soft);
+        color: var(--accent);
+      }
+      .stat .tile.t2 {
+        background: rgba(96, 165, 250, 0.12);
+        color: var(--blue);
+      }
+      .stat .tile.t3 {
+        background: rgba(251, 191, 36, 0.12);
+        color: var(--amber);
+      }
+      .stat .tile.t4 {
+        background: rgba(52, 211, 153, 0.12);
+        color: var(--green);
+      }
+      .stat b {
+        display: block;
+        font-family: var(--disp);
+        font-size: 1.5rem;
+        font-weight: 700;
+      }
+      .stat span {
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+      .stat .delta {
+        margin-left: auto;
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        padding: 3px 8px;
+        border-radius: 999px;
+      }
+      .delta.up {
+        background: rgba(52, 211, 153, 0.14);
+        color: var(--green);
+      }
+      .delta.down {
+        background: rgba(248, 113, 113, 0.14);
+        color: var(--red);
+      }
+
+      /* ---- [GRID] panels row ---- */
+      .panels {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--s4);
+      }
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        padding: var(--s5);
+        display: flex;
+        flex-direction: column;
+        gap: var(--s4);
+      }
+      .panel-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--s3);
+      }
+      .panel-head h3 {
+        font-family: var(--disp);
+        font-size: 1.05rem;
+        font-weight: 600;
+      }
+      .link-more {
+        color: var(--accent);
+        font-family: var(--mono);
+        font-size: 0.85rem;
+      }
+
+      /* ---- CSS bar chart ---- */
+      .chart {
+        display: flex;
+        align-items: flex-end;
+        gap: var(--s3);
+        height: 180px;
+        padding-top: var(--s4);
+      }
+      .chart .bar {
+        flex: 1;
+        background: linear-gradient(
+          180deg,
+          var(--accent),
+          color-mix(in srgb, var(--accent) 55%, transparent)
+        );
+        border-radius: 6px 6px 0 0;
+        position: relative;
+        min-height: 12px;
+        transition: 0.2s;
+      }
+      .chart .bar:hover {
+        filter: brightness(1.2);
+      }
+      .chart .bar span {
+        position: absolute;
+        top: -22px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        color: var(--faint);
+      }
+      .chart .bar em {
+        position: absolute;
+        bottom: -22px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: var(--mono);
+        font-size: 0.7rem;
+        color: var(--faint);
+        font-style: normal;
+      }
+
+      /* ---- activity list [FLEX] ---- */
+      .activity {
+        display: flex;
+        flex-direction: column;
+        gap: var(--s3);
+      }
+      .activity li {
+        display: flex;
+        gap: var(--s3);
+        align-items: center;
+        list-style: none;
+        padding: var(--s2) 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .activity li:last-child {
+        border-bottom: none;
+      }
+      .activity .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex: none;
+      }
+      .activity p {
+        flex: 1;
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+      .activity time {
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        color: var(--faint);
+      }
+
+      /* ---- [TABLE] ---- */
+      .table-wrap {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 640px;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: var(--s3) var(--s4);
+        border-bottom: 1px solid var(--line);
+        font-size: 0.9rem;
+      }
+      th {
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--faint);
+        font-weight: 500;
+      }
+      tbody tr {
+        transition: background 0.15s;
+      }
+      tbody tr:hover {
+        background: var(--surface-2);
+      }
+      td b {
+        font-weight: 600;
+      }
+      td .sub {
+        display: block;
+        font-size: 0.78rem;
+        color: var(--faint);
+      }
+      .status {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 999px;
+        font-family: var(--mono);
+        font-size: 0.72rem;
+        font-weight: 500;
+      }
+      .status.paid {
+        background: rgba(52, 211, 153, 0.14);
+        color: var(--green);
+      }
+      .status.pending {
+        background: rgba(251, 191, 36, 0.14);
+        color: var(--amber);
+      }
+      .status.refunded {
+        background: rgba(248, 113, 113, 0.14);
+        color: var(--red);
+      }
+
+      /* ---- mobile sidebar (pure CSS) ---- */
+      .side-check {
+        display: none;
+      }
+
+      /* ============================================================
+   RESPONSIVE
+   ============================================================ */
+      @media (min-width: 1024px) {
+        .panels {
+          grid-template-columns: 2fr 1fr;
+        } /* chart wider, activity narrower */
+      }
+      @media (max-width: 900px) {
+        .app {
+          grid-template-columns: 1fr;
+        }
+        .sidebar {
+          position: fixed;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: var(--side-w);
+          z-index: 60;
+          transform: translateX(-105%);
+          transition: transform 0.25s ease;
+          box-shadow: 20px 0 60px rgba(0, 0, 0, 0.4);
+        }
+        .menu-btn {
+          display: block;
+        }
+        .side-check:checked ~ .sidebar {
+          transform: translateX(0);
+        }
+        .search input {
+          width: 130px;
+        }
+      }
+      @media (max-width: 640px) {
+        .stats {
+          grid-template-columns: 1fr 1fr;
+        }
+        .search {
+          display: none;
+        }
+      }
+      @media (max-width: 420px) {
+        .stats {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <!-- off-canvas toggle (pure CSS) -->
+      <input type="checkbox" id="side-toggle" class="side-check" />
+
+      <!-- ============ SIDEBAR ============ -->
+      <aside class="sidebar">
+        <a class="logo" href="#"><span class="logo-mark">☕</span> Aurora</a>
+        <nav class="nav">
+          <h4>Overview</h4>
+          <a href="#" class="active"><span class="ic">▦</span> Dashboard</a>
+          <a href="#"><span class="ic">📈</span> Analytics</a>
+          <a href="#"><span class="ic">💰</span> Revenue</a>
+          <h4>Store</h4>
+          <a href="#"><span class="ic">📦</span> Orders</a>
+          <a href="#"><span class="ic">🛍</span> Products</a>
+          <a href="#"><span class="ic">👥</span> Customers</a>
+          <h4>System</h4>
+          <a href="#"><span class="ic">⚙</span> Settings</a>
+          <a href="#"><span class="ic">🧾</span> Logs</a>
+        </nav>
+        <div class="sidebar-foot">
+          <div class="avatar">P</div>
+          <div><b>Pouya</b><span>Admin</span></div>
+        </div>
+      </aside>
+
+      <!-- ============ MAIN ============ -->
+      <main class="main">
+        <!-- [FLEX] header -->
+        <header class="header">
+          <label for="side-toggle" class="menu-btn" aria-label="menu">☰</label>
+          <h1>Dashboard</h1>
+          <div class="search">
+            <span>🔍</span><input type="search" placeholder="Search…" />
+          </div>
+          <button class="icon-btn" aria-label="notifications">
+            🔔<span class="badge-dot"></span>
+          </button>
+          <button class="icon-btn" id="themeToggle" aria-label="toggle theme">
+            ◐
+          </button>
+        </header>
+
+        <div class="content">
+          <!-- [GRID] stats cards -->
+          <div class="stats">
+            <div class="stat">
+              <div class="tile t1">💰</div>
+              <div><b>$48,290</b><span>Revenue</span></div>
+              <span class="delta up">+12.4%</span>
+            </div>
+            <div class="stat">
+              <div class="tile t2">👥</div>
+              <div><b>3,842</b><span>New customers</span></div>
+              <span class="delta up">+8.1%</span>
+            </div>
+            <div class="stat">
+              <div class="tile t3">📦</div>
+              <div><b>1,216</b><span>Orders</span></div>
+              <span class="delta down">−2.3%</span>
+            </div>
+            <div class="stat">
+              <div class="tile t4">🎯</div>
+              <div><b>4.7%</b><span>Conversion</span></div>
+              <span class="delta up">+0.6%</span>
+            </div>
+          </div>
+
+          <!-- [GRID] chart + activity -->
+          <div class="panels">
+            <div class="panel">
+              <div class="panel-head">
+                <h3>Weekly revenue</h3>
+                <a class="link-more" href="#">View report →</a>
+              </div>
+              <div class="chart">
+                <div class="bar" style="height: 55%">
+                  <span>$5.1k</span><em>Mon</em>
+                </div>
+                <div class="bar" style="height: 70%">
+                  <span>$6.6k</span><em>Tue</em>
+                </div>
+                <div class="bar" style="height: 42%">
+                  <span>$4.0k</span><em>Wed</em>
+                </div>
+                <div class="bar" style="height: 82%">
+                  <span>$7.7k</span><em>Thu</em>
+                </div>
+                <div class="bar" style="height: 64%">
+                  <span>$6.0k</span><em>Fri</em>
+                </div>
+                <div class="bar" style="height: 95%">
+                  <span>$9.0k</span><em>Sat</em>
+                </div>
+                <div class="bar" style="height: 48%">
+                  <span>$4.5k</span><em>Sun</em>
+                </div>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="panel-head">
+                <h3>Recent activity</h3>
+                <a class="link-more" href="#">All →</a>
+              </div>
+              <ul class="activity">
+                <li>
+                  <span class="dot" style="background: var(--green)"></span>
+                  <p>Order #1042 paid — <b>$32</b></p>
+                  <time>2m</time>
+                </li>
+                <li>
+                  <span class="dot" style="background: var(--blue)"></span>
+                  <p>New customer <b>Sana L.</b> signed up</p>
+                  <time>14m</time>
+                </li>
+                <li>
+                  <span class="dot" style="background: var(--amber)"></span>
+                  <p>Order #1041 awaiting payment</p>
+                  <time>1h</time>
+                </li>
+                <li>
+                  <span class="dot" style="background: var(--red)"></span>
+                  <p>Refund issued — <b>$18</b></p>
+                  <time>2h</time>
+                </li>
+                <li>
+                  <span class="dot" style="background: var(--green)"></span>
+                  <p>Order #1040 shipped</p>
+                  <time>3h</time>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- [TABLE] recent orders -->
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Recent orders</h3>
+              <a class="link-more" href="#">Export CSV →</a>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Order</th>
+                    <th>Customer</th>
+                    <th>Product</th>
+                    <th>Date</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><b>#1042</b></td>
+                    <td><b>Sana L.</b><span class="sub">sana@…</span></td>
+                    <td>Yirgacheffe 250g</td>
+                    <td>Apr 12</td>
+                    <td><b>$32</b></td>
+                    <td><span class="status paid">Paid</span></td>
+                  </tr>
+                  <tr>
+                    <td><b>#1041</b></td>
+                    <td><b>Daniel K.</b><span class="sub">dk@…</span></td>
+                    <td>Cold brew ×2</td>
+                    <td>Apr 12</td>
+                    <td><b>$24</b></td>
+                    <td><span class="status pending">Pending</span></td>
+                  </tr>
+                  <tr>
+                    <td><b>#1040</b></td>
+                    <td><b>Maya R.</b><span class="sub">maya@…</span></td>
+                    <td>Blend — 1kg</td>
+                    <td>Apr 11</td>
+                    <td><b>$58</b></td>
+                    <td><span class="status paid">Paid</span></td>
+                  </tr>
+                  <tr>
+                    <td><b>#1039</b></td>
+                    <td><b>Omar T.</b><span class="sub">omar@…</span></td>
+                    <td>Espresso 250g</td>
+                    <td>Apr 11</td>
+                    <td><b>$19</b></td>
+                    <td><span class="status refunded">Refunded</span></td>
+                  </tr>
+                  <tr>
+                    <td><b>#1038</b></td>
+                    <td><b>Lena P.</b><span class="sub">lena@…</span></td>
+                    <td>Gift box</td>
+                    <td>Apr 10</td>
+                    <td><b>$46</b></td>
+                    <td><span class="status paid">Paid</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      (() => {
+        const root = document.documentElement;
+        const btn = document.getElementById("themeToggle");
+        const KEY = "aurora-theme";
+        const saved = localStorage.getItem(KEY);
+        if (saved) root.setAttribute("data-theme", saved);
+        btn.addEventListener("click", () => {
+          const next =
+            root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+          root.setAttribute("data-theme", next);
+          localStorage.setItem(KEY, next);
+        });
+      })();
+    </script>
+  </body>
+</html>
