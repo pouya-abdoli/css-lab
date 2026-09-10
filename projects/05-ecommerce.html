@@ -1,0 +1,1241 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aurora Coffee — Shop</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23c2703d'/%3E%3Cpath d='M11 11c0 6 2 9 5 10 3-1 5-4 5-10' fill='none' stroke='%23fff' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ============================================================
+   PROJECT 5 · E-COMMERCE UI
+   Product listing · Product cards · Product page · Cart · Checkout
+   ============================================================ */
+
+      /* ---- themes ---- */
+      :root {
+        --bg: #faf7f2;
+        --surface: #ffffff;
+        --surface-2: #f3ede2;
+        --line: #e7dfd2;
+        --text: #2a2420;
+        --muted: #7a6f64;
+        --faint: #a3988c;
+        --accent: #c2703d;
+        --accent-ink: #ffffff;
+        --accent-soft: rgba(194, 112, 61, 0.12);
+        --green: #059669;
+        --red: #dc2626;
+        --s1: 4px;
+        --s2: 8px;
+        --s3: 12px;
+        --s4: 16px;
+        --s5: 24px;
+        --s6: 32px;
+        --s7: 48px;
+        --r-sm: 9px;
+        --r-md: 14px;
+        --r-lg: 20px;
+        --disp: "Space Grotesk", sans-serif;
+        --body: "IBM Plex Sans", system-ui, sans-serif;
+        --mono: "JetBrains Mono", monospace;
+        --maxw: 1160px;
+      }
+      [data-theme="dark"] {
+        --bg: #141110;
+        --surface: #1d1815;
+        --surface-2: #262019;
+        --line: #332b26;
+        --text: #f0e9e0;
+        --muted: #a89b8c;
+        --faint: #7a6f64;
+        --accent: #e8a34c;
+        --accent-ink: #141110;
+        --accent-soft: rgba(232, 163, 76, 0.14);
+        --green: #34d399;
+        --red: #f87171;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        color-scheme: light;
+        scroll-behavior: smooth;
+      }
+      [data-theme="dark"] {
+        color-scheme: dark;
+      }
+      body {
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 16px;
+        line-height: 1.6;
+        transition:
+          background 0.25s,
+          color 0.25s;
+      }
+      ::selection {
+        background: rgba(194, 112, 61, 0.3);
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      button {
+        font-family: inherit;
+        cursor: pointer;
+      }
+      img {
+        max-width: 100%;
+        display: block;
+      }
+      .wrap {
+        max-width: var(--maxw);
+        margin: 0 auto;
+        padding: 0 var(--s5);
+      }
+      :focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 3px;
+        border-radius: 4px;
+      }
+
+      /* ---- buttons ---- */
+      .btn {
+        display: inline-block;
+        padding: var(--s3) var(--s5);
+        border-radius: var(--r-sm);
+        border: none;
+        font-weight: 600;
+        font-size: 0.95rem;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s,
+          background 0.2s;
+        white-space: nowrap;
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: var(--accent-ink);
+      }
+      .btn-primary:hover {
+        box-shadow: 0 12px 26px -12px rgba(194, 112, 61, 0.5);
+      }
+      .btn-ghost {
+        border: 1px solid var(--line);
+        background: transparent;
+        color: var(--text);
+      }
+      .btn-ghost:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .btn-lg {
+        padding: var(--s4) var(--s6);
+        font-size: 1.05rem;
+      }
+      .btn-block {
+        display: block;
+        width: 100%;
+        text-align: center;
+      }
+
+      /* ---- nav ---- */
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        background: color-mix(in srgb, var(--bg) 88%, transparent);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--line);
+      }
+      .nav-inner {
+        display: flex;
+        align-items: center;
+        gap: var(--s5);
+        padding: var(--s4) 0;
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: var(--s3);
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: 1.15rem;
+        margin-right: auto;
+      }
+      .logo-mark {
+        width: 32px;
+        height: 32px;
+        border-radius: var(--r-sm);
+        background: var(--accent);
+        color: var(--accent-ink);
+        display: grid;
+        place-items: center;
+      }
+      .nav-links {
+        display: flex;
+        gap: var(--s5);
+      }
+      .nav-links a {
+        color: var(--muted);
+        transition: color 0.2s;
+        font-size: 0.95rem;
+      }
+      .nav-links a:hover {
+        color: var(--accent);
+      }
+      .nav-icons {
+        display: flex;
+        gap: var(--s3);
+        align-items: center;
+      }
+      .icon-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: var(--r-sm);
+        background: var(--surface);
+        border: 1px solid var(--line);
+        display: grid;
+        place-items: center;
+        color: var(--text);
+        transition: 0.2s;
+        position: relative;
+        font-size: 16px;
+      }
+      .icon-btn:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .cart-badge {
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        background: var(--accent);
+        color: var(--accent-ink);
+        font-family: var(--mono);
+        font-size: 0.65rem;
+        font-weight: 700;
+        min-width: 18px;
+        height: 18px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+      }
+
+      /* ---- section headings ---- */
+      section {
+        padding: var(--s7) 0;
+      }
+      .sec-head {
+        margin-bottom: var(--s6);
+      }
+      .sec-head .kicker {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+      .sec-head h2 {
+        font-family: var(--disp);
+        font-weight: 600;
+        font-size: clamp(1.6rem, 3.5vw, 2.1rem);
+        letter-spacing: -0.01em;
+        margin-top: var(--s2);
+      }
+
+      /* ============================================================
+   PRODUCT LISTING + CARDS
+   ============================================================ */
+      .filters {
+        display: flex;
+        gap: var(--s2);
+        flex-wrap: wrap;
+        margin-bottom: var(--s5);
+      }
+      .chip {
+        padding: var(--s2) var(--s4);
+        border-radius: 999px;
+        font-size: 0.9rem;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--muted);
+        transition: 0.2s;
+      }
+      .chip:hover {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+      .chip.on {
+        background: var(--accent);
+        color: var(--accent-ink);
+        border-color: var(--accent);
+      }
+      .products {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--s5);
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition:
+          transform 0.25s,
+          border-color 0.25s,
+          box-shadow 0.25s;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+        border-color: var(--accent);
+        box-shadow: 0 22px 46px -26px rgba(0, 0, 0, 0.25);
+      }
+      .card-img {
+        aspect-ratio: 4/3;
+        background: linear-gradient(
+          135deg,
+          var(--accent-soft),
+          var(--surface-2)
+        );
+        display: grid;
+        place-items: center;
+        font-size: 3.4rem;
+        position: relative;
+        border-bottom: 1px solid var(--line);
+      }
+      .card-badge {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        background: var(--accent);
+        color: var(--accent-ink);
+        font-family: var(--mono);
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 4px 10px;
+        border-radius: 999px;
+      }
+      .card-body {
+        padding: var(--s4);
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: var(--s2);
+      }
+      .card-body h3 {
+        font-family: var(--disp);
+        font-size: 1.05rem;
+        font-weight: 600;
+      }
+      .card-body .notes {
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+      .rating {
+        color: var(--accent);
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: var(--s2);
+      }
+      .rating span {
+        color: var(--faint);
+        font-family: var(--mono);
+        font-size: 0.78rem;
+      }
+      .card-foot {
+        margin-top: auto;
+        padding-top: var(--s3);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--s3);
+      }
+      .price {
+        font-family: var(--disp);
+        font-weight: 700;
+        font-size: 1.15rem;
+      }
+      .add-btn {
+        padding: var(--s2) var(--s4);
+        border-radius: var(--r-sm);
+        border: none;
+        background: var(--accent);
+        color: var(--accent-ink);
+        font-weight: 600;
+        font-size: 0.88rem;
+        transition: 0.2s;
+      }
+      .add-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 18px -8px rgba(194, 112, 61, 0.5);
+      }
+
+      /* ============================================================
+   PRODUCT PAGE
+   ============================================================ */
+      .pdp {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--s6);
+      }
+      .pdp-gallery .main-img {
+        aspect-ratio: 1/1;
+        background: linear-gradient(
+          135deg,
+          var(--accent-soft),
+          var(--surface-2)
+        );
+        border: 1px solid var(--line);
+        border-radius: var(--r-lg);
+        display: grid;
+        place-items: center;
+        font-size: 7rem;
+        margin-bottom: var(--s3);
+      }
+      .pdp-thumbs {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--s3);
+      }
+      .pdp-thumbs button {
+        aspect-ratio: 1/1;
+        border-radius: var(--r-sm);
+        border: 1px solid var(--line);
+        background: var(--surface-2);
+        display: grid;
+        place-items: center;
+        font-size: 1.6rem;
+        transition: 0.2s;
+      }
+      .pdp-thumbs button:hover,
+      .pdp-thumbs button.on {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px var(--accent-soft);
+      }
+      .pdp-info h2 {
+        font-family: var(--disp);
+        font-size: clamp(1.8rem, 4vw, 2.4rem);
+        font-weight: 700;
+        letter-spacing: -0.015em;
+        margin-bottom: var(--s2);
+      }
+      .pdp-info .rating {
+        margin-bottom: var(--s3);
+      }
+      .pdp-price {
+        font-family: var(--disp);
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--accent);
+        margin-bottom: var(--s4);
+      }
+      .pdp-price small {
+        font-size: 1rem;
+        color: var(--muted);
+        font-weight: 400;
+      }
+      .pdp-desc {
+        color: var(--muted);
+        margin-bottom: var(--s5);
+      }
+      .opt-group {
+        margin-bottom: var(--s5);
+      }
+      .opt-group label {
+        display: block;
+        font-family: var(--mono);
+        font-size: 0.75rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--faint);
+        margin-bottom: var(--s3);
+      }
+      .size-chips {
+        display: flex;
+        gap: var(--s2);
+        flex-wrap: wrap;
+      }
+      .size-chip {
+        padding: var(--s3) var(--s5);
+        border-radius: var(--r-sm);
+        border: 1px solid var(--line);
+        background: var(--surface);
+        transition: 0.2s;
+        font-size: 0.9rem;
+      }
+      .size-chip:hover {
+        border-color: var(--accent);
+      }
+      .size-chip.on {
+        background: var(--accent);
+        color: var(--accent-ink);
+        border-color: var(--accent);
+      }
+      .pdp-actions {
+        display: flex;
+        gap: var(--s3);
+        flex-wrap: wrap;
+        align-items: stretch;
+      }
+
+      /* ---- quantity stepper (shared) ---- */
+      .qty {
+        display: inline-flex;
+        align-items: center;
+        border: 1px solid var(--line);
+        border-radius: var(--r-sm);
+        background: var(--surface);
+      }
+      .qty button {
+        width: 38px;
+        height: 38px;
+        background: transparent;
+        border: none;
+        color: var(--text);
+        font-size: 16px;
+        transition: 0.15s;
+      }
+      .qty button:hover {
+        color: var(--accent);
+      }
+      .qty span {
+        min-width: 36px;
+        text-align: center;
+        font-family: var(--mono);
+        font-weight: 600;
+      }
+
+      /* ============================================================
+   CART
+   ============================================================ */
+      .cart {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--s5);
+      }
+      .cart-items {
+        display: flex;
+        flex-direction: column;
+        gap: var(--s4);
+      }
+      .cart-item {
+        display: flex;
+        align-items: center;
+        gap: var(--s4);
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        padding: var(--s4);
+        flex-wrap: wrap;
+      }
+      .ci-img {
+        width: 64px;
+        height: 64px;
+        border-radius: var(--r-sm);
+        background: var(--accent-soft);
+        display: grid;
+        place-items: center;
+        font-size: 1.8rem;
+        flex: none;
+      }
+      .ci-info {
+        flex: 1;
+        min-width: 140px;
+      }
+      .ci-info b {
+        display: block;
+        font-size: 0.98rem;
+      }
+      .ci-info span {
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+      .ci-total {
+        font-family: var(--disp);
+        font-weight: 700;
+        min-width: 72px;
+        text-align: right;
+      }
+      .ci-remove {
+        background: transparent;
+        border: none;
+        color: var(--faint);
+        font-size: 15px;
+        transition: 0.2s;
+        padding: var(--s2);
+      }
+      .ci-remove:hover {
+        color: var(--red);
+      }
+      .cart-summary {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        padding: var(--s5);
+        height: fit-content;
+      }
+      .cart-summary h3 {
+        font-family: var(--disp);
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: var(--s4);
+      }
+      .sum-row {
+        display: flex;
+        justify-content: space-between;
+        padding: var(--s2) 0;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+      .sum-row.total {
+        border-top: 1px solid var(--line);
+        margin-top: var(--s3);
+        padding-top: var(--s4);
+        color: var(--text);
+        font-weight: 700;
+        font-size: 1.1rem;
+      }
+      .free-ship {
+        font-size: 0.8rem;
+        color: var(--green);
+      }
+
+      /* ============================================================
+   CHECKOUT
+   ============================================================ */
+      .checkout {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--s6);
+      }
+      .co-form {
+        display: flex;
+        flex-direction: column;
+        gap: var(--s5);
+      }
+      .co-block {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        padding: var(--s5);
+      }
+      .co-block h3 {
+        font-family: var(--disp);
+        font-size: 1.05rem;
+        font-weight: 600;
+        margin-bottom: var(--s4);
+        display: flex;
+        align-items: center;
+        gap: var(--s3);
+      }
+      .co-block h3 .step {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: var(--accent);
+        color: var(--accent-ink);
+        display: grid;
+        place-items: center;
+        font-family: var(--mono);
+        font-size: 0.8rem;
+        font-weight: 700;
+      }
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--s3);
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: var(--s2);
+      }
+      .field label {
+        font-size: 0.85rem;
+        color: var(--muted);
+        font-weight: 500;
+      }
+      .field input,
+      .field select {
+        padding: var(--s3) var(--s4);
+        border: 1px solid var(--line);
+        border-radius: var(--r-sm);
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--body);
+        font-size: 0.95rem;
+        transition: border-color 0.2s;
+      }
+      .field input:focus,
+      .field select:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--accent-soft);
+      }
+      .span-2 {
+        grid-column: 1/-1;
+      }
+      .co-summary {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--r-md);
+        padding: var(--s5);
+        height: fit-content;
+      }
+      .co-line {
+        display: flex;
+        justify-content: space-between;
+        gap: var(--s3);
+        padding: var(--s3) 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .co-line:last-of-type {
+        border-bottom: none;
+      }
+      .co-line .n {
+        font-weight: 600;
+      }
+      .co-line .p {
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+
+      /* ---- footer ---- */
+      footer {
+        border-top: 1px solid var(--line);
+        padding: var(--s6) 0;
+        color: var(--faint);
+        font-size: 0.85rem;
+      }
+      .foot-inner {
+        display: flex;
+        justify-content: space-between;
+        gap: var(--s4);
+        flex-wrap: wrap;
+      }
+
+      /* ============================================================
+   RESPONSIVE
+   ============================================================ */
+      @media (min-width: 560px) {
+        .products {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .form-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+      @media (min-width: 820px) {
+        .products {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+      @media (min-width: 1024px) {
+        .products {
+          grid-template-columns: repeat(4, 1fr);
+        }
+        .pdp {
+          grid-template-columns: 1fr 1fr;
+        }
+        .cart {
+          grid-template-columns: 1fr 360px;
+        }
+        .checkout {
+          grid-template-columns: 1fr 380px;
+        }
+      }
+      @media (max-width: 720px) {
+        .nav-links {
+          display: none;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+        }
+        html {
+          scroll-behavior: auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ============ NAV ============ -->
+    <nav class="nav">
+      <div class="wrap nav-inner">
+        <a class="logo" href="#"><span class="logo-mark">☕</span> Aurora</a>
+        <div class="nav-links">
+          <a href="#listing">Shop</a><a href="#product">Roasts</a
+          ><a href="#cart">Cart</a><a href="#checkout">Checkout</a>
+        </div>
+        <div class="nav-icons">
+          <button class="icon-btn" aria-label="search">🔍</button>
+          <button class="icon-btn" id="themeToggle" aria-label="theme">
+            ◐
+          </button>
+          <button class="icon-btn" aria-label="cart">
+            🛒<span class="cart-badge">3</span>
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ============ PRODUCT LISTING ============ -->
+    <section id="listing">
+      <div class="wrap">
+        <div class="sec-head">
+          <p class="kicker">shop</p>
+          <h2>All roasts</h2>
+        </div>
+        <div class="filters">
+          <button class="chip on">All</button
+          ><button class="chip">Light</button>
+          <button class="chip">Medium</button><button class="chip">Dark</button
+          ><button class="chip">Decaf</button>
+        </div>
+        <div class="products">
+          <article class="card">
+            <div class="card-img">🫘<span class="card-badge">New</span></div>
+            <div class="card-body">
+              <h3>Ethiopia Yirgacheffe</h3>
+              <p class="notes">Floral · Bergamot · Honey</p>
+              <div class="rating">★★★★★<span>4.9</span></div>
+              <div class="card-foot">
+                <span class="price">$19</span
+                ><button class="add-btn">Add</button>
+              </div>
+            </div>
+          </article>
+          <article class="card">
+            <div class="card-img">☕</div>
+            <div class="card-body">
+              <h3>Colombia Huila</h3>
+              <p class="notes">Caramel · Red apple · Round</p>
+              <div class="rating">★★★★★<span>4.8</span></div>
+              <div class="card-foot">
+                <span class="price">$17</span
+                ><button class="add-btn">Add</button>
+              </div>
+            </div>
+          </article>
+          <article class="card">
+            <div class="card-img">🍫</div>
+            <div class="card-body">
+              <h3>Sumatra Mandheling</h3>
+              <p class="notes">Cocoa · Molasses · Syrupy</p>
+              <div class="rating">★★★★☆<span>4.6</span></div>
+              <div class="card-foot">
+                <span class="price">$18</span
+                ><button class="add-btn">Add</button>
+              </div>
+            </div>
+          </article>
+          <article class="card">
+            <div class="card-img">🌸<span class="card-badge">Sale</span></div>
+            <div class="card-body">
+              <h3>Kenya AA</h3>
+              <p class="notes">Blackcurrant · Bright · Juicy</p>
+              <div class="rating">★★★★★<span>4.9</span></div>
+              <div class="card-foot">
+                <span class="price">$21</span
+                ><button class="add-btn">Add</button>
+              </div>
+            </div>
+          </article>
+          <article class="card">
+            <div class="card-img">🧊</div>
+            <div class="card-body">
+              <h3>Cold Brew Blend</h3>
+              <p class="notes">Smooth · Low acid · Chocolate</p>
+              <div class="rating">★★★★☆<span>4.5</span></div>
+              <div class="card-foot">
+                <span class="price">$16</span
+                ><button class="add-btn">Add</button>
+              </div>
+            </div>
+          </article>
+          <article class="card">
+            <div class="card-img">🌿</div>
+            <div class="card-body">
+              <h3>Swiss Water Decaf</h3>
+              <p class="notes">Mellow · Nutty · Clean</p>
+              <div class="rating">★★★★☆<span>4.4</span></div>
+              <div class="card-foot">
+                <span class="price">$17</span
+                ><button class="add-btn">Add</button>
+              </div>
+            </div>
+          </article>
+          <article class="card">
+            <div class="card-img">🎁</div>
+            <div class="card-body">
+              <h3>Gift Box</h3>
+              <p class="notes">3 roasts · Tasting cards</p>
+              <div class="rating">★★★★★<span>4.9</span></div>
+              <div class="card-foot">
+                <span class="price">$46</span
+                ><button class="add-btn">Add</button>
+              </div>
+            </div>
+          </article>
+          <article class="card">
+            <div class="card-img">🫖</div>
+            <div class="card-body">
+              <h3>House Espresso</h3>
+              <p class="notes">Bold · Crema · Balanced</p>
+              <div class="rating">★★★★☆<span>4.7</span></div>
+              <div class="card-foot">
+                <span class="price">$18</span
+                ><button class="add-btn">Add</button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PRODUCT PAGE ============ -->
+    <section id="product">
+      <div class="wrap">
+        <div class="sec-head">
+          <p class="kicker">product</p>
+          <h2>Featured roast</h2>
+        </div>
+        <div class="pdp">
+          <div class="pdp-gallery">
+            <div class="main-img">🫘</div>
+            <div class="pdp-thumbs">
+              <button class="on" aria-label="view 1">🫘</button>
+              <button aria-label="view 2">☕</button>
+              <button aria-label="view 3">🌱</button>
+              <button aria-label="view 4">📦</button>
+            </div>
+          </div>
+          <div class="pdp-info">
+            <h2>Ethiopia Yirgacheffe</h2>
+            <div class="rating">★★★★★<span>4.9 · 214 reviews</span></div>
+            <div class="pdp-price">$19 <small>/ 250g</small></div>
+            <p class="pdp-desc">
+              A washed Yirgacheffe from the Gedeo zone — jasmine and bergamot up
+              front, a honeyed body, and a long, tea-like finish. Roasted light
+              to preserve its delicate florals.
+            </p>
+            <div class="opt-group">
+              <label>Grind</label>
+              <div class="size-chips">
+                <button class="size-chip on">Whole bean</button
+                ><button class="size-chip">Filter</button>
+                <button class="size-chip">Espresso</button
+                ><button class="size-chip">French press</button>
+              </div>
+            </div>
+            <div class="opt-group">
+              <label>Size</label>
+              <div class="size-chips">
+                <button class="size-chip on">250g</button
+                ><button class="size-chip">500g · $34</button
+                ><button class="size-chip">1kg · $62</button>
+              </div>
+            </div>
+            <div class="pdp-actions">
+              <div class="qty">
+                <button>−</button><span>1</span><button>+</button>
+              </div>
+              <button class="btn btn-primary btn-lg" style="flex: 1">
+                Add to cart — $19
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SHOPPING CART ============ -->
+    <section id="cart">
+      <div class="wrap">
+        <div class="sec-head">
+          <p class="kicker">cart</p>
+          <h2>Your cart</h2>
+        </div>
+        <div class="cart">
+          <div class="cart-items">
+            <div class="cart-item" data-price="19">
+              <div class="ci-img">🫘</div>
+              <div class="ci-info">
+                <b>Ethiopia Yirgacheffe</b
+                ><span>Whole bean · 250g · $19.00</span>
+              </div>
+              <div class="qty">
+                <button>−</button><span>1</span><button>+</button>
+              </div>
+              <div class="ci-total">$19.00</div>
+              <button class="ci-remove" aria-label="remove">✕</button>
+            </div>
+            <div class="cart-item" data-price="17">
+              <div class="ci-img">☕</div>
+              <div class="ci-info">
+                <b>Colombia Huila</b><span>Filter · 250g · $17.00</span>
+              </div>
+              <div class="qty">
+                <button>−</button><span>2</span><button>+</button>
+              </div>
+              <div class="ci-total">$34.00</div>
+              <button class="ci-remove" aria-label="remove">✕</button>
+            </div>
+            <div class="cart-item" data-price="46">
+              <div class="ci-img">🎁</div>
+              <div class="ci-info">
+                <b>Gift Box</b><span>3 roasts · $46.00</span>
+              </div>
+              <div class="qty">
+                <button>−</button><span>1</span><button>+</button>
+              </div>
+              <div class="ci-total">$46.00</div>
+              <button class="ci-remove" aria-label="remove">✕</button>
+            </div>
+          </div>
+          <div class="cart-summary">
+            <h3>Order summary</h3>
+            <div class="sum-row">
+              <span>Subtotal</span><span id="subT">$99.00</span>
+            </div>
+            <div class="sum-row">
+              <span>Shipping</span><span id="shipT">Free</span>
+            </div>
+            <div class="sum-row total">
+              <span>Total</span><span id="totT">$99.00</span>
+            </div>
+            <p class="free-ship" style="margin: var(--s3) 0">
+              🎉 You've unlocked free shipping
+            </p>
+            <a class="btn btn-primary btn-block btn-lg" href="#checkout"
+              >Checkout →</a
+            >
+            <a
+              class="btn btn-ghost btn-block"
+              href="#listing"
+              style="margin-top: var(--s3)"
+              >Continue shopping</a
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ CHECKOUT ============ -->
+    <section id="checkout">
+      <div class="wrap">
+        <div class="sec-head">
+          <p class="kicker">checkout</p>
+          <h2>Complete your order</h2>
+        </div>
+        <div class="checkout">
+          <div class="co-form">
+            <div class="co-block">
+              <h3><span class="step">1</span> Shipping details</h3>
+              <div class="form-grid">
+                <div class="field">
+                  <label>First name</label
+                  ><input type="text" placeholder="Pouya" />
+                </div>
+                <div class="field">
+                  <label>Last name</label><input type="text" placeholder="…" />
+                </div>
+                <div class="field span-2">
+                  <label>Email</label
+                  ><input type="email" placeholder="you@email.com" />
+                </div>
+                <div class="field span-2">
+                  <label>Address</label
+                  ><input type="text" placeholder="123 Roast Lane" />
+                </div>
+                <div class="field">
+                  <label>City</label><input type="text" placeholder="City" />
+                </div>
+                <div class="field">
+                  <label>Postal code</label
+                  ><input type="text" placeholder="00000" />
+                </div>
+              </div>
+            </div>
+            <div class="co-block">
+              <h3><span class="step">2</span> Payment</h3>
+              <div class="form-grid">
+                <div class="field span-2">
+                  <label>Name on card</label
+                  ><input type="text" placeholder="As shown on card" />
+                </div>
+                <div class="field span-2">
+                  <label>Card number</label
+                  ><input
+                    type="text"
+                    inputmode="numeric"
+                    placeholder="1234 1234 1234 1234"
+                  />
+                </div>
+                <div class="field">
+                  <label>Expiry</label
+                  ><input type="text" placeholder="MM / YY" />
+                </div>
+                <div class="field">
+                  <label>CVC</label
+                  ><input type="text" inputmode="numeric" placeholder="123" />
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-primary btn-lg btn-block">
+              Place order — <span id="payT">$99.00</span>
+            </button>
+          </div>
+          <div class="co-summary">
+            <h3
+              style="
+                font-family: var(--disp);
+                font-size: 1.05rem;
+                margin-bottom: var(--s3);
+              "
+            >
+              Order summary
+            </h3>
+            <div class="co-line">
+              <div>
+                <div class="n">Ethiopia Yirgacheffe</div>
+                <div class="p">Whole bean · 250g × 1</div>
+              </div>
+              <span>$19.00</span>
+            </div>
+            <div class="co-line">
+              <div>
+                <div class="n">Colombia Huila</div>
+                <div class="p">Filter · 250g × 2</div>
+              </div>
+              <span>$34.00</span>
+            </div>
+            <div class="co-line">
+              <div>
+                <div class="n">Gift Box</div>
+                <div class="p">3 roasts × 1</div>
+              </div>
+              <span>$46.00</span>
+            </div>
+            <div
+              class="sum-row"
+              style="
+                border-top: 1px solid var(--line);
+                margin-top: var(--s3);
+                padding-top: var(--s4);
+                font-weight: 700;
+              "
+            >
+              <span>Total</span><span id="coT">$99.00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap foot-inner">
+        <span>© 2024 Aurora Coffee</span>
+        <span>Free shipping over $50 · Roasted fresh, always</span>
+      </div>
+    </footer>
+
+    <script>
+      (() => {
+        // theme toggle
+        const root = document.documentElement,
+          tBtn = document.getElementById("themeToggle");
+        const saved = localStorage.getItem("aurora-shop-theme");
+        if (saved) root.setAttribute("data-theme", saved);
+        tBtn.addEventListener("click", () => {
+          const next =
+            root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+          root.setAttribute("data-theme", next);
+          localStorage.setItem("aurora-shop-theme", next);
+        });
+
+        // chip groups (filters, grind, size, thumbs)
+        document
+          .querySelectorAll(".filters, .size-chips, .pdp-thumbs")
+          .forEach((g) => {
+            g.addEventListener("click", (e) => {
+              const c = e.target.closest("button");
+              if (!c) return;
+              g.querySelectorAll("button").forEach((b) =>
+                b.classList.remove("on"),
+              );
+              c.classList.add("on");
+            });
+          });
+
+        // cart quantity + totals
+        const shipFree = 50,
+          shipCost = 6;
+        function recalc() {
+          let sub = 0;
+          document.querySelectorAll(".cart-item").forEach((it) => {
+            sub += parseFloat(
+              it.querySelector(".ci-total").textContent.slice(1),
+            );
+          });
+          const ship = sub >= shipFree ? 0 : shipCost;
+          const tot = sub + ship;
+          document.getElementById("subT").textContent = "$" + sub.toFixed(2);
+          document.getElementById("shipT").textContent =
+            ship === 0 ? "Free" : "$" + ship.toFixed(2);
+          document.getElementById("totT").textContent = "$" + tot.toFixed(2);
+          document.getElementById("payT").textContent = "$" + tot.toFixed(2);
+          document.getElementById("coT").textContent = "$" + tot.toFixed(2);
+        }
+        document.querySelectorAll(".qty").forEach((q) => {
+          const [minus, , plus] = q.children,
+            val = q.querySelector("span");
+          const item = q.closest(".cart-item"),
+            line = item && item.querySelector(".ci-total");
+          const price = item ? parseFloat(item.dataset.price) : 0;
+          minus.addEventListener("click", () => {
+            let n = Math.max(1, parseInt(val.textContent) - 1);
+            val.textContent = n;
+            if (line) line.textContent = "$" + (n * price).toFixed(2);
+            recalc();
+          });
+          plus.addEventListener("click", () => {
+            let n = parseInt(val.textContent) + 1;
+            val.textContent = n;
+            if (line) line.textContent = "$" + (n * price).toFixed(2);
+            recalc();
+          });
+        });
+        document.querySelectorAll(".ci-remove").forEach((b) =>
+          b.addEventListener("click", () => {
+            b.closest(".cart-item").remove();
+            recalc();
+          }),
+        );
+        recalc();
+      })();
+    </script>
+  </body>
+</html>
